@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/action_record.schema.json",
+  "title": "ActionRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "timestamp",
+    "actor",
+    "step_id",
+    "command_or_patch",
+    "inputs",
+    "result",
+    "evidence",
+    "rollback"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "step_id": {
+      "type": "string",
+      "pattern": "^[a-z]+-[0-9]+$"
+    },
+    "command_or_patch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "result": {
+      "type": "string",
+      "enum": ["pass", "fail", "blocked"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollback": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
