@@ -3,15 +3,19 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict, dataclass
+from hashlib import sha256
 from pathlib import Path
 
 from autonomous_vnext.attention_operator import AttentionOperator
 from autonomous_vnext.belief_evolution import BeliefEvolutionOperator, BeliefObservation
 from autonomous_vnext.cognitive_hilbert import build_cognitive_backbone
 from autonomous_vnext.cognitive_state import CognitiveState, basis_state
+from autonomous_vnext.experience_memory import ExperienceMemoryStore, ExperienceRecord
 from autonomous_vnext.goal_hamiltonian import GoalHamiltonian
 from autonomous_vnext.mission_projection import MissionProjection
 from autonomous_vnext.multiagent_tensor_mesh import CognitiveAgentNode, build_mesh
+from autonomous_vnext.reflection import ReflectionResult, reflect
+from autonomous_vnext.self_model import SelfModel, default_self_model
 from autonomous_vnext.sheaf_consistency import LocalBeliefPatch
 from autonomous_vnext.tensor_memory import TensorMemory, TensorMemoryRecord
 from autonomous_vnext.uncertainty_operator import subsystem_entropy
@@ -37,9 +41,17 @@ class CognitiveRuntimeReport:
     retrieved_memory: tuple[dict[str, object], ...]
     mesh_consistent: bool
     mesh_conflicts: tuple[dict[str, str], ...]
+    self_model: dict[str, object]
+    reflection: dict[str, object]
+    experience_id: str | None = None
 
 
-def run_cognitive_cycle(objective: str, observations: dict[str, tuple[float, ...]] | None = None) -> CognitiveRuntimeReport:
+def run_cognitive_cycle(
+    objective: str,
+    observations: dict[str, tuple[float, ...]] | None = None,
+    memory_store: ExperienceMemoryStore | None = None,
+    persist_experience: bool = False,
+) -> CognitiveRuntimeReport:
     if not objective.strip():
         raise ValueError("objective is required")
 
@@ -55,6 +67,9 @@ def run_cognitive_cycle(objective: str, observations: dict[str, tuple[float, ...
     state = _evolve_state(state, observation_payload)
 
     memory = _default_memory()
+    if memory_store is not None:
+        for record in memory_store.as_tensor_memory().records:
+            memory = memory.add(record)
     retrieved = tuple(
         {"record_id": record.record_id, "score": score, "payload": record.payload}
         for record, score in memory.search(_query_vector(objective), limit=3)
@@ -82,6 +97,25 @@ def run_cognitive_cycle(objective: str, observations: dict[str, tuple[float, ...
         label: asdict(subsystem_entropy(state, label))
         for label in ("goals", "beliefs", "risks", "environment")
     }
+    self_model = default_self_model(objective)
+    reflection = _reflect_cycle(self_model, consistency.consistent, uncertainty)
+    experience_id = _experience_id(objective, energy, consistency.consistent)
+
+    if persist_experience and memory_store is not None:
+        memory_store.append(
+            ExperienceRecord(
+                experience_id=experience_id,
+                objective=objective,
+                embedding=_query_vector(objective),
+                summary=f"energy={energy:.4f} mesh_consistent={consistency.consistent}",
+                metrics={
+                    "goal_energy": energy,
+                    "mesh_consistent": consistency.consistent,
+                    "risk_confidence": uncertainty["risks"]["confidence"],
+                    "self_confidence": reflection.updated_self_model.confidence,
+                },
+            )
+        )
 
     return CognitiveRuntimeReport(
         objective=objective,
@@ -96,6 +130,9 @@ def run_cognitive_cycle(objective: str, observations: dict[str, tuple[float, ...
         retrieved_memory=retrieved,
         mesh_consistent=consistency.consistent,
         mesh_conflicts=consistency.conflicts,
+        self_model=asdict(reflection.updated_self_model),
+        reflection=asdict(reflection),
+        experience_id=experience_id if persist_experience else None,
     )
 
 
@@ -106,6 +143,25 @@ def report_to_dict(report: CognitiveRuntimeReport) -> dict[str, object]:
 def write_report(report: CognitiveRuntimeReport, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report_to_dict(report), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _reflect_cycle(
+    self_model: SelfModel,
+    mesh_consistent: bool,
+    uncertainty: dict[str, dict[str, float | str]],
+) -> ReflectionResult:
+    expected = {"mesh_consistent": True, "risk_confidence_floor": True}
+    observed = {
+        "mesh_consistent": mesh_consistent,
+        "risk_confidence_floor": float(uncertainty["risks"]["confidence"]) >= 0.5,
+        "risk_confidence": uncertainty["risks"]["confidence"],
+    }
+    return reflect(expected, observed, self_model)
+
+
+def _experience_id(objective: str, energy: float, mesh_consistent: bool) -> str:
+    seed = f"{objective}|{energy:.8f}|{mesh_consistent}".encode("utf-8")
+    return "exp-" + sha256(seed).hexdigest()[:16]
 
 
 def _evolve_state(state: CognitiveState, observations: dict[str, tuple[float, ...]]) -> CognitiveState:
@@ -144,12 +200,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run a deterministic Autonomous vNext cognitive cycle.")
     parser.add_argument("objective", help="Mission objective to project into the cognitive state.")
     parser.add_argument("--output", type=Path, default=Path("reports/cognitive_runtime_report.json"))
+    parser.add_argument("--memory", type=Path, default=Path("state/experience_memory.jsonl"))
+    parser.add_argument("--persist-experience", action="store_true")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    report = run_cognitive_cycle(args.objective)
+    store = ExperienceMemoryStore(args.memory)
+    report = run_cognitive_cycle(args.objective, memory_store=store, persist_experience=args.persist_experience)
     write_report(report, args.output)
     print(args.output)
 

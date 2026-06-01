@@ -130,6 +130,9 @@ Implemented primitives:
 - Goal Hamiltonian: expected energy over a goal subsystem.
 - Uncertainty operator: entropy and confidence over a subsystem.
 - Cognitive runtime: deterministic end-to-end projection, update, retrieval, consistency, and report generation.
+- Experience memory: append-only JSONL records projected back into tensor memory.
+- Self-model: explicit capabilities, limitations, confidence, active goals, and beliefs.
+- Reflection: expected-vs-observed comparison that updates self-model confidence and beliefs.
 
 These are intentionally compact, deterministic primitives. They establish interfaces and invariants before introducing heavier tensor-network backends.
 
@@ -152,6 +155,9 @@ These are intentionally compact, deterministic primitives. They establish interf
 - [x] Goal Hamiltonian.
 - [x] Uncertainty operator.
 - [x] Deterministic cognitive runtime cycle.
+- [x] Persistent experience memory.
+- [x] Self-model.
+- [x] Recursive reflection primitive.
 - [x] Executor hooks.
 - [x] Evidence report generation.
 - [x] Unit tests for runtime primitives.
@@ -176,6 +182,9 @@ These are intentionally compact, deterministic primitives. They establish interf
 - `autonomous_vnext/goal_hamiltonian.py`
 - `autonomous_vnext/uncertainty_operator.py`
 - `autonomous_vnext/cognitive_runtime.py`
+- `autonomous_vnext/experience_memory.py`
+- `autonomous_vnext/self_model.py`
+- `autonomous_vnext/reflection.py`
 - `tests/`
 
 ## Non-Goals

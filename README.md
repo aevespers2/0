@@ -23,6 +23,9 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [autonomous_vnext/goal_hamiltonian.py](autonomous_vnext/goal_hamiltonian.py): goal energy scoring.
 - [autonomous_vnext/uncertainty_operator.py](autonomous_vnext/uncertainty_operator.py): entropy/confidence reporting.
 - [autonomous_vnext/cognitive_runtime.py](autonomous_vnext/cognitive_runtime.py): deterministic end-to-end cognitive cycle runner.
+- [autonomous_vnext/experience_memory.py](autonomous_vnext/experience_memory.py): append-only cognitive experience memory.
+- [autonomous_vnext/self_model.py](autonomous_vnext/self_model.py): explicit capability/limitation/confidence model.
+- [autonomous_vnext/reflection.py](autonomous_vnext/reflection.py): expected-vs-observed reflection updates.
 
 ## Test
 
@@ -39,3 +42,12 @@ python3 -m autonomous_vnext.cognitive_runtime "safe tensor evidence mission"
 ```
 
 The default report is written to `reports/cognitive_runtime_report.json`.
+
+To persist the cycle as experience memory:
+
+```bash
+python3 -m autonomous_vnext.cognitive_runtime \
+  "safe tensor evidence mission" \
+  --persist-experience \
+  --memory state/experience_memory.jsonl
+```

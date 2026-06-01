@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from autonomous_vnext.cognitive_runtime import report_to_dict, run_cognitive_cycle, write_report
+from autonomous_vnext.experience_memory import ExperienceMemoryStore
 
 
 def test_cognitive_cycle_produces_stable_report() -> None:
@@ -20,6 +21,8 @@ def test_cognitive_cycle_produces_stable_report() -> None:
         "tensor_backbone",
     }
     assert set(report.uncertainty) == {"beliefs", "environment", "goals", "risks"}
+    assert report.self_model["current_beliefs"]["last_reflection"] == "matched"
+    assert report.reflection["deltas"] == {}
 
 
 def test_cognitive_cycle_accepts_observation_override() -> None:
@@ -44,3 +47,14 @@ def test_write_report_round_trip(tmp_path) -> None:
 
     data = json.loads(output.read_text(encoding="utf-8"))
     assert data == report_to_dict(report)
+
+
+def test_cognitive_cycle_persists_experience_and_retrieves_it(tmp_path) -> None:
+    store = ExperienceMemoryStore(tmp_path / "experience.jsonl")
+
+    first = run_cognitive_cycle("safe tensor evidence mission", memory_store=store, persist_experience=True)
+    second = run_cognitive_cycle("safe tensor evidence mission", memory_store=store)
+
+    assert first.experience_id is not None
+    assert len(store.load()) == 1
+    assert any(item["record_id"] == first.experience_id for item in second.retrieved_memory)
