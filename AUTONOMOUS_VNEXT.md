@@ -104,6 +104,34 @@ This does not claim quantum hardware access. It provides a disciplined represent
 
 ITensor is treated as an optional acceleration and modeling backend. If bindings are unavailable, the system fails closed for ITensor-specific execution paths while keeping normal deterministic planning available.
 
+## Cognitive Operating Layer
+
+The next layer turns the Hilbert scaffold into executable cognitive primitives:
+
+```text
+Psi_cognition =
+H_identity
+x H_goals
+x H_memory
+x H_beliefs
+x H_risks
+x H_environment
+```
+
+Implemented primitives:
+
+- Cognitive state: normalized subsystem amplitudes over a declared Hilbert backbone.
+- Attention operator: subsystem-local weighting and optional renormalization.
+- Belief evolution: observation-driven updates analogous to `Psi(t+1) = U Psi(t)`, without claiming physical unitary dynamics.
+- Sheaf consistency: local belief patches and conflict detection.
+- Tensor memory: cosine-ranked memory records with stable payloads.
+- Multi-agent tensor mesh: coupled agent nodes with sheaf consistency checks.
+- Mission projection: objective terms projected into a goal subspace.
+- Goal Hamiltonian: expected energy over a goal subsystem.
+- Uncertainty operator: entropy and confidence over a subsystem.
+
+These are intentionally compact, deterministic primitives. They establish interfaces and invariants before introducing heavier tensor-network backends.
+
 ## Phase-0 Build Checklist
 
 - [x] Mission contract schema.
@@ -113,6 +141,15 @@ ITensor is treated as an optional acceleration and modeling backend. If bindings
 - [x] Minimal planning utilities.
 - [x] ITensor adapter gate.
 - [x] Cognitive Hilbert backbone scaffold.
+- [x] Cognitive state tensor primitives.
+- [x] Attention operators.
+- [x] Belief evolution operators.
+- [x] Sheaf consistency checks.
+- [x] Tensor memory search.
+- [x] Multi-agent tensor mesh.
+- [x] Mission projection.
+- [x] Goal Hamiltonian.
+- [x] Uncertainty operator.
 - [x] Executor hooks.
 - [x] Evidence report generation.
 - [x] Unit tests for runtime primitives.
@@ -127,6 +164,15 @@ ITensor is treated as an optional acceleration and modeling backend. If bindings
 - `autonomous_vnext/executor.py`
 - `autonomous_vnext/itensor_adapter.py`
 - `autonomous_vnext/cognitive_hilbert.py`
+- `autonomous_vnext/cognitive_state.py`
+- `autonomous_vnext/attention_operator.py`
+- `autonomous_vnext/belief_evolution.py`
+- `autonomous_vnext/sheaf_consistency.py`
+- `autonomous_vnext/tensor_memory.py`
+- `autonomous_vnext/multiagent_tensor_mesh.py`
+- `autonomous_vnext/mission_projection.py`
+- `autonomous_vnext/goal_hamiltonian.py`
+- `autonomous_vnext/uncertainty_operator.py`
 - `tests/`
 
 ## Non-Goals
