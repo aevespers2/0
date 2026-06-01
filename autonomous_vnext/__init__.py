@@ -5,6 +5,7 @@ __all__ = [
     "attention_operator",
     "belief_evolution",
     "cognitive_hilbert",
+    "cognitive_runtime",
     "cognitive_state",
     "executor",
     "goal_hamiltonian",

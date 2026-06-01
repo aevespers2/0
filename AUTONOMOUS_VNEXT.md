@@ -129,6 +129,7 @@ Implemented primitives:
 - Mission projection: objective terms projected into a goal subspace.
 - Goal Hamiltonian: expected energy over a goal subsystem.
 - Uncertainty operator: entropy and confidence over a subsystem.
+- Cognitive runtime: deterministic end-to-end projection, update, retrieval, consistency, and report generation.
 
 These are intentionally compact, deterministic primitives. They establish interfaces and invariants before introducing heavier tensor-network backends.
 
@@ -150,6 +151,7 @@ These are intentionally compact, deterministic primitives. They establish interf
 - [x] Mission projection.
 - [x] Goal Hamiltonian.
 - [x] Uncertainty operator.
+- [x] Deterministic cognitive runtime cycle.
 - [x] Executor hooks.
 - [x] Evidence report generation.
 - [x] Unit tests for runtime primitives.
@@ -173,6 +175,7 @@ These are intentionally compact, deterministic primitives. They establish interf
 - `autonomous_vnext/mission_projection.py`
 - `autonomous_vnext/goal_hamiltonian.py`
 - `autonomous_vnext/uncertainty_operator.py`
+- `autonomous_vnext/cognitive_runtime.py`
 - `tests/`
 
 ## Non-Goals

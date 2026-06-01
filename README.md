@@ -22,6 +22,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [autonomous_vnext/mission_projection.py](autonomous_vnext/mission_projection.py): objective projection into goal subspace.
 - [autonomous_vnext/goal_hamiltonian.py](autonomous_vnext/goal_hamiltonian.py): goal energy scoring.
 - [autonomous_vnext/uncertainty_operator.py](autonomous_vnext/uncertainty_operator.py): entropy/confidence reporting.
+- [autonomous_vnext/cognitive_runtime.py](autonomous_vnext/cognitive_runtime.py): deterministic end-to-end cognitive cycle runner.
 
 ## Test
 
@@ -30,3 +31,11 @@ pytest -q
 ```
 
 The ITensor integration is dependency-gated. Tests mock availability, so the core suite does not require ITensor bindings to be installed.
+
+## Run A Cognitive Cycle
+
+```bash
+python3 -m autonomous_vnext.cognitive_runtime "safe tensor evidence mission"
+```
+
+The default report is written to `reports/cognitive_runtime_report.json`.
