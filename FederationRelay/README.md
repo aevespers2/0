@@ -31,6 +31,12 @@ Probe the macOS Codex desktop app and record live app evidence:
 python3 scripts/probe_desktop_codex_app.py --print
 ```
 
+Summarize Safari/Desktop relay-contact freshness:
+
+```bash
+python3 scripts/write_federation_contact_report.py --print
+```
+
 Refresh Safari's staged handoff from the latest dispatch and record the contact
 event:
 

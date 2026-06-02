@@ -41,3 +41,4 @@
 - Relay summaries now preserve actionable next steps when Safari acknowledgment extraction observes no valid packet.
 - Relay summaries now select the latest contact for the dispatched surface so Desktop probes do not overwrite Safari relay state.
 - Contact recording now writes per-surface latest relay files under `reports/federation_contact_latest/`.
+- Added `scripts/write_federation_contact_report.py` for Safari/Desktop relay-contact freshness audits.

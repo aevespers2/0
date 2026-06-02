@@ -196,6 +196,12 @@ python3 scripts/record_federation_contact.py \
 Contact recording writes both the global latest event and a per-surface latest
 event under `reports/federation_contact_latest/`.
 
+Summarize Safari/Desktop relay-contact freshness:
+
+```bash
+python3 scripts/write_federation_contact_report.py --print
+```
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash

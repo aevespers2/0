@@ -267,6 +267,12 @@ python3 scripts/record_federation_contact.py \
 Relay contact recording writes both `reports/federation_contact_latest.json` and
 per-surface latest files under `reports/federation_contact_latest/`.
 
+Summarize Safari/Desktop relay-contact freshness:
+
+```bash
+python3 scripts/write_federation_contact_report.py --print
+```
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash
