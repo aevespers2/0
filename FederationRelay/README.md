@@ -58,6 +58,16 @@ python3 scripts/run_safari_relay_retry.py \
 Add `--send` only when the staged handoff should be clicked once Safari exposes
 a send control.
 
+Extract an explicit Safari acknowledgment from the visible ChatGPT conversation:
+
+```bash
+python3 scripts/extract_safari_ack.py --print
+```
+
+This records contact evidence when no valid packet is present. If Safari has
+emitted a valid `codex_federation_message.v1` packet and the packet should be
+transcribed into the repository inbox, add `--write-status`.
+
 Valid statuses:
 
 - `observed`

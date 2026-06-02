@@ -217,6 +217,16 @@ Run bounded Safari relay retries:
 python3 scripts/run_safari_relay_retry.py --attempts 3 --print
 ```
 
+Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
+
+```bash
+python3 scripts/extract_safari_ack.py --print
+```
+
+Add `--write-status` only when the visible Safari response contains a valid
+`codex_federation_message.v1` packet that should be transcribed to
+`FederationInbox/safari/status.json`.
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash

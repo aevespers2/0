@@ -24,6 +24,7 @@
 - Added `scripts/watch_safari_dispatch_send.py` to poll Safari sendability and optionally send staged dispatches.
 - Added `scripts/write_federation_relay_summary.py` for compact relay-state readouts.
 - Added `scripts/run_safari_relay_retry.py` for bounded Safari dispatch staging/watch retry loops.
+- Added `scripts/extract_safari_ack.py` to parse visible Safari acknowledgments and optionally transcribe valid federation packets.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -34,3 +35,4 @@
 - Documented dispatch fallback behavior for surfaces that cannot run local helper scripts.
 - Clarified that `*-assignment.json` handoff files are ignored by the kernel and patch-only Safari behavior is a constraint, not a blocker.
 - Documented relay/contact logging for Safari and Desktop handoff attempts.
+- Documented Safari acknowledgment extraction as a relay step before collecting `FederationInbox/safari/status.json`.

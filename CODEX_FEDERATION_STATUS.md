@@ -288,6 +288,17 @@ Run bounded Safari relay retries:
 python3 scripts/run_safari_relay_retry.py --attempts 3 --print
 ```
 
+Extract an explicit Safari acknowledgment from the visible ChatGPT conversation:
+
+```bash
+python3 scripts/extract_safari_ack.py --print
+```
+
+The extractor records an `observed` relay event if no valid packet is visible.
+Use `--write-status` only to transcribe a visible, valid
+`codex_federation_message.v1` Safari packet into
+`FederationInbox/safari/status.json`.
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
