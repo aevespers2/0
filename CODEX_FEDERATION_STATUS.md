@@ -282,6 +282,12 @@ Write the current relay summary:
 python3 scripts/write_federation_relay_summary.py --print
 ```
 
+Run bounded Safari relay retries:
+
+```bash
+python3 scripts/run_safari_relay_retry.py --attempts 3 --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

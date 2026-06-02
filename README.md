@@ -211,6 +211,12 @@ Summarize current relay state:
 python3 scripts/write_federation_relay_summary.py --print
 ```
 
+Run bounded Safari relay retries:
+
+```bash
+python3 scripts/run_safari_relay_retry.py --attempts 3 --print
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash

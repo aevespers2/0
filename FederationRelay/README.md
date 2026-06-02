@@ -45,6 +45,19 @@ Write a compact relay summary:
 python3 scripts/write_federation_relay_summary.py --print
 ```
 
+Run a bounded Safari relay retry loop:
+
+```bash
+python3 scripts/run_safari_relay_retry.py \
+  --attempts 3 \
+  --interval 5 \
+  --watch-timeout 10 \
+  --print
+```
+
+Add `--send` only when the staged handoff should be clicked once Safari exposes
+a send control.
+
 Valid statuses:
 
 - `observed`

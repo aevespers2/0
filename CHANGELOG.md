@@ -23,6 +23,7 @@
 - Added `scripts/stage_safari_dispatch.py` to refresh Safari composer handoffs from the current dispatch and record relay evidence.
 - Added `scripts/watch_safari_dispatch_send.py` to poll Safari sendability and optionally send staged dispatches.
 - Added `scripts/write_federation_relay_summary.py` for compact relay-state readouts.
+- Added `scripts/run_safari_relay_retry.py` for bounded Safari dispatch staging/watch retry loops.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
