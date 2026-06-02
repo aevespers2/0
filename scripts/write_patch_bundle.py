@@ -111,7 +111,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--blocker", default="")
     parser.add_argument("--next-action", default="await local_cli review")
     parser.add_argument("--workstream", default="Autonomous VNext")
-    parser.add_argument("--patch-dir", type=Path, default=Path("patches/inbox"))
+    parser.add_argument("--patch-dir", type=Path, default=Path("FederationPatches/inbox"))
     parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
     parser.add_argument("--name", help="Patch filename.")
     parser.add_argument("--message-name", help="Patch proposal message filename.")

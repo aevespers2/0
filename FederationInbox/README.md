@@ -17,8 +17,8 @@ Files named `*-assignment.json` are local handoff artifacts and are ignored by
 the federation kernel. Live surface state must use status, blocker,
 routine-checkin, or patch-proposal packets.
 
-Use `patches/` for patch proposal metadata and optional patch text references.
-Safari and advisory surfaces should emit patch proposals instead of direct pushes.
+Use `FederationPatches/inbox/` for patch text references. Safari and advisory
+surfaces should emit patch proposals instead of direct pushes.
 
 To remove stale/blocked runtime packets after relay:
 

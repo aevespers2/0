@@ -127,7 +127,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--summary", required=True)
     parser.add_argument("--file", action="append", default=[], help="Touched files.")
     parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
-    parser.add_argument("--patch-dir", type=Path, default=Path("patches/inbox"))
+    parser.add_argument("--patch-dir", type=Path, default=Path("FederationPatches/inbox"))
     parser.add_argument("--name", help="Patch filename.")
     parser.add_argument("--message-name", help="Patch message filename.")
     parser.add_argument("--branch", default="")

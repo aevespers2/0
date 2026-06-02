@@ -139,10 +139,10 @@ Local CLI validates patches and remains the authoritative GitHub writer.
 Patch-only behavior is a surface constraint, not a blocker. Use `blocker` only
 when a surface cannot produce a current status or patch proposal.
 
-Patch exchange metadata lives under:
+Patch exchange text lives under:
 
 ```text
-patches/
+FederationPatches/inbox/
 ```
 
 Evaluate the inbox with:

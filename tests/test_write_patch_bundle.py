@@ -24,7 +24,7 @@ def args(tmp_path, **overrides):
         "blocker": "no_remote",
         "next_action": "await local_cli review",
         "workstream": "Autonomous VNext",
-        "patch_dir": tmp_path / "patches" / "inbox",
+        "patch_dir": tmp_path / "FederationPatches" / "inbox",
         "inbox": tmp_path / "FederationInbox",
         "name": "proposal.patch",
         "message_name": "proposal.json",
@@ -35,7 +35,7 @@ def args(tmp_path, **overrides):
 
 def test_build_patch_message_args_forces_patch_proposal(tmp_path) -> None:
     parsed = args(tmp_path)
-    message_args = build_patch_message_args(parsed, tmp_path / "patches" / "proposal.patch")
+    message_args = build_patch_message_args(parsed, tmp_path / "FederationPatches" / "proposal.patch")
 
     assert message_args.type == "patch_proposal"
     assert message_args.agent == "safari_cloud"
@@ -49,7 +49,7 @@ def test_write_patch_bundle_exports_patch_and_message(monkeypatch, tmp_path) -> 
     monkeypatch.setattr("scripts.write_patch_bundle.build_patch_text", fake_patch_text)
 
     result = write_patch_bundle(args(tmp_path))
-    patch_path = tmp_path / "patches" / "inbox" / "proposal.patch"
+    patch_path = tmp_path / "FederationPatches" / "inbox" / "proposal.patch"
     message_path = tmp_path / "FederationInbox" / "safari" / "proposal.json"
 
     assert patch_path.exists()

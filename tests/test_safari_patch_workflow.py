@@ -49,7 +49,7 @@ def test_safari_workflow_writes_status_and_status_only_blocker(monkeypatch, tmp_
         "write_patch_bundle",
         lambda args: {
             "schema": "codex_patch_bundle.v1",
-            "patch_path": "patches/inbox/proposal.patch",
+            "patch_path": "FederationPatches/inbox/proposal.patch",
             "message_path": "FederationInbox/safari/proposal.json",
             "source": "safari_cloud",
             "authority": "local_cli",
@@ -77,7 +77,7 @@ def test_safari_workflow_writes_status_and_status_only_blocker(monkeypatch, tmp_
     assert status["agent"] == "safari_cloud"
     assert status["blocker"] == ""
     assert status["constraints"] == ["patch_only_no_direct_push"]
-    assert status["patch_bundle_path"] == "patches/inbox/proposal.patch"
+    assert status["patch_bundle_path"] == "FederationPatches/inbox/proposal.patch"
     assert result["verification"]["valid"] is True
     assert result["patch_bundle"]["authority"] == "local_cli"
 
@@ -89,7 +89,7 @@ def test_safari_workflow_can_allow_direct_push_blocker_override(monkeypatch, tmp
         "write_patch_bundle",
         lambda args: {
             "schema": "codex_patch_bundle.v1",
-            "patch_path": "patches/inbox/proposal.patch",
+            "patch_path": "FederationPatches/inbox/proposal.patch",
             "message_path": "FederationInbox/safari/proposal.json",
             "source": "safari_cloud",
             "authority": "local_cli",
@@ -123,7 +123,7 @@ def test_safari_workflow_enforce_verification_raises_on_failure(monkeypatch, tmp
         "write_patch_bundle",
         lambda args: {
             "schema": "codex_patch_bundle.v1",
-            "patch_path": "patches/inbox/proposal.patch",
+            "patch_path": "FederationPatches/inbox/proposal.patch",
             "message_path": "FederationInbox/safari/proposal.json",
             "source": "safari_cloud",
             "authority": "local_cli",

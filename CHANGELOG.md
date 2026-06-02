@@ -27,6 +27,7 @@
 - Added `scripts/extract_safari_ack.py` to parse visible Safari acknowledgments and optionally transcribe valid federation packets.
 - Added `scripts/run_safari_sync_cycle.py` to refresh, stage, watch, extract, and summarize Safari federation state in one command.
 - Added `scripts/probe_desktop_codex_app.py` to record live macOS Codex desktop app contact evidence.
+- Added `FederationPatches/` as the durable patch exchange lane for nonlocal patch proposals.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -44,3 +45,4 @@
 - Added `scripts/write_federation_contact_report.py` for Safari/Desktop relay-contact freshness audits.
 - Added `scripts/write_federation_dashboard.py` for compact federation handoff summaries.
 - Safari sync cycles now refresh the relay summary, contact report, and federation dashboard together.
+- Patch bundle export now defaults to `FederationPatches/inbox/`.

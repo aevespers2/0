@@ -14,7 +14,7 @@
     "type": "git_patch",
     "summary": "Short description of the proposed change.",
     "files": [],
-    "patch_path": "patches/example.patch",
+    "patch_path": "FederationPatches/inbox/example.patch",
     "authority": "local_cli"
   }
 }
