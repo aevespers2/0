@@ -102,6 +102,18 @@ Both remotes were verified at commit:
 6faf33e551319b40fed4aa5c039071b7b438c291
 ```
 
+The tracked public mirror manifest is:
+
+```text
+public_mirrors.json
+```
+
+The local mirror verifier is:
+
+```bash
+python3 scripts/verify_public_mirrors.py --pretty
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

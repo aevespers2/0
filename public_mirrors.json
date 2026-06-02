@@ -1,0 +1,20 @@
+{
+  "schema": "public_mirrors.v1",
+  "branch": "main",
+  "mirrors": [
+    {
+      "name": "origin",
+      "owner": "aevespers2",
+      "repo": "0",
+      "url": "git@github.com:aevespers2/0.git",
+      "web_url": "https://github.com/aevespers2/0"
+    },
+    {
+      "name": "georgetown",
+      "owner": "GeorgeTownSabatical",
+      "repo": "0",
+      "url": "git@github.com:GeorgeTownSabatical/0.git",
+      "web_url": "https://github.com/GeorgeTownSabatical/0"
+    }
+  ]
+}
