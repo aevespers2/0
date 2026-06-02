@@ -264,6 +264,12 @@ python3 scripts/record_federation_contact.py \
   --detail "handoff inserted into composer"
 ```
 
+Refresh Safari's staged composer handoff from the current dispatch:
+
+```bash
+python3 scripts/stage_safari_dispatch.py --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

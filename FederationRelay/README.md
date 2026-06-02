@@ -24,6 +24,13 @@ python3 scripts/record_federation_contact.py \
   --evidence composer_contains_handoff=true
 ```
 
+Refresh Safari's staged handoff from the latest dispatch and record the contact
+event:
+
+```bash
+python3 scripts/stage_safari_dispatch.py --print
+```
+
 Valid statuses:
 
 - `observed`

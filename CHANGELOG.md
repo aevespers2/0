@@ -20,6 +20,7 @@
 - Added self-contained `status_template` and `handoff_text` fields to dispatch packets for cloud/advisory surfaces.
 - Preserved message `capabilities` and `constraints` through the federation kernel.
 - Added `FederationRelay/` and `scripts/record_federation_contact.py` for UI/browser/app handoff evidence.
+- Added `scripts/stage_safari_dispatch.py` to refresh Safari composer handoffs from the current dispatch and record relay evidence.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.

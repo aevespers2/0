@@ -193,6 +193,12 @@ python3 scripts/record_federation_contact.py \
   --detail "handoff inserted into composer"
 ```
 
+Refresh and stage Safari's current dispatch in the Safari composer:
+
+```bash
+python3 scripts/stage_safari_dispatch.py --print
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash
