@@ -205,6 +205,12 @@ Watch Safari until the staged dispatch is sendable:
 python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
 ```
 
+Summarize current relay state:
+
+```bash
+python3 scripts/write_federation_relay_summary.py --print
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash

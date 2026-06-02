@@ -276,6 +276,12 @@ Watch or send the staged Safari handoff:
 python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
 ```
 
+Write the current relay summary:
+
+```bash
+python3 scripts/write_federation_relay_summary.py --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

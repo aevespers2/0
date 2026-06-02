@@ -39,6 +39,12 @@ python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
 
 To click the send control once it appears, add `--send`.
 
+Write a compact relay summary:
+
+```bash
+python3 scripts/write_federation_relay_summary.py --print
+```
+
 Valid statuses:
 
 - `observed`

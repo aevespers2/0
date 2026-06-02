@@ -22,6 +22,7 @@
 - Added `FederationRelay/` and `scripts/record_federation_contact.py` for UI/browser/app handoff evidence.
 - Added `scripts/stage_safari_dispatch.py` to refresh Safari composer handoffs from the current dispatch and record relay evidence.
 - Added `scripts/watch_safari_dispatch_send.py` to poll Safari sendability and optionally send staged dispatches.
+- Added `scripts/write_federation_relay_summary.py` for compact relay-state readouts.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
