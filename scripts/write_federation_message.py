@@ -47,6 +47,12 @@ def build_message(args: argparse.Namespace) -> dict[str, Any]:
         "blocker": args.blocker,
         "next_action": args.next_action,
     }
+    capabilities = tuple(getattr(args, "capability", ()))
+    constraints = tuple(getattr(args, "constraint", ()))
+    if capabilities:
+        payload["capabilities"] = capabilities
+    if constraints:
+        payload["constraints"] = constraints
     if args.type == "patch_proposal":
         patch = build_patch(args)
         errors = patch.validate()
@@ -105,6 +111,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--remote", default="")
     parser.add_argument("--blocker", default="")
     parser.add_argument("--next-action", default="")
+    parser.add_argument("--capability", action="append", default=[])
+    parser.add_argument("--constraint", action="append", default=[])
     parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
     parser.add_argument("--name", help="Output filename, default is <type>.json.")
     parser.add_argument("--print", action="store_true", dest="print_payload")

@@ -93,6 +93,8 @@ def read_inbox(root: Path) -> tuple[FederationMessage, ...]:
     for path in sorted(root.glob("*/*.json")):
         if "/templates/" in str(path):
             continue
+        if path.name.endswith("-assignment.json"):
+            continue
         messages.append(parse_message(path))
     return tuple(messages)
 
@@ -111,6 +113,8 @@ def message_to_status(message: FederationMessage) -> CodexAgentStatus | None:
         remote=str(payload.get("remote", "")),
         blocker=str(payload.get("blocker", "")),
         next_action=str(payload.get("next_action", "")),
+        capabilities=tuple(str(item) for item in payload.get("capabilities", ())),
+        constraints=tuple(str(item) for item in payload.get("constraints", ())),
     )
 
 

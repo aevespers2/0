@@ -35,6 +35,7 @@ def command_for(agent: str, expected_path: str) -> str:
     if agent == "safari_cloud":
         return (
             "python3 scripts/write_federation_message.py --agent safari_cloud --type status "
+            "--constraint patch_only_no_direct_push "
             f"--commit \"$(git rev-parse HEAD)\" --inbox FederationInbox --name {Path(expected_path).name}"
         )
     if agent == "chatgpt_bridge":
@@ -43,6 +44,79 @@ def command_for(agent: str, expected_path: str) -> str:
             f"--commit \"$(git rev-parse HEAD)\" --inbox FederationInbox --name {Path(expected_path).name}"
         )
     return f"write required packet to {expected_path}"
+
+
+def status_template_for(
+    agent: str,
+    packet_type: str,
+    authoritative_head: str,
+    expected_path: str,
+) -> dict[str, Any]:
+    surface_defaults = {
+        "local_cli": {
+            "cwd": "/Users/ALISTAIRE/aevespers2-0",
+            "branch": "main",
+            "blocker": "",
+            "next_action": "Refresh local_cli status and continue authoritative implementation.",
+        },
+        "desktop_app": {
+            "cwd": "/Users/ALISTAIRE/aevespers2-0",
+            "branch": "main",
+            "blocker": "",
+            "next_action": "Refresh desktop_app status from the safe checkout only.",
+        },
+        "mobile": {
+            "cwd": "/Users/ALISTAIRE/aevespers2-0",
+            "branch": "main",
+            "blocker": "",
+            "next_action": "Report user-facing priorities, blockers, approvals, and completion follow-up.",
+        },
+        "safari_cloud": {
+            "cwd": "/workspace/0",
+            "branch": "work",
+            "blocker": "",
+            "next_action": "Refresh Safari status, export diffs as patch proposals, and do not push directly.",
+            "constraints": ["patch_only_no_direct_push"],
+        },
+        "chatgpt_bridge": {
+            "cwd": "",
+            "branch": "",
+            "blocker": "",
+            "next_action": "Review coordination state and return advisory planning feedback.",
+        },
+    }
+    defaults = surface_defaults.get(agent, surface_defaults["chatgpt_bridge"])
+    template = {
+        "schema": "codex_federation_message.v1",
+        "agent": agent,
+        "type": "routine_checkin" if agent == "chatgpt_bridge" else "status",
+        "workstream": "Autonomous VNext",
+        "cwd": defaults["cwd"],
+        "branch": defaults["branch"],
+        "commit": authoritative_head,
+        "status_short": [],
+        "remote": "",
+        "blocker": defaults["blocker"],
+        "next_action": defaults["next_action"],
+        "expected_path": expected_path,
+    }
+    constraints = defaults.get("constraints", [])
+    if constraints:
+        template["constraints"] = constraints
+    return template
+
+
+def handoff_text_for(dispatch: dict[str, Any], authoritative_head: str) -> str:
+    template = json.dumps(dispatch["status_template"], indent=2, sort_keys=True)
+    return (
+        f"Federation dispatch for {dispatch['agent']}.\n"
+        f"Required packet: {dispatch['packet_type']} at {dispatch['expected_path']}.\n"
+        f"Authoritative head: {authoritative_head}.\n"
+        f"Details: {dispatch['details']}.\n"
+        f"Suggested command: {dispatch['command']}.\n"
+        "If the command cannot run in this surface, emit the equivalent JSON packet:\n"
+        f"{template}"
+    )
 
 
 def build_dispatch(
@@ -56,17 +130,23 @@ def build_dispatch(
     for packet in report.get("next_required_packets", ()):
         agent = str(packet["agent"])
         expected_path = str(packet["expected_path"])
-        dispatches.append(
-            {
-                "agent": agent,
-                "surface_dir": SURFACE_TO_DIR.get(agent, agent),
-                "packet_type": packet["packet_type"],
-                "priority": packet["priority"],
-                "details": packet["details"],
-                "expected_path": expected_path,
-                "command": command_for(agent, expected_path),
-            }
-        )
+        dispatch = {
+            "agent": agent,
+            "surface_dir": SURFACE_TO_DIR.get(agent, agent),
+            "packet_type": packet["packet_type"],
+            "priority": packet["priority"],
+            "details": packet["details"],
+            "expected_path": expected_path,
+            "command": command_for(agent, expected_path),
+            "status_template": status_template_for(
+                agent,
+                str(packet["packet_type"]),
+                authoritative_head,
+                expected_path,
+            ),
+        }
+        dispatch["handoff_text"] = handoff_text_for(dispatch, authoritative_head)
+        dispatches.append(dispatch)
 
     return {
         "schema": "codex_federation_dispatch.v1",

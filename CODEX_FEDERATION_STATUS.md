@@ -136,6 +136,8 @@ FederationInbox/bridge/
 
 Safari/cloud and advisory surfaces export status packets and patch proposals.
 Local CLI validates patches and remains the authoritative GitHub writer.
+Patch-only behavior is a surface constraint, not a blocker. Use `blocker` only
+when a surface cannot produce a current status or patch proposal.
 
 Patch exchange metadata lives under:
 
@@ -239,6 +241,10 @@ python3 scripts/write_federation_dispatch.py \
   --authoritative-head "$(git rev-parse HEAD)" \
   --print
 ```
+
+Dispatch packets include a helper command, a self-contained `status_template`,
+and copy-ready `handoff_text` so Safari/cloud can respond even when helper
+scripts are unavailable in the cloud container.
 
 Run the local federation routine to refresh local/desktop/mobile status, bridge
 signal, state report, and dispatch in one pass:

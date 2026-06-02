@@ -46,7 +46,8 @@ def run_workflow(args: argparse.Namespace) -> dict[str, str | bool | dict]:
         verification_target = commit
 
     verification = verify_inbox(args.inbox, repo, verification_target)
-    blocker = "safari_patch_only" if not args.allow_direct_push else ""
+    blocker = ""
+    constraints = () if args.allow_direct_push else ("patch_only_no_direct_push",)
     status_next_action = "Patch-only production cycle active. " + (
         "Do not push directly; local_cli applies patch from "
         f"{patch_bundle['message_path']}."
@@ -64,6 +65,8 @@ def run_workflow(args: argparse.Namespace) -> dict[str, str | bool | dict]:
             remote=state["remote"],
             blocker=blocker,
             next_action=f"{status_next_action} Verification valid={verification['valid']}.",
+            capability=(),
+            constraint=constraints,
             repo=args.repo_name,
             base="",
             summary="",

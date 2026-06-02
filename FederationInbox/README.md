@@ -13,6 +13,10 @@ Agents should write JSON messages into their own surface folder:
 Local CLI is the authoritative GitHub write agent. Other surfaces should submit
 status packets, plans, and patch proposals here rather than pushing directly.
 
+Files named `*-assignment.json` are local handoff artifacts and are ignored by
+the federation kernel. Live surface state must use status, blocker,
+routine-checkin, or patch-proposal packets.
+
 Use `patches/` for patch proposal metadata and optional patch text references.
 Safari and advisory surfaces should emit patch proposals instead of direct pushes.
 

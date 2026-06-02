@@ -42,6 +42,33 @@ def test_kernel_reads_status_messages_and_assesses_sync(tmp_path) -> None:
     assert report["authoritative_writer"] == "local_cli"
 
 
+def test_kernel_ignores_assignment_packets_as_status(tmp_path) -> None:
+    inbox = tmp_path / "FederationInbox"
+    write_message(inbox, "local", "status.json", base_message("local_cli"))
+    write_message(inbox, "safari", "safari-assignment.json", base_message("safari_cloud", head="old"))
+    write_message(inbox, "safari", "status.json", base_message("safari_cloud"))
+    write_message(inbox, "desktop", "status.json", base_message("desktop_app"))
+
+    report = evaluate_kernel(inbox, authoritative_head="abc123")
+
+    assert report["message_count"] == 3
+    assert report["assessment"]["synchronized"] is True
+    assert report["assessment"]["stale_surfaces"] == ()
+
+
+def test_kernel_preserves_status_constraints(tmp_path) -> None:
+    inbox = tmp_path / "FederationInbox"
+    safari = base_message("safari_cloud")
+    safari["constraints"] = ["patch_only_no_direct_push"]
+    write_message(inbox, "safari", "status.json", safari)
+
+    report = evaluate_kernel(inbox, authoritative_head="abc123")
+
+    status = report["messages"][0]["payload"]
+    assert status["constraints"] == ["patch_only_no_direct_push"]
+    assert report["assessment"]["blocked_surfaces"] == ()
+
+
 def test_kernel_flags_desktop_until_pointed_at_safe_repo(tmp_path) -> None:
     inbox = tmp_path / "FederationInbox"
     desktop = base_message("desktop_app")

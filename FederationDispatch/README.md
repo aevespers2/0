@@ -6,6 +6,15 @@ Dispatch packets are not status packets. They tell a surface which packet the
 kernel currently needs, without pretending that local_cli can speak as that
 surface.
 
+Each dispatch includes:
+
+- `command`: the preferred local helper command.
+- `status_template`: the equivalent packet to emit when the helper is unavailable.
+- `handoff_text`: copy-ready instructions for Safari/Desktop/Mobile/Bridge context.
+
+Patch-only Safari behavior is represented as a `constraints` value, not a
+`blocker`. A blocker means the surface cannot participate in synchronization.
+
 Default runtime outputs are ignored:
 
 - `FederationDispatch/local/dispatch.json`

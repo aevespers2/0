@@ -75,7 +75,8 @@ def test_safari_workflow_writes_status_and_status_only_blocker(monkeypatch, tmp_
     assert status_file.exists()
     status = json.loads(status_file.read_text(encoding="utf-8"))
     assert status["agent"] == "safari_cloud"
-    assert status["blocker"] == "safari_patch_only"
+    assert status["blocker"] == ""
+    assert status["constraints"] == ["patch_only_no_direct_push"]
     assert status["patch_bundle_path"] == "patches/inbox/proposal.patch"
     assert result["verification"]["valid"] is True
     assert result["patch_bundle"]["authority"] == "local_cli"

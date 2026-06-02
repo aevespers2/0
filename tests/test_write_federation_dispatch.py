@@ -35,6 +35,11 @@ def test_build_dispatch_translates_required_packets(monkeypatch, tmp_path) -> No
     assert payload["schema"] == "codex_federation_dispatch.v1"
     assert payload["dispatch_count"] == 2
     assert payload["dispatches"][0]["surface_dir"] == "safari"
+    assert payload["dispatches"][0]["status_template"]["agent"] == "safari_cloud"
+    assert payload["dispatches"][0]["status_template"]["commit"] == "abc123"
+    assert payload["dispatches"][0]["status_template"]["blocker"] == ""
+    assert payload["dispatches"][0]["status_template"]["constraints"] == ["patch_only_no_direct_push"]
+    assert "equivalent JSON packet" in payload["dispatches"][0]["handoff_text"]
     assert payload["dispatches"][1]["command"].startswith("python3 scripts/write_desktop_federation_status.py")
 
 
@@ -55,6 +60,13 @@ def test_write_dispatch_creates_aggregate_and_surface_packets(tmp_path) -> None:
                 "details": "refresh mobile",
                 "expected_path": "FederationInbox/mobile/status.json",
                 "command": "python3 scripts/write_mobile_federation_status.py",
+                "status_template": {
+                    "schema": "codex_federation_message.v1",
+                    "agent": "mobile",
+                    "type": "status",
+                    "commit": "abc123",
+                },
+                "handoff_text": "Federation dispatch for mobile.",
             }
         ],
     }

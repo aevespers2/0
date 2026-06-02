@@ -17,6 +17,8 @@
 - Added regression coverage for mobile status writer, Safari patch workflow, and bridge signal output.
 - Added `FederationDispatch/` plus `scripts/write_federation_dispatch.py` to turn kernel-required packets into per-surface routing instructions.
 - Added `scripts/run_federation_routine.py` to refresh local/desktop/mobile status, bridge signal, state report, and dispatch in one command.
+- Added self-contained `status_template` and `handoff_text` fields to dispatch packets for cloud/advisory surfaces.
+- Preserved message `capabilities` and `constraints` through the federation kernel.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -24,3 +26,5 @@
 - Local remote-write readiness now includes `next_required_packets` and explicit `readiness_blockers` in federation state reports.
 - Added explicit protocol guidance for Safari/mobile/bridge status cycles in `CODEX_FEDERATION_STATUS.md`.
 - Documented dispatch generation and local federation routine execution across README/status docs.
+- Documented dispatch fallback behavior for surfaces that cannot run local helper scripts.
+- Clarified that `*-assignment.json` handoff files are ignored by the kernel and patch-only Safari behavior is a constraint, not a blocker.
