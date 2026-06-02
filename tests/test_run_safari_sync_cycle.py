@@ -1,0 +1,80 @@
+from __future__ import annotations
+
+import argparse
+import json
+
+from scripts import run_safari_sync_cycle
+
+
+def args(tmp_path, **overrides):
+    defaults = {
+        "repo": tmp_path,
+        "watch_timeout": 1,
+        "watch_interval": 1,
+        "send": False,
+        "write_status": False,
+        "output": tmp_path / "reports" / "cycle.json",
+        "print_result": False,
+    }
+    defaults.update(overrides)
+    return argparse.Namespace(**defaults)
+
+
+def result(payload: dict, returncode: int = 0) -> dict:
+    return {"command": [], "returncode": returncode, "stdout": json.dumps(payload), "stderr": ""}
+
+
+def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("watch_safari_dispatch_send.py" in item for item in command):
+            return result({"contact_event": {"status": "blocked", "detail": "stop answering"}})
+        if any("extract_safari_ack.py" in item for item in command):
+            return result({"candidate": None, "written_path": ""})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result(
+                {
+                    "next_action": "Continue watching safari_cloud sendability/acknowledgment.",
+                    "ready_for_remote_write": False,
+                    "required_packets": ["safari_cloud"],
+                    "missing_surfaces": ["safari_cloud"],
+                }
+            )
+        return result({})
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert summary["commands_succeeded"] is True
+    assert summary["watch_status"] == "blocked"
+    assert summary["ack_candidate_found"] is False
+    assert summary["required_packets"] == ["safari_cloud"]
+    assert any("extract_safari_ack.py" in item for command in calls for item in command)
+
+
+def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("watch_safari_dispatch_send.py" in item for item in command):
+            return result({"contact_event": {"status": "sent", "detail": "sent"}})
+        if any("extract_safari_ack.py" in item for item in command):
+            return result({"candidate": {"agent": "safari_cloud"}, "written_path": "FederationInbox/safari/status.json"})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result({"next_action": "No required federation packets are pending.", "ready_for_remote_write": True})
+        return result({})
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path, send=True, write_status=True))
+
+    assert summary["send_requested"] is True
+    assert summary["write_status_requested"] is True
+    assert summary["ack_candidate_found"] is True
+    assert summary["ack_written_path"] == "FederationInbox/safari/status.json"
+    assert any("--send" in command for command in calls)
+    assert any("--write-status" in command for command in calls)

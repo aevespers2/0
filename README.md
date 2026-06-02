@@ -217,6 +217,15 @@ Run bounded Safari relay retries:
 python3 scripts/run_safari_relay_retry.py --attempts 3 --print
 ```
 
+Run one full Safari sync cycle:
+
+```bash
+python3 scripts/run_safari_sync_cycle.py --print
+```
+
+This refreshes the routine, stages Safari dispatch, checks sendability, probes
+for an explicit Safari acknowledgment, and rewrites the relay summary.
+
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 
 ```bash

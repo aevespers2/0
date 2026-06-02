@@ -58,6 +58,17 @@ python3 scripts/run_safari_relay_retry.py \
 Add `--send` only when the staged handoff should be clicked once Safari exposes
 a send control.
 
+Run one full Safari sync cycle:
+
+```bash
+python3 scripts/run_safari_sync_cycle.py --print
+```
+
+The cycle refreshes federation state, stages the current Safari dispatch,
+watches sendability, extracts explicit acknowledgments, and rewrites the relay
+summary. Add `--send` or `--write-status` only when those side effects are
+intended.
+
 Extract an explicit Safari acknowledgment from the visible ChatGPT conversation:
 
 ```bash
