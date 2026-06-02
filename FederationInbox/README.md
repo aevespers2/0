@@ -23,3 +23,11 @@ python3 scripts/prune_federation_runtime.py --inbox FederationInbox --authoritat
 
 This is dry-run by default. Add `--delete` to move matching packets to
 `state/federation_runtime_archive`, or `--delete --no-archive` to hard-delete.
+
+Desktop should emit status through the safe-check helper so wrong checkouts are
+explicitly blocked:
+
+```bash
+python3 scripts/write_desktop_federation_status.py \
+  --safe-root /Users/ALISTAIRE/aevespers2-0
+```

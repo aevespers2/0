@@ -149,3 +149,24 @@ python3 scripts/write_federation_state_report.py \
   --authoritative-head "$(git rev-parse HEAD)" \
   --print
 ```
+
+Enforce remote-write readiness before push (this is the authoritative gate):
+
+```bash
+python3 scripts/enforce_federation_remote_write.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```
+
+Install the local pre-push federation hooks (remote-write gate + runtime cleanup audit):
+
+```bash
+python3 scripts/setup_federation_git_hooks.py
+```
+
+Run status emission for desktop in a safe-check mode that blocks wrong checkouts:
+
+```bash
+python3 scripts/write_desktop_federation_status.py \
+  --repo /Users/ALISTAIRE/aevespers2-0
+```

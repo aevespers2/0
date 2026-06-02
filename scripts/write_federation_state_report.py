@@ -28,6 +28,7 @@ def build_state_report(
     mirrors = verify_public_mirrors(mirror_manifest, repo)
     patches = verify_patch_inbox(inbox, repo, authoritative_head)
     assessment = kernel["assessment"]
+    next_required_packets = kernel.get("next_required_packets", ())
     return {
         "schema": "codex_federation_state_report.v1",
         "generated_at": utc_now(),
@@ -36,12 +37,27 @@ def build_state_report(
         "kernel": kernel,
         "public_mirrors": mirrors,
         "patch_proposals": patches,
+        "next_required_packets": next_required_packets,
         "ready_for_remote_write": bool(
             mirrors["synchronized"]
             and patches["valid"]
             and not kernel["patch_errors"]
             and not assessment["blocked_surfaces"]
             and not assessment["missing_surfaces"]
+            and not next_required_packets
+        ),
+        "readiness_blockers": tuple(
+            reason
+            for reason in (
+                None if mirrors["synchronized"] else "public mirrors out of sync",
+                None if patches["valid"] else "unverified/invalid patch proposals",
+                None if not kernel["patch_errors"] else "patch proposal validation errors",
+                None
+                if (not assessment["blocked_surfaces"] and not assessment["missing_surfaces"])
+                else "missing/blocked federation surfaces",
+                None if not next_required_packets else "required federation packets pending",
+            )
+            if reason is not None
         ),
     }
 

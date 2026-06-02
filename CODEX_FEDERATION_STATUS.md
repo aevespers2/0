@@ -76,6 +76,8 @@ git log --oneline -n 1
 ```
 
 Remote writes are allowed only from an explicit safe repository path.
+Use `scripts/enforce_federation_remote_write.py` to validate remote-write readiness in an
+auditable, machine-checkable way.
 
 ## Role Split
 
@@ -151,6 +153,14 @@ Write Local CLI status into the inbox with:
 
 ```bash
 python3 scripts/write_local_federation_status.py
+```
+
+Install and enable the federation pre-push hook for automatic enforcement and
+runtime cleanup auditing:
+
+```bash
+python3 scripts/setup_federation_git_hooks.py
+python3 scripts/enforce_federation_remote_write.py --authoritative-head "$(git rev-parse HEAD)"
 ```
 
 Write Safari, Desktop, Mobile, or Bridge status into the inbox with:

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+HEAD_SHA="$(git rev-parse HEAD)"
+
+python3 scripts/enforce_federation_remote_write.py \
+  --authoritative-head "$HEAD_SHA" \
+  --print
+
+python3 scripts/prune_federation_runtime.py \
+  --inbox FederationInbox \
+  --authoritative-head "$HEAD_SHA" \
+  --print
