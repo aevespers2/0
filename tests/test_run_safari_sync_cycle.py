@@ -42,6 +42,10 @@ def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
                     "missing_surfaces": ["safari_cloud"],
                 }
             )
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": False, "next_action": "Continue watching."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -52,7 +56,11 @@ def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
     assert summary["watch_status"] == "blocked"
     assert summary["ack_candidate_found"] is False
     assert summary["required_packets"] == ["safari_cloud"]
+    assert summary["contact_evidence_fresh"] is True
+    assert summary["dashboard_next_action"] == "Continue watching."
     assert any("extract_safari_ack.py" in item for command in calls for item in command)
+    assert any("write_federation_contact_report.py" in item for command in calls for item in command)
+    assert any("write_federation_dashboard.py" in item for command in calls for item in command)
 
 
 def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None:
@@ -66,6 +74,10 @@ def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None
             return result({"candidate": {"agent": "safari_cloud"}, "written_path": "FederationInbox/safari/status.json"})
         if any("write_federation_relay_summary.py" in item for item in command):
             return result({"next_action": "No required federation packets are pending.", "ready_for_remote_write": True})
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": True, "next_action": "No required federation packets are pending."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -76,5 +88,7 @@ def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None
     assert summary["write_status_requested"] is True
     assert summary["ack_candidate_found"] is True
     assert summary["ack_written_path"] == "FederationInbox/safari/status.json"
+    assert summary["ready_for_remote_write"] is True
     assert any("--send" in command for command in calls)
     assert any("--write-status" in command for command in calls)
+    assert any("--refresh-mirrors" in command for command in calls)

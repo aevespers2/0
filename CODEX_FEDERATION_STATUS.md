@@ -316,7 +316,8 @@ python3 scripts/run_safari_sync_cycle.py --print
 ```
 
 This refreshes federation state, stages the current Safari dispatch, watches
-sendability, extracts visible acknowledgments, and rewrites the relay summary.
+sendability, extracts visible acknowledgments, and rewrites the relay summary,
+contact report, and dashboard.
 
 Extract an explicit Safari acknowledgment from the visible ChatGPT conversation:
 

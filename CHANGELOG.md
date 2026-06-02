@@ -43,3 +43,4 @@
 - Contact recording now writes per-surface latest relay files under `reports/federation_contact_latest/`.
 - Added `scripts/write_federation_contact_report.py` for Safari/Desktop relay-contact freshness audits.
 - Added `scripts/write_federation_dashboard.py` for compact federation handoff summaries.
+- Safari sync cycles now refresh the relay summary, contact report, and federation dashboard together.

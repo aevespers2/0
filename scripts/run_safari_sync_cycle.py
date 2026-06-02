@@ -37,10 +37,17 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         extract_command.append("--write-status")
     extract = run_command(extract_command, args.repo)
     summary = run_command(["python3", "scripts/write_federation_relay_summary.py", "--print"], args.repo)
+    contact_report = run_command(["python3", "scripts/write_federation_contact_report.py", "--print"], args.repo)
+    dashboard = run_command(
+        ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
+        args.repo,
+    )
 
     watch_payload = parse_json_stdout(watch)
     extract_payload = parse_json_stdout(extract)
     summary_payload = parse_json_stdout(summary)
+    contact_payload = parse_json_stdout(contact_report)
+    dashboard_payload = parse_json_stdout(dashboard)
     contact = watch_payload.get("contact_event", {})
     candidate = extract_payload.get("candidate")
     return {
@@ -48,21 +55,29 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "send_requested": args.send,
         "write_status_requested": args.write_status,
         "commands_succeeded": all(
-            command_succeeded(item) for item in (routine, stage, watch, extract, summary)
+            command_succeeded(item)
+            for item in (routine, stage, watch, extract, summary, contact_report, dashboard)
         ),
         "watch_status": contact.get("status", ""),
         "watch_detail": contact.get("detail", ""),
         "ack_candidate_found": candidate is not None,
         "ack_written_path": extract_payload.get("written_path", ""),
         "relay_next_action": summary_payload.get("next_action", ""),
-        "ready_for_remote_write": summary_payload.get("ready_for_remote_write", False),
+        "ready_for_remote_write": dashboard_payload.get(
+            "ready_for_remote_write",
+            summary_payload.get("ready_for_remote_write", False),
+        ),
         "required_packets": summary_payload.get("required_packets", ()),
         "missing_surfaces": summary_payload.get("missing_surfaces", ()),
+        "contact_evidence_fresh": contact_payload.get("all_contacts_fresh", False),
+        "dashboard_next_action": dashboard_payload.get("next_action", ""),
         "routine": routine,
         "stage": stage,
         "watch": watch,
         "extract": extract,
         "relay_summary": summary,
+        "contact_report": contact_report,
+        "dashboard": dashboard,
     }
 
 
