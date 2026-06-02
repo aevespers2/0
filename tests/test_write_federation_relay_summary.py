@@ -57,7 +57,16 @@ def test_next_action_tracks_staged_and_sent_states() -> None:
 
     assert next_action_for(bridge, dispatch, {"status": "staged"}).startswith("Send staged handoff")
     assert next_action_for(bridge, dispatch, {"status": "sent"}).startswith("Await safari_cloud")
+    assert next_action_for(bridge, dispatch, {"status": "acknowledged"}).startswith("Transcribe")
     assert next_action_for({"required_packets": []}, dispatch, {}).startswith("No required")
+
+
+def test_next_action_for_observed_no_candidate_keeps_watch_path() -> None:
+    bridge = {"required_packets": ["safari_cloud"]}
+    dispatch = {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"}
+    contact = {"status": "observed", "evidence": {"candidate_found": "false"}}
+
+    assert next_action_for(bridge, dispatch, contact).startswith("Continue watching safari_cloud")
 
 
 def test_write_summary_creates_output(tmp_path) -> None:

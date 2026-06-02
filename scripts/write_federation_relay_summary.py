@@ -61,6 +61,10 @@ def next_action_for(
         return f"Send staged handoff to {agent}, then collect {expected_path}."
     if status == "sent":
         return f"Await {agent} acknowledgment and status packet at {expected_path}."
+    if status == "acknowledged":
+        return f"Transcribe or collect acknowledged {agent} packet at {expected_path}."
+    if status == "observed" and contact.get("evidence", {}).get("candidate_found") == "false":
+        return f"Continue watching {agent} sendability/acknowledgment, then collect {expected_path}."
     return f"Dispatch required packet request to {agent}, then collect {expected_path}."
 
 

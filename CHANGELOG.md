@@ -36,3 +36,4 @@
 - Clarified that `*-assignment.json` handoff files are ignored by the kernel and patch-only Safari behavior is a constraint, not a blocker.
 - Documented relay/contact logging for Safari and Desktop handoff attempts.
 - Documented Safari acknowledgment extraction as a relay step before collecting `FederationInbox/safari/status.json`.
+- Relay summaries now preserve actionable next steps when Safari acknowledgment extraction observes no valid packet.
