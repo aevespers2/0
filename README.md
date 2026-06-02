@@ -35,6 +35,9 @@ pytest -q
 
 The ITensor integration is dependency-gated. Tests mock availability, so the core suite does not require ITensor bindings to be installed.
 
+GitHub Actions runs the same suite plus a cognitive-runtime smoke check in
+[`.github/workflows/autonomous-vnext-ci.yml`](.github/workflows/autonomous-vnext-ci.yml).
+
 ## Run A Cognitive Cycle
 
 ```bash
@@ -50,4 +53,13 @@ python3 -m autonomous_vnext.cognitive_runtime \
   "safe tensor evidence mission" \
   --persist-experience \
   --memory state/experience_memory.jsonl
+```
+
+## Codex Federation Status
+
+For local CLI, Safari/cloud Codex, and macOS desktop Codex coordination, emit the
+shared status packet before remote writes:
+
+```bash
+python3 scripts/emit_codex_federation_status.py --pretty
 ```

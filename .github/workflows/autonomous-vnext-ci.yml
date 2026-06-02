@@ -1,0 +1,38 @@
+name: Autonomous vNext CI
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      - name: Run cognitive runtime smoke
+        run: |
+          python -m autonomous_vnext.cognitive_runtime \
+            "ci federation coordination smoke" \
+            --output /tmp/cognitive_runtime_report.json
+          test -s /tmp/cognitive_runtime_report.json
+
+      - name: Emit Codex federation status
+        run: python scripts/emit_codex_federation_status.py --pretty

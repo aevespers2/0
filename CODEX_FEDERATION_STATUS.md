@@ -72,3 +72,23 @@ git log --oneline -n 1
 ```
 
 Remote writes are allowed only from an explicit safe repository path.
+
+## Continuous Integration
+
+The repository now has a shared CI entry point:
+
+```text
+.github/workflows/autonomous-vnext-ci.yml
+```
+
+It runs:
+
+- `pytest -q` locally; CI installs pytest and runs it through the Python interpreter configured by `actions/setup-python`.
+- `python3 -m autonomous_vnext.cognitive_runtime "ci federation coordination smoke" --output /tmp/cognitive_runtime_report.json` locally.
+- `python3 scripts/emit_codex_federation_status.py --pretty` locally.
+
+The machine-readable local coordination packet is:
+
+```bash
+python3 scripts/emit_codex_federation_status.py --pretty
+```
