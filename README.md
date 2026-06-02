@@ -101,3 +101,13 @@ python3 scripts/write_federation_message.py \
   --blocker no_remote \
   --next-action "export patch proposal"
 ```
+
+Export a working-tree diff as a patch bundle for Local CLI review:
+
+```bash
+python3 scripts/write_patch_bundle.py \
+  --agent safari_cloud \
+  --commit "$(git rev-parse HEAD)" \
+  --summary "Describe proposed change" \
+  --file README.md
+```

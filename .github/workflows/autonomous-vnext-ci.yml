@@ -60,3 +60,6 @@ jobs:
             --next-action "export patch proposal" \
             --inbox /tmp/FederationInbox
           python -m json.tool /tmp/FederationInbox/safari/status.json > /tmp/safari_status.validated.json
+
+      - name: Validate patch bundle writer
+        run: python -m pytest -q tests/test_write_patch_bundle.py

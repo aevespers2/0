@@ -166,6 +166,16 @@ python3 scripts/write_federation_message.py \
   --next-action "export patch proposal"
 ```
 
+Export a patch bundle for Local CLI review with:
+
+```bash
+python3 scripts/write_patch_bundle.py \
+  --agent safari_cloud \
+  --commit "$(git rev-parse HEAD)" \
+  --summary "Describe proposed change" \
+  --file README.md
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

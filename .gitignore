@@ -182,3 +182,4 @@ FederationInbox/safari/*.json
 FederationInbox/desktop/*.json
 FederationInbox/mobile/*.json
 FederationInbox/bridge/*.json
+patches/inbox/*.patch
