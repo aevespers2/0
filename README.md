@@ -202,6 +202,12 @@ Summarize Safari/Desktop relay-contact freshness:
 python3 scripts/write_federation_contact_report.py --print
 ```
 
+Write a compact federation dashboard:
+
+```bash
+python3 scripts/write_federation_dashboard.py --refresh-mirrors --print
+```
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash
