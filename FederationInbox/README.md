@@ -14,6 +14,7 @@ Local CLI is the authoritative GitHub write agent. Other surfaces should submit
 status packets, plans, and patch proposals here rather than pushing directly.
 
 Use `patches/` for patch proposal metadata and optional patch text references.
+Safari and advisory surfaces should emit patch proposals instead of direct pushes.
 
 To remove stale/blocked runtime packets after relay:
 
@@ -30,4 +31,19 @@ explicitly blocked:
 ```bash
 python3 scripts/write_desktop_federation_status.py \
   --safe-root /Users/ALISTAIRE/aevespers2-0
+```
+
+Mobile should emit user-facing routine packets for check-ins and completion follow-up:
+
+```bash
+python3 scripts/write_mobile_federation_status.py
+```
+
+Safari patch exports should use:
+
+```bash
+python3 scripts/safari_patch_workflow.py \
+  --summary "Describe proposed change" \
+  --file README.md \
+  --pretty
 ```

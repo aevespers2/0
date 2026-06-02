@@ -209,6 +209,29 @@ Write a federation state report with:
 python3 scripts/write_federation_state_report.py --authoritative-head "$(git rev-parse HEAD)" --print
 ```
 
+Run Safari as patch-first producer:
+
+```bash
+python3 scripts/safari_patch_workflow.py \
+  --summary "Describe proposed change" \
+  --file README.md \
+  --pretty
+```
+
+Emit mobile-facing check-in status:
+
+```bash
+python3 scripts/write_mobile_federation_status.py
+```
+
+Emit bridge signal for planning integration:
+
+```bash
+python3 scripts/emit_bridge_signal.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --pretty
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

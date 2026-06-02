@@ -67,6 +67,12 @@ jobs:
       - name: Validate patch proposal verifier
         run: python -m pytest -q tests/test_verify_patch_proposals.py
 
+      - name: Validate Safari patch workflow
+        run: python -m pytest -q tests/test_safari_patch_workflow.py
+
+      - name: Validate mobile status + bridge signal emitters
+        run: python -m pytest -q tests/test_write_mobile_federation_status.py tests/test_emit_bridge_signal.py
+
       - name: Validate guarded patch apply helper
         run: python -m pytest -q tests/test_apply_verified_patch.py
 

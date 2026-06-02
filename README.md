@@ -150,12 +150,37 @@ python3 scripts/write_federation_state_report.py \
   --print
 ```
 
+Run Safari production as patch-first workflow:
+
+```bash
+python3 scripts/safari_patch_workflow.py \
+  --summary "Describe proposed change" \
+  --file README.md \
+  --pretty
+```
+
+Emit a bridge-facing signal for external coordination and planning:
+
+```bash
+python3 scripts/emit_bridge_signal.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --pretty
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash
 python3 scripts/enforce_federation_remote_write.py \
   --authoritative-head "$(git rev-parse HEAD)" \
   --print
+```
+
+Write a mobile surface check-in packet:
+
+```bash
+python3 scripts/write_mobile_federation_status.py \
+  --repo /Users/ALISTAIRE/aevespers2-0 \
+  --output FederationInbox/mobile/status.json
 ```
 
 Install the local pre-push federation hooks (remote-write gate + runtime cleanup audit):
