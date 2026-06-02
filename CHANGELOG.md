@@ -19,6 +19,7 @@
 - Added `scripts/run_federation_routine.py` to refresh local/desktop/mobile status, bridge signal, state report, and dispatch in one command.
 - Added self-contained `status_template` and `handoff_text` fields to dispatch packets for cloud/advisory surfaces.
 - Preserved message `capabilities` and `constraints` through the federation kernel.
+- Added `FederationRelay/` and `scripts/record_federation_contact.py` for UI/browser/app handoff evidence.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -28,3 +29,4 @@
 - Documented dispatch generation and local federation routine execution across README/status docs.
 - Documented dispatch fallback behavior for surfaces that cannot run local helper scripts.
 - Clarified that `*-assignment.json` handoff files are ignored by the kernel and patch-only Safari behavior is a constraint, not a blocker.
+- Documented relay/contact logging for Safari and Desktop handoff attempts.

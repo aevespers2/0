@@ -10,6 +10,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [public_mirrors.json](public_mirrors.json): public dual-redundancy mirror manifest.
 - [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
 - [FederationDispatch/](FederationDispatch): local_cli-generated per-surface routing instructions.
+- [FederationRelay/](FederationRelay): UI/browser/app contact evidence for surface handoffs.
 - [patches/](patches): patch exchange area for advisory/cloud proposals.
 - [autonomous_vnext/policy.py](autonomous_vnext/policy.py): deny-by-default policy evaluator.
 - [autonomous_vnext/audit.py](autonomous_vnext/audit.py): append-only JSONL audit writer.
@@ -180,6 +181,16 @@ Run the local daily federation routine in one command:
 
 ```bash
 python3 scripts/run_federation_routine.py --print
+```
+
+Record a browser/app contact attempt:
+
+```bash
+python3 scripts/record_federation_contact.py \
+  --surface safari_cloud \
+  --channel safari_chatgpt \
+  --status staged \
+  --detail "handoff inserted into composer"
 ```
 
 Enforce remote-write readiness before push (this is the authoritative gate):

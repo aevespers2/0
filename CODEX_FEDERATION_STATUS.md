@@ -253,6 +253,17 @@ signal, state report, and dispatch in one pass:
 python3 scripts/run_federation_routine.py --print
 ```
 
+Record UI/browser/app contact attempts as relay evidence:
+
+```bash
+python3 scripts/record_federation_contact.py \
+  --surface safari_cloud \
+  --channel safari_chatgpt \
+  --status staged \
+  --dispatch FederationDispatch/safari/dispatch.json \
+  --detail "handoff inserted into composer"
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
