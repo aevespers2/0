@@ -82,3 +82,9 @@ python3 -m autonomous_vnext.federation_kernel \
   --authoritative-head "$(git rev-parse HEAD)" \
   --pretty
 ```
+
+Write Local CLI's current status packet into the inbox:
+
+```bash
+python3 scripts/write_local_federation_status.py
+```

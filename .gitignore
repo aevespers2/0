@@ -177,3 +177,8 @@ cython_debug/
 _handoff/
 reports/
 state/
+FederationInbox/local/*.json
+FederationInbox/safari/*.json
+FederationInbox/desktop/*.json
+FederationInbox/mobile/*.json
+FederationInbox/bridge/*.json

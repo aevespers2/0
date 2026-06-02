@@ -42,3 +42,8 @@ jobs:
 
       - name: Evaluate empty federation inbox
         run: python scripts/emit_codex_federation_status.py --pretty | python -c 'import json, subprocess, sys; payload=json.load(sys.stdin); subprocess.run(["python", "-m", "autonomous_vnext.federation_kernel", "--authoritative-head", payload["head"], "--pretty"], check=True)'
+
+      - name: Validate local federation status writer
+        run: |
+          python scripts/write_local_federation_status.py --output /tmp/local_federation_status.json
+          python -m json.tool /tmp/local_federation_status.json > /tmp/local_federation_status.validated.json

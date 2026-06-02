@@ -147,6 +147,12 @@ Evaluate the inbox with:
 python3 -m autonomous_vnext.federation_kernel --authoritative-head "$(git rev-parse HEAD)" --pretty
 ```
 
+Write Local CLI status into the inbox with:
+
+```bash
+python3 scripts/write_local_federation_status.py
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
