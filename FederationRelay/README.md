@@ -10,6 +10,7 @@ Default runtime outputs are ignored:
 
 - `reports/federation_contact_log.jsonl`
 - `reports/federation_contact_latest.json`
+- `reports/federation_contact_latest/<surface>.json`
 
 Record a contact event:
 

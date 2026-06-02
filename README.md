@@ -193,6 +193,9 @@ python3 scripts/record_federation_contact.py \
   --detail "handoff inserted into composer"
 ```
 
+Contact recording writes both the global latest event and a per-surface latest
+event under `reports/federation_contact_latest/`.
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash

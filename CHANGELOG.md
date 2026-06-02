@@ -40,3 +40,4 @@
 - Documented Safari acknowledgment extraction as a relay step before collecting `FederationInbox/safari/status.json`.
 - Relay summaries now preserve actionable next steps when Safari acknowledgment extraction observes no valid packet.
 - Relay summaries now select the latest contact for the dispatched surface so Desktop probes do not overwrite Safari relay state.
+- Contact recording now writes per-surface latest relay files under `reports/federation_contact_latest/`.

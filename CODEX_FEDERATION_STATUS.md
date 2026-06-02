@@ -264,6 +264,9 @@ python3 scripts/record_federation_contact.py \
   --detail "handoff inserted into composer"
 ```
 
+Relay contact recording writes both `reports/federation_contact_latest.json` and
+per-surface latest files under `reports/federation_contact_latest/`.
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash

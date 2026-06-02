@@ -17,6 +17,9 @@ def load_latest_contact_for_surface(
     contact_log_path: Path,
     surface: str,
 ) -> dict[str, Any]:
+    surface_latest = latest_contact_path.parent / "federation_contact_latest" / f"{surface}.json"
+    if surface and surface_latest.exists():
+        return load_json(surface_latest)
     latest = load_json(latest_contact_path)
     if not surface or latest.get("surface") == surface:
         return latest

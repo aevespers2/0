@@ -5,7 +5,12 @@ import json
 
 import pytest
 
-from scripts.record_federation_contact import build_contact_event, parse_evidence, write_contact_event
+from scripts.record_federation_contact import (
+    build_contact_event,
+    parse_evidence,
+    surface_latest_path,
+    write_contact_event,
+)
 
 
 def test_parse_evidence_requires_key_value() -> None:
@@ -48,3 +53,4 @@ def test_write_contact_event_appends_log_and_latest(tmp_path) -> None:
 
     assert len(log.read_text(encoding="utf-8").splitlines()) == 2
     assert json.loads(latest.read_text(encoding="utf-8"))["surface"] == "desktop_app"
+    assert json.loads(surface_latest_path(latest, "desktop_app").read_text(encoding="utf-8"))["surface"] == "desktop_app"

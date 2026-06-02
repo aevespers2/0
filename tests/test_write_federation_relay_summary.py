@@ -95,6 +95,30 @@ def test_summary_uses_latest_contact_for_dispatch_surface(tmp_path) -> None:
     assert summary["latest_contact_detail"] == "safari staged"
 
 
+def test_summary_prefers_surface_latest_file(tmp_path) -> None:
+    bridge = tmp_path / "bridge.json"
+    dispatch = tmp_path / "dispatch.json"
+    latest = tmp_path / "latest.json"
+    log = tmp_path / "contact.jsonl"
+    surface_latest = tmp_path / "federation_contact_latest" / "safari_cloud.json"
+    write_json(bridge, {"required_packets": ["safari_cloud"]})
+    write_json(
+        dispatch,
+        {"dispatch": {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"}},
+    )
+    write_json(latest, {"surface": "desktop_app", "status": "observed"})
+    write_json(surface_latest, {"surface": "safari_cloud", "status": "blocked", "detail": "surface latest"})
+    log.write_text(
+        json.dumps({"surface": "safari_cloud", "status": "staged", "detail": "older log"}) + "\n",
+        encoding="utf-8",
+    )
+
+    summary = build_summary(bridge, dispatch, latest, log)
+
+    assert summary["latest_contact_status"] == "blocked"
+    assert summary["latest_contact_detail"] == "surface latest"
+
+
 def test_load_latest_contact_for_surface_ignores_bad_log_lines(tmp_path) -> None:
     latest = tmp_path / "latest.json"
     log = tmp_path / "contact.jsonl"

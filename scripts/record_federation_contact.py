@@ -50,12 +50,19 @@ def build_contact_event(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def surface_latest_path(latest_path: Path, surface: str) -> Path:
+    return latest_path.parent / "federation_contact_latest" / f"{surface}.json"
+
+
 def write_contact_event(event: dict[str, Any], log_path: Path, latest_path: Path) -> None:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     latest_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, sort_keys=True) + "\n")
     latest_path.write_text(json.dumps(event, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    latest_surface = surface_latest_path(latest_path, str(event.get("surface", "unknown")))
+    latest_surface.parent.mkdir(parents=True, exist_ok=True)
+    latest_surface.write_text(json.dumps(event, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def parse_args() -> argparse.Namespace:
