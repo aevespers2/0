@@ -15,10 +15,12 @@ The shared workstream is Autonomous vNext / cognitive-engine continuous integrat
 ## Safe Local Checkout
 
 - Path: `/Users/ALISTAIRE/aevespers2-0`
-- Remote: `git@github.com:aevespers2/0.git`
+- Primary remote: `origin` -> `git@github.com:aevespers2/0.git`
+- Public redundancy remote: `georgetown` -> `git@github.com:GeorgeTownSabatical/0.git`
 - Branch: `main`
 - Latest verified commit before this status file: `8935fa5f6301b8adbf6a319d7208d7c470d83832`
 - GitHub repo: `https://github.com/aevespers2/0`
+- Public mirror: `https://github.com/GeorgeTownSabatical/0`
 - Local GitHub account: `GeorgeTownSabatical`
 - Permission observed with GitHub CLI: `WRITE`
 
@@ -84,6 +86,21 @@ Remote writes are allowed only from an explicit safe repository path.
 - ChatGPT / Bridge: design and planning assistance, with advisory status only.
 
 Fraud-pipeline work is prioritized when the target repo, APIs, credentials, and safety boundaries are explicit.
+
+## Public Redundancy
+
+The current public backup policy keeps this repository available through two public remotes:
+
+```text
+origin      git@github.com:aevespers2/0.git
+georgetown  git@github.com:GeorgeTownSabatical/0.git
+```
+
+Both remotes were verified at commit:
+
+```text
+6faf33e551319b40fed4aa5c039071b7b438c291
+```
 
 ## Continuous Integration
 
