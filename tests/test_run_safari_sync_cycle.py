@@ -92,3 +92,23 @@ def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None
     assert any("--send" in command for command in calls)
     assert any("--write-status" in command for command in calls)
     assert any("--refresh-mirrors" in command for command in calls)
+
+
+def test_cycle_refuses_to_stage_stale_dispatch_when_routine_fails(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("run_federation_routine.py" in item for item in command):
+            return result({}, returncode=1)
+        raise AssertionError(f"unexpected command after routine failure: {command}")
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert summary["commands_succeeded"] is False
+    assert summary["stage_skipped"] is True
+    assert "refusing to stage stale dispatch" in summary["skip_reason"]
+    assert summary["ready_for_remote_write"] is False
+    assert len(calls) == 1

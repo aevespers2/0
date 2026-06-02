@@ -15,8 +15,47 @@ def command_succeeded(result: dict[str, Any]) -> bool:
     return int(result.get("returncode", 1)) == 0
 
 
+def skipped_command(reason: str) -> dict[str, Any]:
+    return {
+        "command": [],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": reason,
+        "skipped": True,
+    }
+
+
 def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     routine = run_command(["python3", "scripts/run_federation_routine.py", "--print"], args.repo)
+    if not command_succeeded(routine):
+        reason = "federation routine failed; refusing to stage stale dispatch"
+        skipped = skipped_command(reason)
+        return {
+            "schema": "codex_safari_sync_cycle.v1",
+            "send_requested": args.send,
+            "write_status_requested": args.write_status,
+            "commands_succeeded": False,
+            "stage_skipped": True,
+            "skip_reason": reason,
+            "watch_status": "",
+            "watch_detail": "",
+            "ack_candidate_found": False,
+            "ack_written_path": "",
+            "relay_next_action": "Fix federation routine failure before staging Safari dispatch.",
+            "ready_for_remote_write": False,
+            "required_packets": (),
+            "missing_surfaces": (),
+            "contact_evidence_fresh": False,
+            "dashboard_next_action": "",
+            "routine": routine,
+            "stage": skipped,
+            "watch": skipped,
+            "extract": skipped,
+            "relay_summary": skipped,
+            "contact_report": skipped,
+            "dashboard": skipped,
+        }
+
     stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
 
     watch_command = [
