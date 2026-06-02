@@ -9,6 +9,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [action_record.schema.json](action_record.schema.json): append-only execution/audit event contract.
 - [public_mirrors.json](public_mirrors.json): public dual-redundancy mirror manifest.
 - [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
+- [FederationDispatch/](FederationDispatch): local_cli-generated per-surface routing instructions.
 - [patches/](patches): patch exchange area for advisory/cloud proposals.
 - [autonomous_vnext/policy.py](autonomous_vnext/policy.py): deny-by-default policy evaluator.
 - [autonomous_vnext/audit.py](autonomous_vnext/audit.py): append-only JSONL audit writer.
@@ -165,6 +166,20 @@ Emit a bridge-facing signal for external coordination and planning:
 python3 scripts/emit_bridge_signal.py \
   --authoritative-head "$(git rev-parse HEAD)" \
   --pretty
+```
+
+Write per-surface dispatch packets from the current federation state:
+
+```bash
+python3 scripts/write_federation_dispatch.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```
+
+Run the local daily federation routine in one command:
+
+```bash
+python3 scripts/run_federation_routine.py --print
 ```
 
 Enforce remote-write readiness before push (this is the authoritative gate):

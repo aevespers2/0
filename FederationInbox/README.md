@@ -47,3 +47,12 @@ python3 scripts/safari_patch_workflow.py \
   --file README.md \
   --pretty
 ```
+
+When the kernel reports missing/stale packets, local_cli writes instructions to
+`FederationDispatch/`:
+
+```bash
+python3 scripts/write_federation_dispatch.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```

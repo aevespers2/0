@@ -232,6 +232,21 @@ python3 scripts/emit_bridge_signal.py \
   --pretty
 ```
 
+Write dispatch packets for surfaces that owe status refreshes or unblock actions:
+
+```bash
+python3 scripts/write_federation_dispatch.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```
+
+Run the local federation routine to refresh local/desktop/mobile status, bridge
+signal, state report, and dispatch in one pass:
+
+```bash
+python3 scripts/run_federation_routine.py --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
