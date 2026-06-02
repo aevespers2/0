@@ -1,0 +1,13 @@
+{
+  "schema": "codex_federation_message.v1",
+  "agent": "safari_cloud",
+  "type": "status",
+  "workstream": "Autonomous vNext",
+  "cwd": "/workspace/0",
+  "branch": "work",
+  "commit": "31ef9682eaa3cc678a28f919b0a05da1755a7ab6",
+  "status_short": ["## work"],
+  "remote": "",
+  "blocker": "no_remote",
+  "next_action": "export patch proposal"
+}

@@ -114,6 +114,39 @@ The local mirror verifier is:
 python3 scripts/verify_public_mirrors.py --pretty
 ```
 
+## Federation Inbox
+
+The repository-tracked inbox is:
+
+```text
+FederationInbox/
+```
+
+Surface directories:
+
+```text
+FederationInbox/local/
+FederationInbox/safari/
+FederationInbox/desktop/
+FederationInbox/mobile/
+FederationInbox/bridge/
+```
+
+Safari/cloud and advisory surfaces export status packets and patch proposals.
+Local CLI validates patches and remains the authoritative GitHub writer.
+
+Patch exchange metadata lives under:
+
+```text
+patches/
+```
+
+Evaluate the inbox with:
+
+```bash
+python3 -m autonomous_vnext.federation_kernel --authoritative-head "$(git rev-parse HEAD)" --pretty
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

@@ -8,6 +8,8 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [mission_contract.schema.json](mission_contract.schema.json): mission intake contract.
 - [action_record.schema.json](action_record.schema.json): append-only execution/audit event contract.
 - [public_mirrors.json](public_mirrors.json): public dual-redundancy mirror manifest.
+- [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
+- [patches/](patches): patch exchange area for advisory/cloud proposals.
 - [autonomous_vnext/policy.py](autonomous_vnext/policy.py): deny-by-default policy evaluator.
 - [autonomous_vnext/audit.py](autonomous_vnext/audit.py): append-only JSONL audit writer.
 - [autonomous_vnext/planner.py](autonomous_vnext/planner.py): minimal candidate planning and risk scoring.
@@ -26,6 +28,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [autonomous_vnext/cognitive_runtime.py](autonomous_vnext/cognitive_runtime.py): deterministic end-to-end cognitive cycle runner.
 - [autonomous_vnext/experience_memory.py](autonomous_vnext/experience_memory.py): append-only cognitive experience memory.
 - [autonomous_vnext/federation.py](autonomous_vnext/federation.py): cross-surface Codex synchronization, role assignment, and recurring routine primitives.
+- [autonomous_vnext/federation_kernel.py](autonomous_vnext/federation_kernel.py): inbox reader, patch proposal validator, and coordination report generator.
 - [autonomous_vnext/self_model.py](autonomous_vnext/self_model.py): explicit capability/limitation/confidence model.
 - [autonomous_vnext/reflection.py](autonomous_vnext/reflection.py): expected-vs-observed reflection updates.
 
@@ -70,4 +73,12 @@ Verify public mirror heads from a local checkout with both remotes reachable:
 
 ```bash
 python3 scripts/verify_public_mirrors.py --pretty
+```
+
+Evaluate federation inbox messages with Local CLI as the authoritative writer:
+
+```bash
+python3 -m autonomous_vnext.federation_kernel \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --pretty
 ```

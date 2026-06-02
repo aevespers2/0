@@ -39,3 +39,6 @@ jobs:
 
       - name: Validate public mirror manifest
         run: python -m json.tool public_mirrors.json > /tmp/public_mirrors.validated.json
+
+      - name: Evaluate empty federation inbox
+        run: python scripts/emit_codex_federation_status.py --pretty | python -c 'import json, subprocess, sys; payload=json.load(sys.stdin); subprocess.run(["python", "-m", "autonomous_vnext.federation_kernel", "--authoritative-head", payload["head"], "--pretty"], check=True)'

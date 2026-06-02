@@ -1,0 +1,20 @@
+{
+  "schema": "codex_federation_message.v1",
+  "agent": "safari_cloud",
+  "type": "patch_proposal",
+  "workstream": "Autonomous vNext",
+  "cwd": "/workspace/0",
+  "branch": "work",
+  "commit": "31ef9682eaa3cc678a28f919b0a05da1755a7ab6",
+  "patch": {
+    "schema": "codex_patch_proposal.v1",
+    "source": "safari_cloud",
+    "repo": "aevespers2/0",
+    "base": "31ef9682eaa3cc678a28f919b0a05da1755a7ab6",
+    "type": "git_patch",
+    "summary": "Short description of the proposed change.",
+    "files": [],
+    "patch_path": "patches/example.patch",
+    "authority": "local_cli"
+  }
+}

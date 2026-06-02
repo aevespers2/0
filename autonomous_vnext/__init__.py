@@ -10,6 +10,7 @@ __all__ = [
     "executor",
     "experience_memory",
     "federation",
+    "federation_kernel",
     "goal_hamiltonian",
     "itensor_adapter",
     "mission_projection",
