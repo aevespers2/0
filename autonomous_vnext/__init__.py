@@ -9,6 +9,7 @@ __all__ = [
     "cognitive_state",
     "executor",
     "experience_memory",
+    "federation",
     "goal_hamiltonian",
     "itensor_adapter",
     "mission_projection",

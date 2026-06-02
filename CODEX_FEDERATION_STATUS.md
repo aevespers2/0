@@ -7,6 +7,8 @@ This repository participates in the three-surface Codex coordination loop:
 - Local Codex CLI on `/Users/ALISTAIRE`.
 - Safari Codex cloud task: `Outline cybernetic autonomous entity`.
 - macOS Codex desktop app.
+- Codex mobile surface reachable from the Codex application sidebar.
+- ChatGPT / Bridge planning surface.
 
 The shared workstream is Autonomous vNext / cognitive-engine continuous integration and development.
 
@@ -72,6 +74,16 @@ git log --oneline -n 1
 ```
 
 Remote writes are allowed only from an explicit safe repository path.
+
+## Role Split
+
+- Local CLI: final implementation authority, verification, commits, and deployments.
+- Safari/cloud Codex: PR-visible planning, diff review, and cloud-side status reporting.
+- macOS desktop Codex: desktop UI observation, local context relay, and sidebar access to mobile.
+- Codex mobile: daily user-facing routines, check-ins, completion follow-up, and escalation prompts.
+- ChatGPT / Bridge: design and planning assistance, with advisory status only.
+
+Fraud-pipeline work is prioritized when the target repo, APIs, credentials, and safety boundaries are explicit.
 
 ## Continuous Integration
 

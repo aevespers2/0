@@ -29,6 +29,7 @@ def build_status(repo: Path) -> dict[str, Any]:
             remotes.setdefault(parts[0], {})[parts[2].strip("()")] = parts[1]
     return {
         "schema": "codex_federation_status.v1",
+        "surface": "local_cli",
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "repo_root": str(root),
         "branch": git(["branch", "--show-current"], root),
@@ -38,6 +39,13 @@ def build_status(repo: Path) -> dict[str, Any]:
         "coordination": {
             "safe_repo_hint": "/Users/ALISTAIRE/aevespers2-0",
             "workstream": "Autonomous vNext cognitive engine continuous integration",
+            "known_surfaces": [
+                "local_cli",
+                "safari_cloud",
+                "desktop_app",
+                "mobile",
+                "chatgpt_bridge",
+            ],
             "required_checks": [
                 "pytest -q",
                 "python3 -m autonomous_vnext.cognitive_runtime \"ci federation coordination smoke\" --output /tmp/cognitive_runtime_report.json",

@@ -24,6 +24,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [autonomous_vnext/uncertainty_operator.py](autonomous_vnext/uncertainty_operator.py): entropy/confidence reporting.
 - [autonomous_vnext/cognitive_runtime.py](autonomous_vnext/cognitive_runtime.py): deterministic end-to-end cognitive cycle runner.
 - [autonomous_vnext/experience_memory.py](autonomous_vnext/experience_memory.py): append-only cognitive experience memory.
+- [autonomous_vnext/federation.py](autonomous_vnext/federation.py): cross-surface Codex synchronization, role assignment, and recurring routine primitives.
 - [autonomous_vnext/self_model.py](autonomous_vnext/self_model.py): explicit capability/limitation/confidence model.
 - [autonomous_vnext/reflection.py](autonomous_vnext/reflection.py): expected-vs-observed reflection updates.
 
