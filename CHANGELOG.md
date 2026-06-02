@@ -26,6 +26,7 @@
 - Added `scripts/run_safari_relay_retry.py` for bounded Safari dispatch staging/watch retry loops.
 - Added `scripts/extract_safari_ack.py` to parse visible Safari acknowledgments and optionally transcribe valid federation packets.
 - Added `scripts/run_safari_sync_cycle.py` to refresh, stage, watch, extract, and summarize Safari federation state in one command.
+- Added `scripts/probe_desktop_codex_app.py` to record live macOS Codex desktop app contact evidence.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -38,3 +39,4 @@
 - Documented relay/contact logging for Safari and Desktop handoff attempts.
 - Documented Safari acknowledgment extraction as a relay step before collecting `FederationInbox/safari/status.json`.
 - Relay summaries now preserve actionable next steps when Safari acknowledgment extraction observes no valid packet.
+- Relay summaries now select the latest contact for the dispatched surface so Desktop probes do not overwrite Safari relay state.

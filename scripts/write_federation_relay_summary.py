@@ -12,15 +12,42 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_latest_contact_for_surface(
+    latest_contact_path: Path,
+    contact_log_path: Path,
+    surface: str,
+) -> dict[str, Any]:
+    latest = load_json(latest_contact_path)
+    if not surface or latest.get("surface") == surface:
+        return latest
+    if not contact_log_path.exists():
+        return {}
+    for line in reversed(contact_log_path.read_text(encoding="utf-8").splitlines()):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("surface") == surface:
+            return event
+    return {}
+
+
 def build_summary(
     bridge_signal_path: Path,
     dispatch_path: Path,
     latest_contact_path: Path,
+    contact_log_path: Path | None = None,
 ) -> dict[str, Any]:
     bridge = load_json(bridge_signal_path)
     dispatch = load_json(dispatch_path)
-    contact = load_json(latest_contact_path)
     dispatch_body = dispatch.get("dispatch", {})
+    contact = load_latest_contact_for_surface(
+        latest_contact_path,
+        contact_log_path or Path(""),
+        str(dispatch_body.get("agent", "")),
+    )
     return {
         "schema": "codex_federation_relay_summary.v1",
         "authoritative_head": (
@@ -78,6 +105,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bridge-signal", type=Path, default=Path("reports/federation_bridge_signal.json"))
     parser.add_argument("--dispatch", type=Path, default=Path("FederationDispatch/safari/dispatch.json"))
     parser.add_argument("--latest-contact", type=Path, default=Path("reports/federation_contact_latest.json"))
+    parser.add_argument("--contact-log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("reports/federation_relay_summary.json"))
     parser.add_argument("--print", action="store_true", dest="print_summary")
     return parser.parse_args()
@@ -85,7 +113,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    summary = build_summary(args.bridge_signal, args.dispatch, args.latest_contact)
+    summary = build_summary(args.bridge_signal, args.dispatch, args.latest_contact, args.contact_log)
     write_summary(summary, args.output)
     if args.print_summary:
         print(json.dumps(summary, indent=2, sort_keys=True))

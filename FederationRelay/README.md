@@ -24,6 +24,12 @@ python3 scripts/record_federation_contact.py \
   --evidence composer_contains_handoff=true
 ```
 
+Probe the macOS Codex desktop app and record live app evidence:
+
+```bash
+python3 scripts/probe_desktop_codex_app.py --print
+```
+
 Refresh Safari's staged handoff from the latest dispatch and record the contact
 event:
 

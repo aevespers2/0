@@ -193,6 +193,12 @@ python3 scripts/record_federation_contact.py \
   --detail "handoff inserted into composer"
 ```
 
+Probe the macOS Codex desktop app and record live app evidence:
+
+```bash
+python3 scripts/probe_desktop_codex_app.py --print
+```
+
 Refresh and stage Safari's current dispatch in the Safari composer:
 
 ```bash
