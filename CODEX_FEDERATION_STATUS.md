@@ -193,6 +193,12 @@ python3 scripts/apply_verified_patch.py \
 
 Use `--apply` only after Local CLI review and a clean worktree check.
 
+Write a federation state report with:
+
+```bash
+python3 scripts/write_federation_state_report.py --authoritative-head "$(git rev-parse HEAD)" --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

@@ -69,3 +69,6 @@ jobs:
 
       - name: Validate guarded patch apply helper
         run: python -m pytest -q tests/test_apply_verified_patch.py
+
+      - name: Validate federation state report
+        run: python -m pytest -q tests/test_federation_state_report.py

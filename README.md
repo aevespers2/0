@@ -130,3 +130,11 @@ python3 scripts/apply_verified_patch.py \
 ```
 
 Add `--apply` only after reviewing the patch and confirming the worktree is clean.
+
+Write a durable federation state report:
+
+```bash
+python3 scripts/write_federation_state_report.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```
