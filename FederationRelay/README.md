@@ -31,6 +31,14 @@ event:
 python3 scripts/stage_safari_dispatch.py --print
 ```
 
+Watch for the staged Safari handoff to become sendable:
+
+```bash
+python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
+```
+
+To click the send control once it appears, add `--send`.
+
 Valid statuses:
 
 - `observed`

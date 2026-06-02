@@ -199,6 +199,12 @@ Refresh and stage Safari's current dispatch in the Safari composer:
 python3 scripts/stage_safari_dispatch.py --print
 ```
 
+Watch Safari until the staged dispatch is sendable:
+
+```bash
+python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash

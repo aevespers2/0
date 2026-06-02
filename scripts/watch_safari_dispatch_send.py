@@ -1,0 +1,165 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.record_federation_contact import build_contact_event, write_contact_event
+
+
+def safari_probe_script() -> str:
+    return """
+(() => {
+  const textarea = document.querySelector('textarea');
+  const text = textarea ? textarea.value : '';
+  const buttons = [...document.querySelectorAll('button')].map((button, index) => ({
+    index,
+    label: button.getAttribute('aria-label') || button.textContent.trim(),
+    disabled: button.disabled,
+    testid: button.getAttribute('data-testid') || '',
+    id: button.id || ''
+  })).filter(item => item.label || item.testid || item.id);
+  const sendButton = buttons.find(item =>
+    !item.disabled &&
+    String(item.label).toLowerCase().includes('send') &&
+    !String(item.label).toLowerCase().includes('stop')
+  );
+  const stopVisible = buttons.some(item =>
+    String(item.label).toLowerCase().includes('stop answering') ||
+    item.testid === 'stop-button'
+  );
+  return JSON.stringify({
+    url: location.href,
+    title: document.title,
+    composer_contains_handoff: text.includes('Federation handoff from Local CLI'),
+    textarea_length: text.length,
+    send_button_visible: Boolean(sendButton),
+    send_button_index: sendButton ? sendButton.index : -1,
+    stop_answering_visible: stopVisible,
+    labels: buttons.map(item => item.label).filter(Boolean).slice(-20)
+  });
+})()
+"""
+
+
+def safari_click_send_script(button_index: int) -> str:
+    return f"""
+(() => {{
+  const buttons = [...document.querySelectorAll('button')];
+  const button = buttons[{button_index}];
+  if (!button) return JSON.stringify({{clicked: false, reason: 'button_not_found'}});
+  const label = button.getAttribute('aria-label') || button.textContent.trim();
+  if (!label || !label.toLowerCase().includes('send') || label.toLowerCase().includes('stop')) {{
+    return JSON.stringify({{clicked: false, reason: 'button_not_send', label}});
+  }}
+  if (button.disabled) return JSON.stringify({{clicked: false, reason: 'button_disabled', label}});
+  button.click();
+  return JSON.stringify({{clicked: true, label}});
+}})()
+"""
+
+
+def run_osascript(javascript: str) -> dict[str, Any]:
+    script = (
+        'tell application "Safari"\n'
+        f'  do JavaScript {json.dumps(javascript)} in current tab of front window\n'
+        "end tell\n"
+    )
+    result = subprocess.run(
+        ["osascript"],
+        input=script,
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    return json.loads(result.stdout.strip())
+
+
+def wait_for_sendable(timeout_seconds: float, interval_seconds: float) -> dict[str, Any]:
+    deadline = time.monotonic() + timeout_seconds
+    probe = run_osascript(safari_probe_script())
+    while time.monotonic() < deadline:
+        if probe.get("send_button_visible") and not probe.get("stop_answering_visible"):
+            return probe
+        time.sleep(interval_seconds)
+        probe = run_osascript(safari_probe_script())
+    return probe
+
+
+def record_probe(
+    probe: dict[str, Any],
+    args: argparse.Namespace,
+    status: str,
+    detail: str,
+) -> dict[str, Any]:
+    event_args = argparse.Namespace(
+        surface="safari_cloud",
+        channel="safari_chatgpt",
+        status=status,
+        authoritative_head=args.authoritative_head,
+        dispatch=str(args.dispatch),
+        detail=detail,
+        evidence=[
+            f"title={probe.get('title', '')}",
+            f"url={probe.get('url', '')}",
+            f"composer_contains_handoff={str(probe.get('composer_contains_handoff', False)).lower()}",
+            f"send_button_visible={str(probe.get('send_button_visible', False)).lower()}",
+            f"stop_answering_visible={str(probe.get('stop_answering_visible', False)).lower()}",
+        ],
+    )
+    event = build_contact_event(event_args)
+    write_contact_event(event, args.log, args.latest)
+    return event
+
+
+def watch(args: argparse.Namespace) -> dict[str, Any]:
+    probe = wait_for_sendable(args.timeout, args.interval)
+    sent = None
+    if probe.get("send_button_visible") and not probe.get("stop_answering_visible") and args.send:
+        sent = run_osascript(safari_click_send_script(int(probe["send_button_index"])))
+        status = "sent" if sent.get("clicked") else "failed"
+        detail = "Safari dispatch handoff sent." if sent.get("clicked") else f"Safari send failed: {sent.get('reason')}"
+    elif probe.get("send_button_visible") and not probe.get("stop_answering_visible"):
+        status = "staged"
+        detail = "Safari dispatch handoff is staged and sendable; --send was not requested."
+    else:
+        status = "blocked"
+        detail = "Safari dispatch handoff is staged but send is unavailable."
+    event = record_probe(probe, args, status, detail)
+    return {"probe": probe, "send_result": sent, "contact_event": event}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Wait for Safari dispatch handoff sendability.")
+    parser.add_argument("--dispatch", type=Path, default=Path("FederationDispatch/safari/dispatch.json"))
+    parser.add_argument("--authoritative-head", default="")
+    parser.add_argument("--timeout", type=float, default=5.0)
+    parser.add_argument("--interval", type=float, default=1.0)
+    parser.add_argument("--send", action="store_true")
+    parser.add_argument("--log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
+    parser.add_argument("--latest", type=Path, default=Path("reports/federation_contact_latest.json"))
+    parser.add_argument("--print", action="store_true", dest="print_result")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    if not args.authoritative_head and args.dispatch.exists():
+        payload = json.loads(args.dispatch.read_text(encoding="utf-8"))
+        args.authoritative_head = payload.get("authoritative_head", "")
+    result = watch(args)
+    if args.print_result:
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(args.latest)
+
+
+if __name__ == "__main__":
+    main()

@@ -270,6 +270,12 @@ Refresh Safari's staged composer handoff from the current dispatch:
 python3 scripts/stage_safari_dispatch.py --print
 ```
 
+Watch or send the staged Safari handoff:
+
+```bash
+python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
