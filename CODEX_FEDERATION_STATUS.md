@@ -153,6 +153,19 @@ Write Local CLI status into the inbox with:
 python3 scripts/write_local_federation_status.py
 ```
 
+Write Safari, Desktop, Mobile, or Bridge status into the inbox with:
+
+```bash
+python3 scripts/write_federation_message.py \
+  --agent safari_cloud \
+  --type status \
+  --cwd /workspace/0 \
+  --branch work \
+  --commit "$(git rev-parse HEAD)" \
+  --blocker no_remote \
+  --next-action "export patch proposal"
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

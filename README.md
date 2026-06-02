@@ -88,3 +88,16 @@ Write Local CLI's current status packet into the inbox:
 ```bash
 python3 scripts/write_local_federation_status.py
 ```
+
+Write a nonlocal surface status packet:
+
+```bash
+python3 scripts/write_federation_message.py \
+  --agent safari_cloud \
+  --type status \
+  --cwd /workspace/0 \
+  --branch work \
+  --commit "$(git rev-parse HEAD)" \
+  --blocker no_remote \
+  --next-action "export patch proposal"
+```

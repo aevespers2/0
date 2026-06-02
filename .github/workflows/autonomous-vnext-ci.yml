@@ -47,3 +47,16 @@ jobs:
         run: |
           python scripts/write_local_federation_status.py --output /tmp/local_federation_status.json
           python -m json.tool /tmp/local_federation_status.json > /tmp/local_federation_status.validated.json
+
+      - name: Validate generic federation message writer
+        run: |
+          python scripts/write_federation_message.py \
+            --agent safari_cloud \
+            --type status \
+            --cwd /workspace/0 \
+            --branch work \
+            --commit "$(git rev-parse HEAD)" \
+            --blocker no_remote \
+            --next-action "export patch proposal" \
+            --inbox /tmp/FederationInbox
+          python -m json.tool /tmp/FederationInbox/safari/status.json > /tmp/safari_status.validated.json
