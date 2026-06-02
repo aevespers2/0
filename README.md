@@ -119,3 +119,14 @@ python3 scripts/verify_patch_proposals.py \
   --authoritative-head "$(git rev-parse HEAD)" \
   --pretty
 ```
+
+Check or apply one verified patch proposal:
+
+```bash
+python3 scripts/apply_verified_patch.py \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --source safari_cloud \
+  --pretty
+```
+
+Add `--apply` only after reviewing the patch and confirming the worktree is clean.
