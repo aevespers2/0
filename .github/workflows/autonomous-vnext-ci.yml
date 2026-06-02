@@ -63,3 +63,6 @@ jobs:
 
       - name: Validate patch bundle writer
         run: python -m pytest -q tests/test_write_patch_bundle.py
+
+      - name: Validate patch proposal verifier
+        run: python -m pytest -q tests/test_verify_patch_proposals.py

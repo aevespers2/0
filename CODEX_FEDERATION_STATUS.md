@@ -176,6 +176,12 @@ python3 scripts/write_patch_bundle.py \
   --file README.md
 ```
 
+Verify proposed patch bundles without applying them with:
+
+```bash
+python3 scripts/verify_patch_proposals.py --authoritative-head "$(git rev-parse HEAD)" --pretty
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:
