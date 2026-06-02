@@ -122,26 +122,98 @@ def collect_patch_proposals(messages: tuple[FederationMessage, ...]) -> tuple[Pa
     return tuple(proposals)
 
 
+def _infer_surface_dir(agent: str) -> str:
+    for surface_dir, surface_name in SURFACE_DIRS.items():
+        if surface_name == agent:
+            return surface_dir
+    return agent
+
+
+def _next_required_packets(
+    assessment: dict[str, Any],
+    status_by_surface: dict[str, CodexAgentStatus],
+    authoritative_head: str,
+) -> tuple[dict[str, str], ...]:
+    action_payloads = []
+    seen: set[str] = set()
+
+    for surface in assessment["missing_surfaces"]:
+        if surface in seen:
+            continue
+        seen.add(surface)
+        action_payloads.append(
+            {
+                "agent": surface,
+                "packet_type": "status",
+                "priority": "required",
+                "details": "status packet missing in FederationInbox",
+                "expected_path": f"FederationInbox/{_infer_surface_dir(surface)}/status.json",
+            }
+        )
+
+    for surface in assessment["stale_surfaces"]:
+        if surface in seen:
+            continue
+        seen.add(surface)
+        action_payloads.append(
+            {
+                "agent": surface,
+                "packet_type": "status_refresh",
+                "priority": "required",
+                "details": (
+                    f"status is stale (saw {status_by_surface[surface].head}); "
+                    f"refresh to {authoritative_head}"
+                ),
+                "expected_path": f"FederationInbox/{_infer_surface_dir(surface)}/status.json",
+            }
+        )
+
+    for surface in assessment["explicitly_blocked_surfaces"]:
+        if surface in seen:
+            continue
+        seen.add(surface)
+        action_payloads.append(
+            {
+                "agent": surface,
+                "packet_type": "status_unblock",
+                "priority": "required",
+                "details": f"active blocker: {status_by_surface[surface].blocker}",
+                "expected_path": f"FederationInbox/{_infer_surface_dir(surface)}/status.json",
+            }
+        )
+
+    return tuple(action_payloads)
+
+
 def evaluate_kernel(inbox: Path, authoritative_head: str) -> dict[str, Any]:
     messages = read_inbox(inbox)
     statuses = tuple(status for message in messages if (status := message_to_status(message)) is not None)
-    assessment = assess_federation(statuses, authoritative_head=authoritative_head)
+    status_by_surface = {status.surface: status for status in statuses}
+    assessment_obj = assess_federation(statuses, authoritative_head=authoritative_head)
+    assessment = assessment_obj.to_dict()
     proposals = collect_patch_proposals(messages)
-    patch_errors = {
-        proposal.source: proposal.validate()
-        for proposal in proposals
-        if proposal.validate()
-    }
+
+    patch_errors = {}
+    for proposal in proposals:
+        errors = proposal.validate()
+        if errors:
+            patch_errors[proposal.source] = errors
+
     return {
         "schema": "codex_federation_kernel_report.v1",
         "authoritative_writer": AUTHORIZED_WRITER,
         "authoritative_head": authoritative_head,
         "message_count": len(messages),
         "messages": tuple(asdict(message) for message in messages),
-        "assessment": assessment.to_dict(),
+        "assessment": assessment,
         "patch_proposals": tuple(asdict(proposal) for proposal in proposals),
         "patch_errors": patch_errors,
-        "routines": recurring_routines(assessment),
+        "next_required_packets": _next_required_packets(
+            assessment,
+            status_by_surface,
+            authoritative_head,
+        ),
+        "routines": recurring_routines(assessment_obj),
     }
 
 

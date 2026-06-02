@@ -102,6 +102,17 @@ python3 scripts/write_federation_message.py \
   --next-action "export patch proposal"
 ```
 
+Prune stale/failing runtime packets once the state is reconciled:
+
+```bash
+python3 scripts/prune_federation_runtime.py \
+  --inbox FederationInbox \
+  --authoritative-head "$(git rev-parse HEAD)" \
+  --print
+```
+
+Add `--delete` to move selected packets into `state/federation_runtime_archive`, or `--delete --no-archive` to hard-delete selected packets.
+
 Export a working-tree diff as a patch bundle for Local CLI review:
 
 ```bash

@@ -37,7 +37,9 @@ def test_assess_federation_detects_stale_or_blocked_surface() -> None:
     )
 
     assert not assessment.synchronized
-    assert assessment.blocked_surfaces == ("safari_cloud", "desktop_app")
+    assert set(assessment.blocked_surfaces) == {"safari_cloud", "desktop_app"}
+    assert assessment.stale_surfaces == ("safari_cloud",)
+    assert assessment.explicitly_blocked_surfaces == ("desktop_app",)
 
 
 def test_assess_federation_assigns_surface_specific_roles() -> None:

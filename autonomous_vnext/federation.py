@@ -64,6 +64,8 @@ class FederationAssessment:
     authoritative_head: str
     present_surfaces: tuple[str, ...]
     missing_surfaces: tuple[str, ...]
+    explicitly_blocked_surfaces: tuple[str, ...]
+    stale_surfaces: tuple[str, ...]
     blocked_surfaces: tuple[str, ...]
     assignments: tuple[RoleAssignment, ...] = field(default_factory=tuple)
 
@@ -73,6 +75,8 @@ class FederationAssessment:
             "authoritative_head": self.authoritative_head,
             "present_surfaces": self.present_surfaces,
             "missing_surfaces": self.missing_surfaces,
+            "explicitly_blocked_surfaces": self.explicitly_blocked_surfaces,
+            "stale_surfaces": self.stale_surfaces,
             "blocked_surfaces": self.blocked_surfaces,
             "assignments": tuple(asdict(item) for item in self.assignments),
         }
@@ -89,18 +93,29 @@ def assess_federation(
     latest_by_surface = {status.surface: status for status in statuses}
     present = tuple(surface for surface in required_surfaces if surface in latest_by_surface)
     missing = tuple(surface for surface in required_surfaces if surface not in latest_by_surface)
-    blocked = tuple(
-        surface
-        for surface in present
-        if latest_by_surface[surface].blocker.strip()
-        or latest_by_surface[surface].head != authoritative_head
+    explicitly_blocked = tuple(
+        surface for surface in present if latest_by_surface[surface].blocker.strip()
     )
+    stale = tuple(
+        surface for surface in present if latest_by_surface[surface].head != authoritative_head
+    )
+
+    blocked: list[str] = []
+    seen: set[str] = set()
+    for surface in (*explicitly_blocked, *stale):
+        if surface not in seen:
+            blocked.append(surface)
+            seen.add(surface)
+    blocked = tuple(blocked)
+
     synchronized = not missing and not blocked
     return FederationAssessment(
         synchronized=synchronized,
         authoritative_head=authoritative_head,
         present_surfaces=present,
         missing_surfaces=missing,
+        explicitly_blocked_surfaces=explicitly_blocked,
+        stale_surfaces=stale,
         blocked_surfaces=blocked,
         assignments=assign_roles(statuses),
     )
@@ -193,6 +208,25 @@ def recurring_routines(assessment: FederationAssessment) -> tuple[dict[str, str]
                 "cadence": "until_resolved",
                 "owner": "local_cli",
                 "task": "Collect missing status packets: " + ", ".join(assessment.missing_surfaces),
+            }
+        )
+    if assessment.stale_surfaces:
+        routines.append(
+            {
+                "cadence": "until_resolved",
+                "owner": "local_cli",
+                "task": "Collect updated status packets for stale heads: "
+                + ", ".join(
+                    f"{surface}@{assessment.authoritative_head}" for surface in assessment.stale_surfaces
+                ),
+            }
+        )
+    if assessment.explicitly_blocked_surfaces:
+        routines.append(
+            {
+                "cadence": "until_resolved",
+                "owner": "local_cli",
+                "task": "Resolve blockers for surfaces: " + ", ".join(assessment.explicitly_blocked_surfaces),
             }
         )
     return tuple(routines)
