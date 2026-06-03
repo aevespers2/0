@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import subprocess
+import sys
 
 from scripts import recover_desktop_codex_app
 
@@ -50,3 +52,15 @@ def test_recover_skips_open_when_window_present(monkeypatch, tmp_path) -> None:
 
     assert result["opened"] is False
     assert result["recovered"] is True
+
+
+def test_script_help_runs_as_direct_entrypoint() -> None:
+    result = subprocess.run(
+        [sys.executable, "scripts/recover_desktop_codex_app.py", "--help"],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    assert result.returncode == 0
+    assert "Recover the macOS Codex desktop app window" in result.stdout

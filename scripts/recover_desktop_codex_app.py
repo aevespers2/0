@@ -4,8 +4,11 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import sys
 import time
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts import probe_desktop_codex_app
 
