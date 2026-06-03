@@ -112,3 +112,32 @@ def test_cycle_refuses_to_stage_stale_dispatch_when_routine_fails(monkeypatch, t
     assert "refusing to stage stale dispatch" in summary["skip_reason"]
     assert summary["ready_for_remote_write"] is False
     assert len(calls) == 1
+
+
+def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("run_federation_routine.py" in item for item in command):
+            return result({})
+        if any("stage_safari_dispatch.py" in item for item in command):
+            return result({"contact_event": {"status": "failed", "detail": "composer_not_found"}})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result({"next_action": "Restore Safari composer.", "ready_for_remote_write": False})
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": False, "next_action": "Restore Safari composer."})
+        raise AssertionError(f"unexpected command after stage failure: {command}")
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert summary["commands_succeeded"] is False
+    assert summary["stage_failed"] is True
+    assert "refusing to watch" in summary["skip_reason"]
+    assert summary["dashboard_next_action"] == "Restore Safari composer."
+    assert not any("watch_safari_dispatch_send.py" in item for command in calls for item in command)
+    assert not any("extract_safari_ack.py" in item for command in calls for item in command)

@@ -15,6 +15,17 @@ def command_succeeded(result: dict[str, Any]) -> bool:
     return int(result.get("returncode", 1)) == 0
 
 
+def contact_status(result: dict[str, Any]) -> str:
+    payload = parse_json_stdout(result)
+    contact = payload.get("contact_event", {})
+    return str(contact.get("status", ""))
+
+
+def stage_succeeded(result: dict[str, Any]) -> bool:
+    status = contact_status(result)
+    return command_succeeded(result) and status != "failed"
+
+
 def skipped_command(reason: str) -> dict[str, Any]:
     return {
         "command": [],
@@ -57,6 +68,46 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         }
 
     stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
+    if not stage_succeeded(stage):
+        reason = "Safari dispatch staging failed; refusing to watch or extract stale state"
+        skipped = skipped_command(reason)
+        summary = run_command(["python3", "scripts/write_federation_relay_summary.py", "--print"], args.repo)
+        contact_report = run_command(["python3", "scripts/write_federation_contact_report.py", "--print"], args.repo)
+        dashboard = run_command(
+            ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
+            args.repo,
+        )
+        summary_payload = parse_json_stdout(summary)
+        contact_payload = parse_json_stdout(contact_report)
+        dashboard_payload = parse_json_stdout(dashboard)
+        return {
+            "schema": "codex_safari_sync_cycle.v1",
+            "send_requested": args.send,
+            "write_status_requested": args.write_status,
+            "commands_succeeded": False,
+            "stage_failed": True,
+            "skip_reason": reason,
+            "watch_status": "",
+            "watch_detail": "",
+            "ack_candidate_found": False,
+            "ack_written_path": "",
+            "relay_next_action": summary_payload.get("next_action", ""),
+            "ready_for_remote_write": dashboard_payload.get(
+                "ready_for_remote_write",
+                summary_payload.get("ready_for_remote_write", False),
+            ),
+            "required_packets": summary_payload.get("required_packets", ()),
+            "missing_surfaces": summary_payload.get("missing_surfaces", ()),
+            "contact_evidence_fresh": contact_payload.get("all_contacts_fresh", False),
+            "dashboard_next_action": dashboard_payload.get("next_action", ""),
+            "routine": routine,
+            "stage": stage,
+            "watch": skipped,
+            "extract": skipped,
+            "relay_summary": summary,
+            "contact_report": contact_report,
+            "dashboard": dashboard,
+        }
 
     watch_command = [
         "python3",
