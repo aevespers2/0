@@ -240,6 +240,12 @@ send button remains disabled:
 python3 scripts/nudge_safari_sendability.py --print
 ```
 
+Write a compact Safari operator handoff from the current relay evidence:
+
+```bash
+python3 scripts/write_safari_operator_handoff.py --print
+```
+
 Recover Safari composer visibility after a stale/blank ChatGPT app shell:
 
 ```bash

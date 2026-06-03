@@ -1,0 +1,11 @@
+Safari Federation Operator Handoff
+Head: efa4f0860e3bee6d22e72bdf2dfbfba51f7c1027
+Status: blocked_send_disabled
+Expected packet: FederationInbox/safari/status.json
+Next action: Safari handoff is staged but send is disabled; enable/send in safari_cloud, then collect FederationInbox/safari/status.json.
+
+- Open the Safari ChatGPT conversation.
+- Confirm the federation handoff text is still in the composer.
+- If ChatGPT enables Send, send the handoff.
+- After Safari responds, collect or transcribe the status packet to FederationInbox/safari/status.json.
+- Do not push directly from Safari; export patch proposals for Local CLI review.
