@@ -226,6 +226,12 @@ Watch Safari until the staged dispatch is sendable:
 python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
 ```
 
+Recover Safari composer visibility after a stale/blank ChatGPT app shell:
+
+```bash
+python3 scripts/recover_safari_composer.py --print
+```
+
 Summarize current relay state:
 
 ```bash
@@ -245,8 +251,8 @@ python3 scripts/run_safari_sync_cycle.py --print
 ```
 
 This refreshes the routine, stages Safari dispatch, checks sendability, probes
-for an explicit Safari acknowledgment, and rewrites the relay summary, contact
-report, and dashboard.
+for an explicit Safari acknowledgment, attempts one composer recovery when
+staging fails, and rewrites the relay summary, contact report, and dashboard.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

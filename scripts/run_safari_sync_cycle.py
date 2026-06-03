@@ -68,6 +68,13 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         }
 
     stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
+    recovery = skipped_command("Safari dispatch staging succeeded; recovery not needed")
+    if not stage_succeeded(stage) and args.recover_composer:
+        recovery = run_command(["python3", "scripts/recover_safari_composer.py", "--print"], args.repo)
+        if command_succeeded(recovery):
+            recovery_payload = parse_json_stdout(recovery)
+            if recovery_payload.get("recovered"):
+                stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
     if not stage_succeeded(stage):
         reason = "Safari dispatch staging failed; refusing to watch or extract stale state"
         skipped = skipped_command(reason)
@@ -102,6 +109,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "dashboard_next_action": dashboard_payload.get("next_action", ""),
             "routine": routine,
             "stage": stage,
+            "recovery": recovery,
             "watch": skipped,
             "extract": skipped,
             "relay_summary": summary,
@@ -163,6 +171,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "dashboard_next_action": dashboard_payload.get("next_action", ""),
         "routine": routine,
         "stage": stage,
+        "recovery": recovery,
         "watch": watch,
         "extract": extract,
         "relay_summary": summary,
@@ -180,6 +189,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--watch-interval", type=float, default=1.0)
     parser.add_argument("--send", action="store_true")
     parser.add_argument("--write-status", action="store_true")
+    parser.add_argument("--no-recover-composer", action="store_false", dest="recover_composer")
+    parser.set_defaults(recover_composer=True)
     parser.add_argument("--output", type=Path, default=Path("reports/safari_sync_cycle_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")
     return parser.parse_args()

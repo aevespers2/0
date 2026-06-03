@@ -28,6 +28,7 @@
 - Added `scripts/run_safari_sync_cycle.py` to refresh, stage, watch, extract, and summarize Safari federation state in one command.
 - Added `scripts/probe_desktop_codex_app.py` to record live macOS Codex desktop app contact evidence.
 - Added `FederationPatches/` as the durable patch exchange lane for nonlocal patch proposals.
+- Added `scripts/recover_safari_composer.py` to reload and re-probe Safari when ChatGPT hides the composer.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -46,3 +47,4 @@
 - Added `scripts/write_federation_dashboard.py` for compact federation handoff summaries.
 - Safari sync cycles now refresh the relay summary, contact report, and federation dashboard together.
 - Patch bundle export now defaults to `FederationPatches/inbox/`.
+- Safari sync cycles now attempt one composer recovery before failing closed on staging failure.

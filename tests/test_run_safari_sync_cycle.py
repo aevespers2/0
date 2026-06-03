@@ -13,6 +13,7 @@ def args(tmp_path, **overrides):
         "watch_interval": 1,
         "send": False,
         "write_status": False,
+        "recover_composer": True,
         "output": tmp_path / "reports" / "cycle.json",
         "print_result": False,
     }
@@ -133,7 +134,7 @@ def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_p
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
 
-    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path, recover_composer=False))
 
     assert summary["commands_succeeded"] is False
     assert summary["stage_failed"] is True
@@ -141,3 +142,41 @@ def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_p
     assert summary["dashboard_next_action"] == "Restore Safari composer."
     assert not any("watch_safari_dispatch_send.py" in item for command in calls for item in command)
     assert not any("extract_safari_ack.py" in item for command in calls for item in command)
+
+
+def test_cycle_recovers_composer_once_after_stage_failure(monkeypatch, tmp_path) -> None:
+    calls = []
+    stage_calls = 0
+
+    def fake_run(command, cwd):
+        nonlocal stage_calls
+        calls.append(command)
+        if any("run_federation_routine.py" in item for item in command):
+            return result({})
+        if any("stage_safari_dispatch.py" in item for item in command):
+            stage_calls += 1
+            if stage_calls == 1:
+                return result({"contact_event": {"status": "failed", "detail": "composer_not_found"}})
+            return result({"contact_event": {"status": "staged", "detail": "composer restored"}})
+        if any("recover_safari_composer.py" in item for item in command):
+            return result({"recovered": True})
+        if any("watch_safari_dispatch_send.py" in item for item in command):
+            return result({"contact_event": {"status": "blocked", "detail": "disabled"}})
+        if any("extract_safari_ack.py" in item for item in command):
+            return result({"candidate": None, "written_path": ""})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result({"next_action": "Continue.", "ready_for_remote_write": False})
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": False, "next_action": "Continue."})
+        raise AssertionError(command)
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert stage_calls == 2
+    assert summary["commands_succeeded"] is True
+    assert summary["watch_status"] == "blocked"
+    assert any("recover_safari_composer.py" in item for command in calls for item in command)
