@@ -4,8 +4,10 @@ import json
 
 from scripts.write_federation_relay_summary import (
     build_summary,
+    contact_actionability_score,
     load_latest_contact_for_surface,
     next_action_for,
+    select_actionable_contact,
     write_summary,
 )
 
@@ -74,6 +76,17 @@ def test_next_action_for_observed_no_candidate_keeps_watch_path() -> None:
     assert next_action_for(bridge, dispatch, contact).startswith("Continue watching safari_cloud")
 
 
+def test_next_action_for_send_disabled_is_specific() -> None:
+    bridge = {"required_packets": ["safari_cloud"]}
+    dispatch = {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"}
+    contact = {
+        "status": "blocked",
+        "evidence": {"composer_contains_handoff": "true", "send_button_enabled": "false"},
+    }
+
+    assert next_action_for(bridge, dispatch, contact).startswith("Safari handoff is staged but send is disabled")
+
+
 def test_summary_uses_latest_contact_for_dispatch_surface(tmp_path) -> None:
     bridge = tmp_path / "bridge.json"
     dispatch = tmp_path / "dispatch.json"
@@ -117,6 +130,81 @@ def test_summary_prefers_surface_latest_file(tmp_path) -> None:
 
     assert summary["latest_contact_status"] == "blocked"
     assert summary["latest_contact_detail"] == "surface latest"
+
+
+def test_summary_prefers_current_head_send_disabled_contact_over_later_ack_probe(tmp_path) -> None:
+    bridge = tmp_path / "bridge.json"
+    dispatch = tmp_path / "dispatch.json"
+    latest = tmp_path / "latest.json"
+    log = tmp_path / "contact.jsonl"
+    surface_latest = tmp_path / "federation_contact_latest" / "safari_cloud.json"
+    write_json(
+        bridge,
+        {
+            "authoritative_head": "head1",
+            "required_packets": ["safari_cloud"],
+            "missing_surfaces": ["safari_cloud"],
+        },
+    )
+    write_json(
+        dispatch,
+        {
+            "authoritative_head": "head1",
+            "dispatch": {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"},
+        },
+    )
+    write_json(
+        surface_latest,
+        {
+            "surface": "safari_cloud",
+            "authoritative_head": "head1",
+            "status": "observed",
+            "detail": "no candidate",
+            "evidence": {"candidate_found": "false"},
+        },
+    )
+    write_json(latest, {"surface": "safari_cloud", "status": "observed"})
+    log.write_text(
+        json.dumps(
+            {
+                "surface": "safari_cloud",
+                "authoritative_head": "old",
+                "status": "blocked",
+                "detail": "old disabled",
+                "evidence": {"composer_contains_handoff": "true", "send_button_enabled": "false"},
+            }
+        )
+        + "\n"
+        + json.dumps(
+            {
+                "surface": "safari_cloud",
+                "authoritative_head": "head1",
+                "status": "blocked",
+                "detail": "send disabled",
+                "evidence": {"composer_contains_handoff": "true", "send_button_enabled": "false"},
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    summary = build_summary(bridge, dispatch, latest, log)
+
+    assert summary["latest_contact_status"] == "blocked"
+    assert summary["latest_contact_detail"] == "send disabled"
+    assert summary["next_action"].startswith("Safari handoff is staged but send is disabled")
+
+
+def test_select_actionable_contact_filters_by_authoritative_head() -> None:
+    old = {
+        "authoritative_head": "old",
+        "status": "blocked",
+        "evidence": {"composer_contains_handoff": "true", "send_button_enabled": "false"},
+    }
+    current = {"authoritative_head": "head1", "status": "observed", "evidence": {"candidate_found": "false"}}
+
+    assert contact_actionability_score(old) > contact_actionability_score(current)
+    assert select_actionable_contact([old, current], "head1") == current
 
 
 def test_load_latest_contact_for_surface_ignores_bad_log_lines(tmp_path) -> None:

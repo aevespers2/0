@@ -16,25 +16,65 @@ def load_latest_contact_for_surface(
     latest_contact_path: Path,
     contact_log_path: Path,
     surface: str,
+    authoritative_head: str = "",
 ) -> dict[str, Any]:
+    candidates: list[dict[str, Any]] = []
     surface_latest = latest_contact_path.parent / "federation_contact_latest" / f"{surface}.json"
     if surface and surface_latest.exists():
-        return load_json(surface_latest)
+        candidates.append(load_json(surface_latest))
     latest = load_json(latest_contact_path)
     if not surface or latest.get("surface") == surface:
-        return latest
-    if not contact_log_path.exists():
+        candidates.append(latest)
+    if contact_log_path.is_file():
+        for line in reversed(contact_log_path.read_text(encoding="utf-8").splitlines()):
+            if not line.strip():
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if event.get("surface") == surface:
+                candidates.append(event)
+    return select_actionable_contact(candidates, authoritative_head)
+
+
+def contact_actionability_score(contact: dict[str, Any]) -> int:
+    evidence = contact.get("evidence", {})
+    status = contact.get("status", "")
+    if (
+        evidence.get("composer_contains_handoff") == "true"
+        and evidence.get("send_button_enabled") == "false"
+    ):
+        return 90
+    if status == "blocked":
+        return 80
+    if status == "staged":
+        return 70
+    if status == "sent":
+        return 60
+    if status == "acknowledged":
+        return 50
+    if status == "failed":
+        return 40
+    if status == "observed" and evidence.get("candidate_found") == "false":
+        return 10
+    return 0
+
+
+def select_actionable_contact(
+    contacts: list[dict[str, Any]],
+    authoritative_head: str = "",
+) -> dict[str, Any]:
+    valid = [
+        contact
+        for contact in contacts
+        if contact and (not authoritative_head or contact.get("authoritative_head") == authoritative_head)
+    ]
+    if not valid:
+        valid = [contact for contact in contacts if contact]
+    if not valid:
         return {}
-    for line in reversed(contact_log_path.read_text(encoding="utf-8").splitlines()):
-        if not line.strip():
-            continue
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if event.get("surface") == surface:
-            return event
-    return {}
+    return max(valid, key=contact_actionability_score)
 
 
 def build_summary(
@@ -46,16 +86,21 @@ def build_summary(
     bridge = load_json(bridge_signal_path)
     dispatch = load_json(dispatch_path)
     dispatch_body = dispatch.get("dispatch", {})
+    authoritative_head = (
+        bridge.get("authoritative_head")
+        or dispatch.get("authoritative_head")
+        or ""
+    )
     contact = load_latest_contact_for_surface(
         latest_contact_path,
         contact_log_path or Path(""),
         str(dispatch_body.get("agent", "")),
+        str(authoritative_head),
     )
     return {
         "schema": "codex_federation_relay_summary.v1",
         "authoritative_head": (
-            bridge.get("authoritative_head")
-            or dispatch.get("authoritative_head")
+            authoritative_head
             or contact.get("authoritative_head", "")
         ),
         "ready_for_remote_write": bridge.get("ready_for_remote_write", False),
@@ -86,8 +131,17 @@ def next_action_for(
     expected_path = dispatch.get("expected_path", "")
     status = contact.get("status", "")
     if status == "blocked":
+        evidence = contact.get("evidence", {})
+        if (
+            evidence.get("composer_contains_handoff") == "true"
+            and evidence.get("send_button_enabled") == "false"
+        ):
+            return f"Safari handoff is staged but send is disabled; enable/send in {agent}, then collect {expected_path}."
         return f"Wait for {agent} sendability/acknowledgment, then collect {expected_path}."
     if status == "staged":
+        evidence = contact.get("evidence", {})
+        if evidence.get("send_button_enabled") == "false":
+            return f"Safari handoff is staged but send is disabled; enable/send in {agent}, then collect {expected_path}."
         return f"Send staged handoff to {agent}, then collect {expected_path}."
     if status == "sent":
         return f"Await {agent} acknowledgment and status packet at {expected_path}."
