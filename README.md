@@ -246,6 +246,9 @@ Write a compact Safari operator handoff from the current relay evidence:
 python3 scripts/write_safari_operator_handoff.py --print
 ```
 
+`run_safari_sync_cycle.py` writes its automatically refreshed operator handoff
+to ignored runtime files under `reports/` to avoid tracked commit-hash churn.
+
 Recover Safari composer visibility after a stale/blank ChatGPT app shell:
 
 ```bash
@@ -273,7 +276,7 @@ python3 scripts/run_safari_sync_cycle.py --print
 This refreshes the routine, stages Safari dispatch, checks sendability, probes
 for an explicit Safari acknowledgment, attempts one composer recovery when
 staging fails, and rewrites the relay summary, contact report, dashboard, and
-Safari operator handoff.
+runtime Safari operator handoff.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

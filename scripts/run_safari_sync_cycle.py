@@ -37,7 +37,18 @@ def skipped_command(reason: str) -> dict[str, Any]:
 
 
 def write_operator_handoff(repo: Path) -> dict[str, Any]:
-    return run_command(["python3", "scripts/write_safari_operator_handoff.py", "--print"], repo)
+    return run_command(
+        [
+            "python3",
+            "scripts/write_safari_operator_handoff.py",
+            "--json-output",
+            "reports/safari_operator_handoff_latest.json",
+            "--text-output",
+            "reports/safari_operator_handoff_latest.txt",
+            "--print",
+        ],
+        repo,
+    )
 
 
 def run_cycle(args: argparse.Namespace) -> dict[str, Any]:

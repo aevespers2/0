@@ -1,7 +1,8 @@
 {
-  "authoritative_head": "a5752845799c08d42c3a1dcfcd42b4d949fb058a",
+  "authoritative_head": "",
   "composer_contains_handoff": true,
   "expected_packet": "FederationInbox/safari/status.json",
+  "head_source": "reports/federation_dashboard.json or reports/safari_operator_handoff_latest.json",
   "instructions": [
     "Open the Safari ChatGPT conversation.",
     "Confirm the federation handoff text is still in the composer.",
@@ -9,7 +10,7 @@
     "After Safari responds, collect or transcribe the status packet to FederationInbox/safari/status.json.",
     "Do not push directly from Safari; export patch proposals for Local CLI review."
   ],
-  "next_action": "Safari handoff is staged but send is disabled; enable/send in safari_cloud, then collect FederationInbox/safari/status.json.",
+  "next_action": "Use the latest runtime handoff report, enable/send in safari_cloud when ChatGPT allows it, then collect FederationInbox/safari/status.json.",
   "nudge_attempt_count": 2,
   "ready_for_remote_write": false,
   "schema": "codex_safari_operator_handoff.v1",

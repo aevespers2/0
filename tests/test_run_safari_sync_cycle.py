@@ -66,6 +66,8 @@ def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
     assert any("write_federation_contact_report.py" in item for command in calls for item in command)
     assert any("write_federation_dashboard.py" in item for command in calls for item in command)
     assert any("write_safari_operator_handoff.py" in item for command in calls for item in command)
+    assert any("reports/safari_operator_handoff_latest.json" in item for command in calls for item in command)
+    assert any("reports/safari_operator_handoff_latest.txt" in item for command in calls for item in command)
     assert summary["operator_handoff"]["returncode"] == 0
 
 

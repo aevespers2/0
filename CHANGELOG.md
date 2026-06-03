@@ -52,3 +52,5 @@
 - Patch bundle export now defaults to `FederationPatches/inbox/`.
 - Safari sync cycles now attempt one composer recovery before failing closed on staging failure.
 - Safari sync cycles now rewrite the Safari operator handoff alongside the dashboard.
+- Safari sync cycle operator handoffs now write to ignored runtime reports to avoid tracked commit-hash churn.
+- Tracked Safari operator handoff artifacts now point to runtime reports instead of embedding a historical commit hash.
