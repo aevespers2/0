@@ -183,6 +183,11 @@ Run the local daily federation routine in one command:
 python3 scripts/run_federation_routine.py --print
 ```
 
+The routine refreshes local, Desktop, and mobile inbox status; writes bridge,
+state, and dispatch artifacts; and records fresh Desktop Codex app contact
+evidence. Use `--no-desktop-contact` when running in a non-macOS or
+non-interactive environment.
+
 Record a browser/app contact attempt:
 
 ```bash

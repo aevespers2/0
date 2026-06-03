@@ -15,6 +15,13 @@ def _args(tmp_path, **overrides):
         "state_report": tmp_path / "reports" / "federation_state_report.json",
         "bridge_signal": tmp_path / "reports" / "federation_bridge_signal.json",
         "dispatch_root": tmp_path / "FederationDispatch",
+        "desktop_app_name": "Codex",
+        "desktop_recovery_wait": 0,
+        "force_desktop_open": False,
+        "refresh_desktop_contact": True,
+        "contact_log": tmp_path / "reports" / "federation_contact_log.jsonl",
+        "contact_latest": tmp_path / "reports" / "federation_contact_latest.json",
+        "desktop_recovery_output": tmp_path / "reports" / "desktop_codex_recovery_latest.json",
         "print_payload": False,
     }
     defaults.update(overrides)
@@ -63,6 +70,11 @@ def test_run_routine_refreshes_local_surfaces_and_dispatch(monkeypatch, tmp_path
             "dispatches": [],
         },
     )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "refresh_desktop_contact",
+        lambda args, head: {"schema": "codex_desktop_app_recovery.v1", "recovered": False, "head": head},
+    )
 
     result = run_federation_routine.run_routine(_args(tmp_path))
 
@@ -72,3 +84,52 @@ def test_run_routine_refreshes_local_surfaces_and_dispatch(monkeypatch, tmp_path
     assert (tmp_path / "FederationInbox" / "desktop" / "status.json").exists()
     assert (tmp_path / "FederationInbox" / "mobile" / "status.json").exists()
     assert (tmp_path / "FederationDispatch" / "dispatch.json").exists()
+    assert result["desktop_contact"]["head"] == "abc123"
+
+
+def test_run_routine_can_skip_desktop_contact_refresh(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(
+        run_federation_routine,
+        "build_local_status",
+        lambda repo: {"schema": "codex_federation_message.v1", "agent": "local_cli"},
+    )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "build_desktop_status",
+        lambda repo, safe_root: {"schema": "codex_federation_message.v1", "agent": "desktop_app"},
+    )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "build_mobile_status",
+        lambda repo: {"schema": "codex_federation_message.v1", "agent": "mobile"},
+    )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "build_state_report",
+        lambda repo, inbox, manifest, head: {
+            "ready_for_remote_write": False,
+            "readiness_blockers": ("required federation packets pending",),
+        },
+    )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "collect_bridge_signal",
+        lambda repo, inbox, manifest, head: {"schema": "codex_bridge_signal.v1"},
+    )
+    monkeypatch.setattr(
+        run_federation_routine,
+        "build_dispatch",
+        lambda repo, inbox, manifest, head: {
+            "schema": "codex_federation_dispatch.v1",
+            "generated_at": "2026-06-02T00:00:00Z",
+            "authoritative_head": head,
+            "ready_for_remote_write": False,
+            "readiness_blockers": ("required federation packets pending",),
+            "dispatch_count": 0,
+            "dispatches": [],
+        },
+    )
+
+    result = run_federation_routine.run_routine(_args(tmp_path, refresh_desktop_contact=False))
+
+    assert result["desktop_contact"]["skipped"] is True

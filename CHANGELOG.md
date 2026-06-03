@@ -55,3 +55,4 @@
 - Safari sync cycle operator handoffs now write to ignored runtime reports to avoid tracked commit-hash churn.
 - Tracked Safari operator handoff artifacts now point to runtime reports instead of embedding a historical commit hash.
 - Federation dashboard readiness blockers now drop stale mirror blockers after refreshed mirror verification succeeds.
+- Local federation routines now refresh Desktop Codex app contact evidence, with `--no-desktop-contact` for constrained environments.
