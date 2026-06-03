@@ -30,6 +30,7 @@
 - Added `FederationPatches/` as the durable patch exchange lane for nonlocal patch proposals.
 - Added `scripts/recover_safari_composer.py` to reload and re-probe Safari when ChatGPT hides the composer.
 - Added `scripts/recover_desktop_codex_app.py` to reopen and re-probe Desktop Codex when no accessible window is reported.
+- Added `scripts/nudge_safari_sendability.py` to try bounded input-event nudges when Safari has a staged handoff but disabled send.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.

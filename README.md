@@ -233,6 +233,13 @@ Watch Safari until the staged dispatch is sendable:
 python3 scripts/watch_safari_dispatch_send.py --timeout 30 --print
 ```
 
+Try bounded input-state nudges when Safari contains the handoff but ChatGPT's
+send button remains disabled:
+
+```bash
+python3 scripts/nudge_safari_sendability.py --print
+```
+
 Recover Safari composer visibility after a stale/blank ChatGPT app shell:
 
 ```bash
