@@ -51,3 +51,4 @@
 - Safari sync cycles now refresh the relay summary, contact report, and federation dashboard together.
 - Patch bundle export now defaults to `FederationPatches/inbox/`.
 - Safari sync cycles now attempt one composer recovery before failing closed on staging failure.
+- Safari sync cycles now rewrite the Safari operator handoff alongside the dashboard.

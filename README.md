@@ -272,7 +272,8 @@ python3 scripts/run_safari_sync_cycle.py --print
 
 This refreshes the routine, stages Safari dispatch, checks sendability, probes
 for an explicit Safari acknowledgment, attempts one composer recovery when
-staging fails, and rewrites the relay summary, contact report, and dashboard.
+staging fails, and rewrites the relay summary, contact report, dashboard, and
+Safari operator handoff.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

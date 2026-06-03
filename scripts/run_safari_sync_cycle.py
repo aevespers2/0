@@ -36,6 +36,10 @@ def skipped_command(reason: str) -> dict[str, Any]:
     }
 
 
+def write_operator_handoff(repo: Path) -> dict[str, Any]:
+    return run_command(["python3", "scripts/write_safari_operator_handoff.py", "--print"], repo)
+
+
 def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     routine = run_command(["python3", "scripts/run_federation_routine.py", "--print"], args.repo)
     if not command_succeeded(routine):
@@ -65,6 +69,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "relay_summary": skipped,
             "contact_report": skipped,
             "dashboard": skipped,
+            "operator_handoff": skipped,
         }
 
     stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
@@ -84,6 +89,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
             args.repo,
         )
+        operator_handoff = write_operator_handoff(args.repo)
         summary_payload = parse_json_stdout(summary)
         contact_payload = parse_json_stdout(contact_report)
         dashboard_payload = parse_json_stdout(dashboard)
@@ -115,6 +121,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "relay_summary": summary,
             "contact_report": contact_report,
             "dashboard": dashboard,
+            "operator_handoff": operator_handoff,
         }
 
     watch_command = [
@@ -147,6 +154,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
         args.repo,
     )
+    operator_handoff = write_operator_handoff(args.repo)
 
     watch_payload = parse_json_stdout(watch)
     extract_payload = parse_json_stdout(extract)
@@ -161,7 +169,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "write_status_requested": args.write_status,
         "commands_succeeded": all(
             command_succeeded(item)
-            for item in (routine, stage, watch, extract, summary, contact_report, dashboard)
+            for item in (routine, stage, watch, extract, summary, contact_report, dashboard, operator_handoff)
         ),
         "watch_status": contact.get("status", ""),
         "watch_detail": contact.get("detail", ""),
@@ -185,6 +193,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "relay_summary": summary,
         "contact_report": contact_report,
         "dashboard": dashboard,
+        "operator_handoff": operator_handoff,
     }
 
 
