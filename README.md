@@ -214,6 +214,13 @@ Probe the macOS Codex desktop app and record live app evidence:
 python3 scripts/probe_desktop_codex_app.py --print
 ```
 
+Recover the macOS Codex desktop app window when the process is running but no
+accessible window is reported:
+
+```bash
+python3 scripts/recover_desktop_codex_app.py --print
+```
+
 Refresh and stage Safari's current dispatch in the Safari composer:
 
 ```bash
