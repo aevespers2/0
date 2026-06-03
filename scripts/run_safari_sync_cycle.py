@@ -129,6 +129,13 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     if args.send:
         watch_command.append("--send")
     watch = run_command(watch_command, args.repo)
+    sendability_nudge = skipped_command("Safari watch did not require sendability nudge")
+    if contact_status(watch) == "blocked" and args.nudge_sendability:
+        sendability_nudge = run_command(["python3", "scripts/nudge_safari_sendability.py", "--print"], args.repo)
+        if command_succeeded(sendability_nudge):
+            nudge_payload = parse_json_stdout(sendability_nudge)
+            if nudge_payload.get("sendable"):
+                watch = run_command(watch_command, args.repo)
 
     extract_command = ["python3", "scripts/extract_safari_ack.py", "--print"]
     if args.write_status:
@@ -173,6 +180,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "stage": stage,
         "recovery": recovery,
         "watch": watch,
+        "sendability_nudge": sendability_nudge,
         "extract": extract,
         "relay_summary": summary,
         "contact_report": contact_report,
@@ -191,6 +199,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--write-status", action="store_true")
     parser.add_argument("--no-recover-composer", action="store_false", dest="recover_composer")
     parser.set_defaults(recover_composer=True)
+    parser.add_argument("--no-nudge-sendability", action="store_false", dest="nudge_sendability")
+    parser.set_defaults(nudge_sendability=True)
     parser.add_argument("--output", type=Path, default=Path("reports/safari_sync_cycle_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")
     return parser.parse_args()

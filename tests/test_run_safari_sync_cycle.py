@@ -14,6 +14,7 @@ def args(tmp_path, **overrides):
         "send": False,
         "write_status": False,
         "recover_composer": True,
+        "nudge_sendability": True,
         "output": tmp_path / "reports" / "cycle.json",
         "print_result": False,
     }
@@ -162,6 +163,8 @@ def test_cycle_recovers_composer_once_after_stage_failure(monkeypatch, tmp_path)
             return result({"recovered": True})
         if any("watch_safari_dispatch_send.py" in item for item in command):
             return result({"contact_event": {"status": "blocked", "detail": "disabled"}})
+        if any("nudge_safari_sendability.py" in item for item in command):
+            return result({"sendable": False})
         if any("extract_safari_ack.py" in item for item in command):
             return result({"candidate": None, "written_path": ""})
         if any("write_federation_relay_summary.py" in item for item in command):
@@ -180,3 +183,59 @@ def test_cycle_recovers_composer_once_after_stage_failure(monkeypatch, tmp_path)
     assert summary["commands_succeeded"] is True
     assert summary["watch_status"] == "blocked"
     assert any("recover_safari_composer.py" in item for command in calls for item in command)
+
+
+def test_cycle_runs_sendability_nudge_after_blocked_watch(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("watch_safari_dispatch_send.py" in item for item in command):
+            return result({"contact_event": {"status": "blocked", "detail": "disabled"}})
+        if any("nudge_safari_sendability.py" in item for item in command):
+            return result({"sendable": False})
+        if any("extract_safari_ack.py" in item for item in command):
+            return result({"candidate": None, "written_path": ""})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result({"next_action": "Still disabled.", "ready_for_remote_write": False})
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": False, "next_action": "Still disabled."})
+        return result({})
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert summary["watch_status"] == "blocked"
+    assert summary["sendability_nudge"]["returncode"] == 0
+    assert sum(any("watch_safari_dispatch_send.py" in item for item in command) for command in calls) == 1
+
+
+def test_cycle_rewatches_when_sendability_nudge_recovers(monkeypatch, tmp_path) -> None:
+    calls = []
+    watch_statuses = ["blocked", "staged"]
+
+    def fake_run(command, cwd):
+        calls.append(command)
+        if any("watch_safari_dispatch_send.py" in item for item in command):
+            return result({"contact_event": {"status": watch_statuses.pop(0), "detail": "watch"}})
+        if any("nudge_safari_sendability.py" in item for item in command):
+            return result({"sendable": True})
+        if any("extract_safari_ack.py" in item for item in command):
+            return result({"candidate": None, "written_path": ""})
+        if any("write_federation_relay_summary.py" in item for item in command):
+            return result({"next_action": "Send staged.", "ready_for_remote_write": False})
+        if any("write_federation_contact_report.py" in item for item in command):
+            return result({"all_contacts_fresh": True})
+        if any("write_federation_dashboard.py" in item for item in command):
+            return result({"ready_for_remote_write": False, "next_action": "Send staged."})
+        return result({})
+
+    monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
+
+    summary = run_safari_sync_cycle.run_cycle(args(tmp_path))
+
+    assert summary["watch_status"] == "staged"
+    assert sum(any("watch_safari_dispatch_send.py" in item for item in command) for command in calls) == 2
