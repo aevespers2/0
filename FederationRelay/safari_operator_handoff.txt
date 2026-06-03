@@ -1,5 +1,5 @@
 Safari Federation Operator Handoff
-Head: 2221b8bf22a345578745805ab0831cebd464f11d
+Head: a5752845799c08d42c3a1dcfcd42b4d949fb058a
 Status: blocked_send_disabled
 Expected packet: FederationInbox/safari/status.json
 Next action: Safari handoff is staged but send is disabled; enable/send in safari_cloud, then collect FederationInbox/safari/status.json.
