@@ -1,5 +1,5 @@
 {
-  "authoritative_head": "efa4f0860e3bee6d22e72bdf2dfbfba51f7c1027",
+  "authoritative_head": "2221b8bf22a345578745805ab0831cebd464f11d",
   "composer_contains_handoff": true,
   "expected_packet": "FederationInbox/safari/status.json",
   "instructions": [
