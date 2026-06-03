@@ -40,6 +40,7 @@ def safari_probe_script() -> str:
     composer_contains_handoff: text.includes('Federation handoff from Local CLI'),
     textarea_length: text.length,
     send_button_visible: Boolean(sendButton),
+    send_button_enabled: Boolean(sendButton),
     send_button_index: sendButton ? sendButton.index : -1,
     stop_answering_visible: stopVisible,
     labels: buttons.map(item => item.label).filter(Boolean).slice(-20)
@@ -111,6 +112,7 @@ def record_probe(
             f"url={probe.get('url', '')}",
             f"composer_contains_handoff={str(probe.get('composer_contains_handoff', False)).lower()}",
             f"send_button_visible={str(probe.get('send_button_visible', False)).lower()}",
+            f"send_button_enabled={str(probe.get('send_button_enabled', False)).lower()}",
             f"stop_answering_visible={str(probe.get('stop_answering_visible', False)).lower()}",
         ],
     )

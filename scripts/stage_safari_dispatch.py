@@ -53,8 +53,24 @@ def safari_probe_script(handoff_text: str) -> str:
     }});
   }}
   if (textarea) {{
-    textarea.value = text;
+    textarea.focus();
+    const setter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      'value'
+    ).set;
+    setter.call(textarea, text);
+    textarea.dispatchEvent(new InputEvent('beforeinput', {{
+      bubbles: true,
+      inputType: 'insertText',
+      data: text
+    }}));
     textarea.dispatchEvent(new Event('input', {{ bubbles: true }}));
+    textarea.dispatchEvent(new InputEvent('input', {{
+      bubbles: true,
+      inputType: 'insertText',
+      data: text
+    }}));
+    textarea.dispatchEvent(new Event('change', {{ bubbles: true }}));
   }} else {{
     editable.focus();
     editable.textContent = text;
@@ -77,6 +93,13 @@ def safari_probe_script(handoff_text: str) -> str:
       ? textarea.value.includes('Federation handoff from Local CLI')
       : editable.textContent.includes('Federation handoff from Local CLI'),
     send_button_visible: labels.some(label => label.toLowerCase().includes('send')),
+    send_button_enabled: [...document.querySelectorAll('button')].some(button => {{
+      const label = button.getAttribute('aria-label') || button.textContent.trim();
+      return label.toLowerCase().includes('send') &&
+        !label.toLowerCase().includes('stop') &&
+        !button.disabled &&
+        button.getAttribute('aria-disabled') !== 'true';
+    }}),
     stop_answering_visible: labels.some(label => label.toLowerCase().includes('stop answering')),
     labels: labels.slice(-20)
   }});
@@ -106,10 +129,12 @@ def stage_dispatch(args: argparse.Namespace) -> dict[str, Any]:
     handoff_text = build_handoff_text(dispatch_payload)
     probe = run_osascript(safari_probe_script(handoff_text))
     status = "staged" if probe.get("staged") else "failed"
-    if probe.get("stop_answering_visible") and not probe.get("send_button_visible"):
+    if probe.get("stop_answering_visible") and not probe.get("send_button_enabled"):
         detail = "handoff staged in Safari composer; send unavailable while page exposes Stop answering"
+    elif probe.get("send_button_enabled"):
+        detail = "handoff staged in Safari composer; send button enabled"
     elif probe.get("send_button_visible"):
-        detail = "handoff staged in Safari composer; send button visible"
+        detail = "handoff staged in Safari composer; send button visible but disabled"
     else:
         detail = f"Safari handoff staging result: {probe.get('reason', 'unknown')}"
     event_args = argparse.Namespace(
@@ -124,6 +149,7 @@ def stage_dispatch(args: argparse.Namespace) -> dict[str, Any]:
             f"url={probe.get('url', '')}",
             f"composer_contains_handoff={str(probe.get('composer_contains_handoff', False)).lower()}",
             f"send_button_visible={str(probe.get('send_button_visible', False)).lower()}",
+            f"send_button_enabled={str(probe.get('send_button_enabled', False)).lower()}",
             f"stop_answering_visible={str(probe.get('stop_answering_visible', False)).lower()}",
         ],
     )
