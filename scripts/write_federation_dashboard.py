@@ -38,6 +38,15 @@ def contact_surfaces(contact_report: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def effective_readiness_blockers(
+    state_report: dict[str, Any], mirror_report: dict[str, Any]
+) -> tuple[str, ...]:
+    blockers = tuple(str(item) for item in state_report.get("readiness_blockers", ()))
+    if mirror_report.get("synchronized") is True:
+        blockers = tuple(item for item in blockers if item != "public mirrors out of sync")
+    return blockers
+
+
 def build_dashboard(
     state_report: dict[str, Any],
     relay_summary: dict[str, Any],
@@ -46,7 +55,7 @@ def build_dashboard(
     authoritative_head: str,
 ) -> dict[str, Any]:
     required_packets = tuple(relay_summary.get("required_packets", ()))
-    readiness_blockers = tuple(state_report.get("readiness_blockers", ()))
+    readiness_blockers = effective_readiness_blockers(state_report, mirror_report)
     return {
         "schema": "codex_federation_dashboard.v1",
         "authoritative_head": authoritative_head,

@@ -5,6 +5,7 @@ import json
 from scripts.write_federation_dashboard import (
     build_dashboard,
     contact_surfaces,
+    effective_readiness_blockers,
     load_or_verify_mirrors,
     write_dashboard,
 )
@@ -42,6 +43,20 @@ def test_build_dashboard_summarizes_operational_state() -> None:
 
 def test_contact_surfaces_ignores_empty_surface_names() -> None:
     assert contact_surfaces({"surfaces": ({"surface": "", "status": "missing"},)}) == {}
+
+
+def test_effective_readiness_blockers_removes_synced_mirror_blocker() -> None:
+    blockers = effective_readiness_blockers(
+        {
+            "readiness_blockers": (
+                "public mirrors out of sync",
+                "required federation packets pending",
+            )
+        },
+        {"synchronized": True},
+    )
+
+    assert blockers == ("required federation packets pending",)
 
 
 def test_load_or_verify_mirrors_uses_saved_report(tmp_path, monkeypatch) -> None:
