@@ -57,3 +57,4 @@
 - Federation dashboard readiness blockers now drop stale mirror blockers after refreshed mirror verification succeeds.
 - Local federation routines now refresh Desktop Codex app contact evidence, with `--no-desktop-contact` for constrained environments.
 - Public mirror verification now retries transient remote-head reads and reports persistent read failures as structured mirror errors.
+- Added `scripts/run_federation_post_push_refresh.py` to refresh ignored runtime status, contact, and dashboard artifacts after mirrored pushes.

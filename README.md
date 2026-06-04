@@ -191,6 +191,13 @@ state, and dispatch artifacts; and records fresh Desktop Codex app contact
 evidence. Use `--no-desktop-contact` when running in a non-macOS or
 non-interactive environment.
 
+After pushing mirrored commits, refresh ignored runtime status and dashboard
+artifacts so local status packets reflect the post-push branch state:
+
+```bash
+python3 scripts/run_federation_post_push_refresh.py --print
+```
+
 Record a browser/app contact attempt:
 
 ```bash
