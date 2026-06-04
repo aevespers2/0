@@ -23,12 +23,16 @@ def safari_probe_script() -> str:
     index,
     label: button.getAttribute('aria-label') || button.textContent.trim(),
     disabled: button.disabled,
+    ariaDisabled: button.getAttribute('aria-disabled') || '',
     testid: button.getAttribute('data-testid') || '',
     id: button.id || ''
   })).filter(item => item.label || item.testid || item.id);
   const sendButton = buttons.find(item =>
-    !item.disabled &&
-    String(item.label).toLowerCase().includes('send') &&
+    (
+      item.testid === 'send-button' ||
+      item.id === 'composer-submit-button' ||
+      String(item.label).toLowerCase().includes('send')
+    ) &&
     !String(item.label).toLowerCase().includes('stop')
   );
   const stopVisible = buttons.some(item =>
@@ -41,7 +45,7 @@ def safari_probe_script() -> str:
     composer_contains_handoff: text.includes('Federation handoff from Local CLI'),
     textarea_length: text.length,
     send_button_visible: Boolean(sendButton),
-    send_button_enabled: Boolean(sendButton),
+    send_button_enabled: Boolean(sendButton) && !sendButton.disabled && sendButton.ariaDisabled !== 'true',
     send_button_index: sendButton ? sendButton.index : -1,
     stop_answering_visible: stopVisible,
     labels: buttons.map(item => item.label).filter(Boolean).slice(-20)
@@ -57,10 +61,17 @@ def safari_click_send_script(button_index: int) -> str:
   const button = buttons[{button_index}];
   if (!button) return JSON.stringify({{clicked: false, reason: 'button_not_found'}});
   const label = button.getAttribute('aria-label') || button.textContent.trim();
-  if (!label || !label.toLowerCase().includes('send') || label.toLowerCase().includes('stop')) {{
+  const testid = button.getAttribute('data-testid') || '';
+  const id = button.id || '';
+  const isSend = testid === 'send-button' ||
+    id === 'composer-submit-button' ||
+    String(label).toLowerCase().includes('send');
+  if (!isSend || String(label).toLowerCase().includes('stop')) {{
     return JSON.stringify({{clicked: false, reason: 'button_not_send', label}});
   }}
-  if (button.disabled) return JSON.stringify({{clicked: false, reason: 'button_disabled', label}});
+  if (button.disabled || button.getAttribute('aria-disabled') === 'true') {{
+    return JSON.stringify({{clicked: false, reason: 'button_disabled', label}});
+  }}
   button.click();
   return JSON.stringify({{clicked: true, label}});
 }})()
@@ -88,7 +99,7 @@ def wait_for_sendable(timeout_seconds: float, interval_seconds: float) -> dict[s
     deadline = time.monotonic() + timeout_seconds
     probe = run_osascript(safari_probe_script())
     while time.monotonic() < deadline:
-        if probe.get("send_button_visible") and not probe.get("stop_answering_visible"):
+        if probe.get("send_button_enabled") and not probe.get("stop_answering_visible"):
             return probe
         time.sleep(interval_seconds)
         probe = run_osascript(safari_probe_script())
@@ -117,7 +128,7 @@ def record_probe(
     args: argparse.Namespace,
     status: str,
     detail: str,
-    ) -> dict[str, Any]:
+) -> dict[str, Any]:
     target_url = expected_target_url(args)
     target_matched = target_url_matches(str(probe.get("url", "")), target_url)
     event_args = argparse.Namespace(
@@ -151,11 +162,11 @@ def watch(args: argparse.Namespace) -> dict[str, Any]:
     if not target_matched:
         status = "failed"
         detail = f"Safari watch is on wrong tab: expected {target_url}, saw {probe.get('url', '')}"
-    elif probe.get("send_button_visible") and not probe.get("stop_answering_visible") and args.send:
+    elif probe.get("send_button_enabled") and not probe.get("stop_answering_visible") and args.send:
         sent = run_osascript(safari_click_send_script(int(probe["send_button_index"])))
         status = "sent" if sent.get("clicked") else "failed"
         detail = "Safari dispatch handoff sent." if sent.get("clicked") else f"Safari send failed: {sent.get('reason')}"
-    elif probe.get("send_button_visible") and not probe.get("stop_answering_visible"):
+    elif probe.get("send_button_enabled") and not probe.get("stop_answering_visible"):
         status = "staged"
         detail = "Safari dispatch handoff is staged and sendable; --send was not requested."
     else:
