@@ -204,12 +204,16 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     watch_command = [
         "python3",
         "scripts/watch_safari_dispatch_send.py",
+        "--target",
+        str(args.safari_target),
         "--timeout",
         str(args.watch_timeout),
         "--interval",
         str(args.watch_interval),
         "--print",
     ]
+    if args.safari_url:
+        watch_command.extend(["--url", args.safari_url])
     if args.send:
         watch_command.append("--send")
     watch = run_command(watch_command, args.repo)
@@ -221,7 +225,15 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             if nudge_payload.get("sendable"):
                 watch = run_command(watch_command, args.repo)
 
-    extract_command = ["python3", "scripts/extract_safari_ack.py", "--print"]
+    extract_command = [
+        "python3",
+        "scripts/extract_safari_ack.py",
+        "--target",
+        str(args.safari_target),
+        "--print",
+    ]
+    if args.safari_url:
+        extract_command.extend(["--url", args.safari_url])
     if args.write_status:
         extract_command.append("--write-status")
     extract = run_command(extract_command, args.repo)

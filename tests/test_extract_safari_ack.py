@@ -72,6 +72,8 @@ def test_run_ingests_copied_text_file_and_writes_status(tmp_path) -> None:
         text_file=text_file,
         stdin=False,
         source_url="https://chatgpt.com/c/test",
+        target=tmp_path / "missing-target.json",
+        url="",
         log=tmp_path / "contact.jsonl",
         latest=tmp_path / "latest.json",
     )
@@ -89,6 +91,8 @@ def test_snapshot_source_rejects_multiple_manual_inputs(tmp_path) -> None:
         text_file=tmp_path / "safari-response.txt",
         stdin=True,
         source_url="",
+        target=tmp_path / "missing-target.json",
+        url="",
     )
 
     try:
@@ -118,6 +122,8 @@ def test_run_records_observed_without_candidate(monkeypatch, tmp_path) -> None:
         text_file=None,
         stdin=False,
         source_url="",
+        target=tmp_path / "missing-target.json",
+        url="",
         log=tmp_path / "contact.jsonl",
         latest=tmp_path / "latest.json",
     )
@@ -126,4 +132,43 @@ def test_run_records_observed_without_candidate(monkeypatch, tmp_path) -> None:
 
     assert result["candidate"] is None
     assert result["contact_event"]["status"] == "observed"
+    assert not (tmp_path / "FederationInbox" / "safari" / "status.json").exists()
+
+
+def test_run_refuses_to_extract_from_wrong_target_url(monkeypatch, tmp_path) -> None:
+    payload = {
+        "schema": "codex_federation_message.v1",
+        "agent": "safari_cloud",
+        "type": "status",
+        "commit": "abc123",
+    }
+    monkeypatch.setattr(
+        extract_safari_ack,
+        "run_osascript",
+        lambda _script: {
+            "url": "https://chatgpt.com/c/wrong",
+            "title": "ChatGPT",
+            "message_count": 1,
+            "messages": [{"role": "assistant", "text": json.dumps(payload)}],
+        },
+    )
+    args = argparse.Namespace(
+        dispatch=tmp_path / "missing.json",
+        authoritative_head="abc123",
+        inbox=tmp_path / "FederationInbox",
+        write_status=True,
+        text_file=None,
+        stdin=False,
+        source_url="",
+        target=tmp_path / "missing-target.json",
+        url="https://chatgpt.com/c/expected",
+        log=tmp_path / "contact.jsonl",
+        latest=tmp_path / "latest.json",
+    )
+
+    result = extract_safari_ack.run(args)
+
+    assert result["candidate"] is None
+    assert result["contact_event"]["status"] == "failed"
+    assert result["contact_event"]["evidence"]["target_url_matched"] == "false"
     assert not (tmp_path / "FederationInbox" / "safari" / "status.json").exists()

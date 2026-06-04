@@ -308,6 +308,9 @@ Safari staging is target-checked against
 `FederationRelay/safari_target.json`; a handoff inserted into a different
 ChatGPT URL is recorded as failed so the sync cycle will not watch or extract
 stale state.
+The same target check is enforced while watching sendability and extracting
+acknowledgments, so a later Safari tab drift cannot produce a false status
+packet.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

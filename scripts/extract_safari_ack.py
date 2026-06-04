@@ -10,6 +10,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from autonomous_vnext.federation_kernel import parse_message
+from scripts.focus_safari_target import load_target
 from scripts.record_federation_contact import build_contact_event, write_contact_event
 from scripts.write_federation_message import output_path
 
@@ -157,6 +158,23 @@ def write_status_packet(payload: dict[str, Any], inbox: Path) -> Path:
     return path
 
 
+def expected_target_url(args: argparse.Namespace) -> str:
+    url = str(getattr(args, "url", "") or "")
+    if url:
+        return url
+    target_path = getattr(args, "target", None)
+    if not target_path:
+        return ""
+    target = load_target(Path(target_path))
+    return str(target.get("target_url", ""))
+
+
+def target_url_matches(current_url: str, target_url: str) -> bool:
+    if not target_url or not current_url:
+        return True
+    return current_url == target_url or current_url.startswith(target_url)
+
+
 def record_ack(
     snapshot: dict[str, Any],
     args: argparse.Namespace,
@@ -165,6 +183,8 @@ def record_ack(
     candidate: dict[str, Any] | None,
     output_path_value: str = "",
 ) -> dict[str, Any]:
+    target_url = expected_target_url(args)
+    target_matched = target_url_matches(str(snapshot.get("url", "")), target_url)
     event_args = argparse.Namespace(
         surface=EXPECTED_AGENT,
         channel="safari_chatgpt",
@@ -179,6 +199,8 @@ def record_ack(
             f"candidate_found={str(candidate is not None).lower()}",
             f"candidate_type={candidate.get('type', '') if candidate else ''}",
             f"written_path={output_path_value}",
+            f"target_url={target_url}",
+            f"target_url_matched={str(target_matched).lower()}",
         ],
     )
     event = build_contact_event(event_args)
@@ -188,9 +210,14 @@ def record_ack(
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     snapshot = snapshot_from_source(args)
-    candidate = extract_candidate(snapshot, args.authoritative_head)
+    target_url = expected_target_url(args)
+    target_matched = target_url_matches(str(snapshot.get("url", "")), target_url)
+    candidate = None if not target_matched else extract_candidate(snapshot, args.authoritative_head)
     written_path = ""
-    if candidate and args.write_status:
+    if not target_matched:
+        status = "failed"
+        detail = f"Safari acknowledgment extraction is on wrong tab: expected {target_url}, saw {snapshot.get('url', '')}"
+    elif candidate and args.write_status:
         written_path = str(write_status_packet(candidate, args.inbox))
         status = "acknowledged"
         detail = f"Safari visible response yielded a valid federation packet at {written_path}."
@@ -219,6 +246,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--text-file", type=Path, help="Read copied Safari response text from this file instead of live Safari.")
     parser.add_argument("--stdin", action="store_true", help="Read copied Safari response text from stdin instead of live Safari.")
     parser.add_argument("--source-url", default="", help="Optional Safari conversation URL for manual text input evidence.")
+    parser.add_argument("--target", type=Path, default=Path("FederationRelay/safari_target.json"))
+    parser.add_argument("--url", default="")
     parser.add_argument("--log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
     parser.add_argument("--latest", type=Path, default=Path("reports/federation_contact_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")

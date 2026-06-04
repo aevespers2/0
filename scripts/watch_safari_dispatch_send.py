@@ -10,6 +10,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from scripts.focus_safari_target import load_target
 from scripts.record_federation_contact import build_contact_event, write_contact_event
 
 
@@ -94,12 +95,31 @@ def wait_for_sendable(timeout_seconds: float, interval_seconds: float) -> dict[s
     return probe
 
 
+def expected_target_url(args: argparse.Namespace) -> str:
+    url = str(getattr(args, "url", "") or "")
+    if url:
+        return url
+    target_path = getattr(args, "target", None)
+    if not target_path:
+        return ""
+    target = load_target(Path(target_path))
+    return str(target.get("target_url", ""))
+
+
+def target_url_matches(current_url: str, target_url: str) -> bool:
+    if not target_url:
+        return True
+    return current_url == target_url or current_url.startswith(target_url)
+
+
 def record_probe(
     probe: dict[str, Any],
     args: argparse.Namespace,
     status: str,
     detail: str,
-) -> dict[str, Any]:
+    ) -> dict[str, Any]:
+    target_url = expected_target_url(args)
+    target_matched = target_url_matches(str(probe.get("url", "")), target_url)
     event_args = argparse.Namespace(
         surface="safari_cloud",
         channel="safari_chatgpt",
@@ -114,6 +134,8 @@ def record_probe(
             f"send_button_visible={str(probe.get('send_button_visible', False)).lower()}",
             f"send_button_enabled={str(probe.get('send_button_enabled', False)).lower()}",
             f"stop_answering_visible={str(probe.get('stop_answering_visible', False)).lower()}",
+            f"target_url={target_url}",
+            f"target_url_matched={str(target_matched).lower()}",
         ],
     )
     event = build_contact_event(event_args)
@@ -124,7 +146,12 @@ def record_probe(
 def watch(args: argparse.Namespace) -> dict[str, Any]:
     probe = wait_for_sendable(args.timeout, args.interval)
     sent = None
-    if probe.get("send_button_visible") and not probe.get("stop_answering_visible") and args.send:
+    target_url = expected_target_url(args)
+    target_matched = target_url_matches(str(probe.get("url", "")), target_url)
+    if not target_matched:
+        status = "failed"
+        detail = f"Safari watch is on wrong tab: expected {target_url}, saw {probe.get('url', '')}"
+    elif probe.get("send_button_visible") and not probe.get("stop_answering_visible") and args.send:
         sent = run_osascript(safari_click_send_script(int(probe["send_button_index"])))
         status = "sent" if sent.get("clicked") else "failed"
         detail = "Safari dispatch handoff sent." if sent.get("clicked") else f"Safari send failed: {sent.get('reason')}"
@@ -145,6 +172,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=float, default=5.0)
     parser.add_argument("--interval", type=float, default=1.0)
     parser.add_argument("--send", action="store_true")
+    parser.add_argument("--target", type=Path, default=Path("FederationRelay/safari_target.json"))
+    parser.add_argument("--url", default="")
     parser.add_argument("--log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
     parser.add_argument("--latest", type=Path, default=Path("reports/federation_contact_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")
