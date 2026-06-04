@@ -132,16 +132,13 @@ def next_action_for(
     status = contact.get("status", "")
     if status == "blocked":
         evidence = contact.get("evidence", {})
-        if (
-            evidence.get("composer_contains_handoff") == "true"
-            and evidence.get("send_button_enabled") == "false"
-        ):
-            return f"Safari handoff is staged but send is disabled; enable/send in {agent}, then collect {expected_path}."
+        if send_disabled(evidence):
+            return send_disabled_next_action(agent, expected_path, evidence)
         return f"Wait for {agent} sendability/acknowledgment, then collect {expected_path}."
     if status == "staged":
         evidence = contact.get("evidence", {})
-        if evidence.get("send_button_enabled") == "false":
-            return f"Safari handoff is staged but send is disabled; enable/send in {agent}, then collect {expected_path}."
+        if send_disabled(evidence):
+            return send_disabled_next_action(agent, expected_path, evidence)
         return f"Send staged handoff to {agent}, then collect {expected_path}."
     if status == "sent":
         return f"Await {agent} acknowledgment and status packet at {expected_path}."
@@ -150,6 +147,23 @@ def next_action_for(
     if status == "observed" and contact.get("evidence", {}).get("candidate_found") == "false":
         return f"Continue watching {agent} sendability/acknowledgment, then collect {expected_path}."
     return f"Dispatch required packet request to {agent}, then collect {expected_path}."
+
+
+def send_disabled(evidence: dict[str, Any]) -> bool:
+    return (
+        evidence.get("composer_contains_handoff") == "true"
+        and evidence.get("send_button_enabled") == "false"
+    ) or evidence.get("send_button_disabled") == "true"
+
+
+def send_disabled_next_action(agent: str, expected_path: str, evidence: dict[str, Any]) -> str:
+    source_url = str(evidence.get("target_url") or evidence.get("url") or "")
+    source_arg = f' --source-url "{source_url}"' if source_url else ""
+    command = f"python3 scripts/extract_safari_ack.py --clipboard{source_arg} --write-status --print"
+    return (
+        f"Safari handoff is staged but send is disabled in {agent}; if a Safari status packet is visible, "
+        f"copy it and run `{command}` to validate and write {expected_path}."
+    )
 
 
 def write_summary(summary: dict[str, Any], output: Path) -> None:

@@ -68,3 +68,4 @@
 - Safari staging and sendability watching now distinguish visible send controls from enabled controls using `data-testid`, button id, labels, and disabled state.
 - Safari staging and sendability evidence now records send-button identity fields (`label`, `id`, `data-testid`, disabled state, and `aria-disabled`) for browser-button drift diagnosis.
 - Safari operator handoffs now include clipboard and file copied-response ingestion commands for send-disabled recovery.
+- Federation relay/dashboard next actions now route send-disabled Safari recovery through validated clipboard packet ingestion.

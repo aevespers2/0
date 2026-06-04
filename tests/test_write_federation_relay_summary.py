@@ -81,10 +81,37 @@ def test_next_action_for_send_disabled_is_specific() -> None:
     dispatch = {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"}
     contact = {
         "status": "blocked",
-        "evidence": {"composer_contains_handoff": "true", "send_button_enabled": "false"},
+        "evidence": {
+            "composer_contains_handoff": "true",
+            "send_button_enabled": "false",
+            "target_url": "https://chatgpt.com/c/example",
+        },
     }
 
-    assert next_action_for(bridge, dispatch, contact).startswith("Safari handoff is staged but send is disabled")
+    action = next_action_for(bridge, dispatch, contact)
+
+    assert action.startswith("Safari handoff is staged but send is disabled")
+    assert "--clipboard" in action
+    assert '--source-url "https://chatgpt.com/c/example"' in action
+    assert "FederationInbox/safari/status.json" in action
+
+
+def test_next_action_for_staged_disabled_uses_clipboard_recovery() -> None:
+    bridge = {"required_packets": ["safari_cloud"]}
+    dispatch = {"agent": "safari_cloud", "expected_path": "FederationInbox/safari/status.json"}
+    contact = {
+        "status": "staged",
+        "evidence": {
+            "composer_contains_handoff": "true",
+            "send_button_disabled": "true",
+            "url": "https://chatgpt.com/c/example",
+        },
+    }
+
+    action = next_action_for(bridge, dispatch, contact)
+
+    assert "--clipboard" in action
+    assert '--source-url "https://chatgpt.com/c/example"' in action
 
 
 def test_summary_uses_latest_contact_for_dispatch_surface(tmp_path) -> None:
@@ -193,6 +220,7 @@ def test_summary_prefers_current_head_send_disabled_contact_over_later_ack_probe
     assert summary["latest_contact_status"] == "blocked"
     assert summary["latest_contact_detail"] == "send disabled"
     assert summary["next_action"].startswith("Safari handoff is staged but send is disabled")
+    assert "--clipboard" in summary["next_action"]
 
 
 def test_select_actionable_contact_filters_by_authoritative_head() -> None:
