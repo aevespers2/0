@@ -105,6 +105,11 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["safari_cloud"]["status"] == "blocked"
     assert surfaces["safari_cloud"]["required"] is True
     assert surfaces["safari_cloud"]["expected_path"] == "FederationInbox/safari/status.json"
+    assert surfaces["safari_cloud"]["packet_present"] is False
+    assert surfaces["safari_cloud"]["packet_missing"] is True
+    assert surfaces["safari_cloud"]["packet_missing_reason"] == (
+        "required packet missing at FederationInbox/safari/status.json"
+    )
     assert "--clipboard" in surfaces["safari_cloud"]["command"]
     assert surfaces["safari_cloud"]["next_action"] == "copy Safari packet"
     assert surfaces["desktop_app"]["detail"] == "no window"
@@ -112,12 +117,16 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["mobile"]["detail"] == "## main...origin/main"
     assert surfaces["mobile"]["expected_path"] == "FederationInbox/mobile/status.json"
     assert surfaces["mobile"]["packet_fresh"] is True
+    assert surfaces["mobile"]["packet_present"] is True
+    assert surfaces["mobile"]["packet_missing"] is False
     assert surfaces["mobile"]["command"].startswith("python3 scripts/write_mobile_federation_status.py")
     assert surfaces["chatgpt_bridge"]["role"] == "planning_and_dispatch_coordinator"
     assert surfaces["chatgpt_bridge"]["status"] == "stale_blocked"
     assert surfaces["chatgpt_bridge"]["blocker"] == "sandbox_write_boundary"
     assert surfaces["chatgpt_bridge"]["packet_fresh"] is False
     assert surfaces["chatgpt_bridge"]["packet_stale"] is True
+    assert surfaces["chatgpt_bridge"]["packet_present"] is True
+    assert surfaces["chatgpt_bridge"]["packet_missing"] is False
     assert "from packet commit old123 to authoritative head abc123" in surfaces["chatgpt_bridge"]["next_action"]
     assert "codex_federation_message.v1" in surfaces["chatgpt_bridge"]["next_action"]
     assert surfaces["chatgpt_bridge"]["packet_stale_reason"] == (

@@ -224,6 +224,8 @@ packets.
 Stale packet rows include the expected commit, stale reason, and a recovery
 instruction to refresh the status packet or relay an equivalent packet through
 Local CLI.
+Required packet rows also expose `packet_missing` and `packet_missing_reason`
+so automation can route missing Safari/status packets without parsing prose.
 
 Record a browser/app contact attempt:
 

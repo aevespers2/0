@@ -75,3 +75,4 @@
 - Safari sendability evidence now records candidate send controls for browser-button drift diagnosis while retaining fail-closed click behavior.
 - Federation operator handoffs now mark inbox packets stale when their commit differs from the authoritative head.
 - Federation operator handoffs now include stale packet recovery instructions and current-head bridge signal commands.
+- Federation operator handoffs now expose missing required packet fields for automation-friendly Safari/status recovery.

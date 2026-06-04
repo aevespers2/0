@@ -142,6 +142,10 @@ def packet_is_stale(inbox_status: dict[str, Any], authoritative_head: str) -> bo
     return bool(packet_commit and authoritative_head and packet_commit != authoritative_head)
 
 
+def packet_is_present(inbox_status: dict[str, Any]) -> bool:
+    return bool(inbox_status.get("_path") or inbox_status.get("commit") or inbox_status.get("generated_at"))
+
+
 def stale_packet_next_action(surface: str, inbox_status: dict[str, Any], authoritative_head: str) -> str:
     path = str(inbox_status.get("_path", ""))
     packet_commit = str(inbox_status.get("commit", ""))
@@ -179,6 +183,9 @@ def build_surface_packet(
     inbox_status = inbox_statuses.get(surface, {})
     role = surface_role(dispatch, surface)
     packet_stale = packet_is_stale(inbox_status, authoritative_head)
+    required = surface in dispatches or surface in dashboard.get("required_packets", ())
+    packet_present = packet_is_present(inbox_status)
+    packet_missing = required and not packet_present
     next_action = next_action_for_surface(surface, dashboard, relay_summary, contact, inbox_status, dispatches)
     if packet_stale:
         next_action = stale_packet_next_action(surface, inbox_status, authoritative_head)
@@ -187,7 +194,7 @@ def build_surface_packet(
         "role": role.get("role", ""),
         "handoff_type": role.get("handoff_type", ""),
         "status": status_for_surface(surface, dashboard, contact, inbox_status, authoritative_head),
-        "required": surface in dispatches or surface in dashboard.get("required_packets", ()),
+        "required": required,
         "constraints": role.get("constraints", ()),
         "may_execute": role.get("may_execute", ()),
         "must_report": role.get("must_report", ()),
@@ -198,9 +205,16 @@ def build_surface_packet(
         "packet_path": inbox_status.get("_path", ""),
         "packet_commit": inbox_status.get("commit", ""),
         "packet_generated_at": inbox_status.get("generated_at", ""),
+        "packet_present": packet_present,
+        "packet_missing": packet_missing,
         "packet_fresh": bool(inbox_status.get("commit")) and not packet_stale,
         "packet_stale": packet_stale,
         "packet_expected_commit": authoritative_head,
+        "packet_missing_reason": (
+            f"required packet missing at {dispatches.get(surface, {}).get('expected_path', inbox_status.get('_path', ''))}"
+            if packet_missing
+            else ""
+        ),
         "packet_stale_reason": (
             f"packet commit {inbox_status.get('commit', '')} differs from authoritative head {authoritative_head}"
             if packet_stale
