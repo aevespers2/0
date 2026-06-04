@@ -181,6 +181,11 @@ python3 scripts/write_federation_dispatch.py \
   --print
 ```
 
+Dispatch packets include a `parallel_work` allocation that keeps local CLI as
+the authoritative integrator while Safari, Desktop, Mobile, and bridge surfaces
+work concurrently through status, observations, routine check-ins, and patch
+proposals.
+
 Run the local daily federation routine in one command:
 
 ```bash

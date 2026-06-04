@@ -16,6 +16,7 @@
 - Added bridge signal emitter (`scripts/emit_bridge_signal.py`) for planning/coordination bridge handoff.
 - Added regression coverage for mobile status writer, Safari patch workflow, and bridge signal output.
 - Added `FederationDispatch/` plus `scripts/write_federation_dispatch.py` to turn kernel-required packets into per-surface routing instructions.
+- Added `parallel_work` allocation to federation dispatch packets so surfaces can split concurrent work without violating local_cli write authority.
 - Added `scripts/run_federation_routine.py` to refresh local/desktop/mobile status, bridge signal, state report, and dispatch in one command.
 - Added self-contained `status_template` and `handoff_text` fields to dispatch packets for cloud/advisory surfaces.
 - Preserved message `capabilities` and `constraints` through the federation kernel.

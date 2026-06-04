@@ -20,6 +20,117 @@ SURFACE_TO_DIR = {
     "chatgpt_bridge": "bridge",
 }
 
+PARALLEL_WORK_SCHEMA = "codex_parallel_work_allocation.v1"
+
+
+def parallel_work_allocation(authoritative_head: str) -> dict[str, Any]:
+    """Describe how federation surfaces can work concurrently without shared-write contention."""
+    return {
+        "schema": PARALLEL_WORK_SCHEMA,
+        "authoritative_head": authoritative_head,
+        "coordination_rule": (
+            "Surfaces may execute bounded work in parallel, but local_cli remains "
+            "the authoritative writer for commits, pushes, and final integration."
+        ),
+        "merge_rule": (
+            "Non-local surfaces report status, evidence, and patch proposals. "
+            "local_cli validates base commits, applies non-conflicting work, runs tests, "
+            "and publishes the synchronized result."
+        ),
+        "contention_rule": (
+            "If two surfaces need the same file or runtime resource, the dispatch owner "
+            "is primary and the other surface becomes reviewer or patch proposer."
+        ),
+        "surfaces": {
+            "local_cli": {
+                "role": "authoritative_integrator",
+                "may_execute": [
+                    "repo writes",
+                    "tests",
+                    "local services",
+                    "commits",
+                    "approved pushes",
+                ],
+                "must_report": [
+                    "status packet",
+                    "validation results",
+                    "files changed",
+                    "merge decisions",
+                ],
+                "handoff_type": "direct_commit_or_status",
+            },
+            "safari_cloud": {
+                "role": "patch_first_parallel_builder",
+                "may_execute": [
+                    "isolated implementation drafts",
+                    "architecture review",
+                    "diff generation",
+                    "patch proposals",
+                ],
+                "must_report": [
+                    "status packet",
+                    "base commit",
+                    "patch proposal",
+                    "files touched",
+                    "blockers",
+                ],
+                "handoff_type": "patch_proposal",
+                "constraints": ["patch_only_no_direct_push"],
+            },
+            "desktop_app": {
+                "role": "local_context_observer",
+                "may_execute": [
+                    "desktop UI observation",
+                    "local context relay",
+                    "safe checkout status",
+                    "sidebar/mobile readiness checks",
+                ],
+                "must_report": [
+                    "status packet",
+                    "observed cwd",
+                    "observed branch",
+                    "observed commit",
+                    "UI blockers",
+                ],
+                "handoff_type": "status_or_observation",
+            },
+            "mobile": {
+                "role": "user_facing_followup",
+                "may_execute": [
+                    "routine check-ins",
+                    "approval prompts",
+                    "completion follow-up",
+                    "escalation summaries",
+                ],
+                "must_report": [
+                    "status packet",
+                    "user priorities",
+                    "approval state",
+                    "blockers",
+                ],
+                "handoff_type": "routine_checkin",
+            },
+            "chatgpt_bridge": {
+                "role": "planning_and_dispatch_coordinator",
+                "may_execute": [
+                    "task decomposition",
+                    "parallel work allocation",
+                    "status synthesis",
+                    "bridge packet drafting",
+                    "permission-scoped inspection",
+                ],
+                "must_report": [
+                    "routine_checkin packet",
+                    "coordination summary",
+                    "recommended task split",
+                    "known sandbox constraints",
+                ],
+                "handoff_type": "routine_checkin_or_status",
+                "constraints": ["permission_scoped", "no_direct_push"],
+            },
+        },
+    }
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -152,6 +263,7 @@ def build_dispatch(
         "schema": "codex_federation_dispatch.v1",
         "generated_at": utc_now(),
         "authoritative_head": authoritative_head,
+        "parallel_work": parallel_work_allocation(authoritative_head),
         "ready_for_remote_write": report["ready_for_remote_write"],
         "readiness_blockers": report["readiness_blockers"],
         "dispatch_count": len(dispatches),
@@ -173,6 +285,7 @@ def write_dispatch(payload: dict[str, Any], output_root: Path) -> dict[str, str]
             "schema": "codex_federation_surface_dispatch.v1",
             "generated_at": payload["generated_at"],
             "authoritative_head": payload["authoritative_head"],
+            "parallel_work": payload["parallel_work"],
             "dispatch": dispatch,
         }
         path.write_text(json.dumps(surface_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")

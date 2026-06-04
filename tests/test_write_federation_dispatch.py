@@ -2,7 +2,19 @@ from __future__ import annotations
 
 import json
 
-from scripts.write_federation_dispatch import build_dispatch, command_for, write_dispatch
+from scripts.write_federation_dispatch import build_dispatch, command_for, parallel_work_allocation, write_dispatch
+
+
+def test_parallel_work_allocation_defines_surface_roles() -> None:
+    payload = parallel_work_allocation("abc123")
+
+    assert payload["schema"] == "codex_parallel_work_allocation.v1"
+    assert payload["authoritative_head"] == "abc123"
+    assert payload["surfaces"]["local_cli"]["role"] == "authoritative_integrator"
+    assert payload["surfaces"]["safari_cloud"]["handoff_type"] == "patch_proposal"
+    assert "patch_only_no_direct_push" in payload["surfaces"]["safari_cloud"]["constraints"]
+    assert payload["surfaces"]["chatgpt_bridge"]["role"] == "planning_and_dispatch_coordinator"
+    assert "local_cli remains" in payload["coordination_rule"]
 
 
 def test_build_dispatch_translates_required_packets(monkeypatch, tmp_path) -> None:
@@ -33,6 +45,7 @@ def test_build_dispatch_translates_required_packets(monkeypatch, tmp_path) -> No
     payload = build_dispatch(tmp_path, tmp_path / "FederationInbox", tmp_path / "public_mirrors.json", "abc123")
 
     assert payload["schema"] == "codex_federation_dispatch.v1"
+    assert payload["parallel_work"]["schema"] == "codex_parallel_work_allocation.v1"
     assert payload["dispatch_count"] == 2
     assert payload["dispatches"][0]["surface_dir"] == "safari"
     assert payload["dispatches"][0]["status_template"]["agent"] == "safari_cloud"
@@ -48,6 +61,7 @@ def test_write_dispatch_creates_aggregate_and_surface_packets(tmp_path) -> None:
         "schema": "codex_federation_dispatch.v1",
         "generated_at": "2026-06-02T00:00:00Z",
         "authoritative_head": "abc123",
+        "parallel_work": parallel_work_allocation("abc123"),
         "ready_for_remote_write": False,
         "readiness_blockers": ("required federation packets pending",),
         "dispatch_count": 1,
@@ -77,7 +91,9 @@ def test_write_dispatch_creates_aggregate_and_surface_packets(tmp_path) -> None:
     aggregate = json.loads((tmp_path / "FederationDispatch" / "dispatch.json").read_text(encoding="utf-8"))
     surface = json.loads((tmp_path / "FederationDispatch" / "mobile" / "dispatch.json").read_text(encoding="utf-8"))
     assert aggregate["dispatch_count"] == 1
+    assert aggregate["parallel_work"]["authoritative_head"] == "abc123"
     assert surface["schema"] == "codex_federation_surface_dispatch.v1"
+    assert surface["parallel_work"]["surfaces"]["mobile"]["role"] == "user_facing_followup"
     assert surface["dispatch"]["agent"] == "mobile"
 
 
