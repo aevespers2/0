@@ -7,6 +7,13 @@ from typing import Any
 
 
 SURFACE_ORDER = ("local_cli", "safari_cloud", "desktop_app", "mobile", "chatgpt_bridge")
+INBOX_SURFACE_DIRS = {
+    "local_cli": "local",
+    "safari_cloud": "safari",
+    "desktop_app": "desktop",
+    "mobile": "mobile",
+    "chatgpt_bridge": "bridge",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -21,6 +28,17 @@ def dispatch_by_agent(dispatch: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 def contact_by_surface(contact_report: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {str(item.get("surface", "")): item for item in contact_report.get("surfaces", ()) if item.get("surface")}
+
+
+def load_inbox_statuses(inbox: Path) -> dict[str, dict[str, Any]]:
+    statuses: dict[str, dict[str, Any]] = {}
+    for surface, surface_dir in INBOX_SURFACE_DIRS.items():
+        path = inbox / surface_dir / "status.json"
+        packet = load_json(path)
+        if packet:
+            packet["_path"] = str(path)
+            statuses[surface] = packet
+    return statuses
 
 
 def surface_role(dispatch: dict[str, Any], surface: str) -> dict[str, Any]:
@@ -56,6 +74,7 @@ def next_action_for_surface(
     dashboard: dict[str, Any],
     relay_summary: dict[str, Any],
     contact: dict[str, Any],
+    inbox_status: dict[str, Any],
     dispatches: dict[str, dict[str, Any]],
 ) -> str:
     if surface in dispatches:
@@ -63,15 +82,61 @@ def next_action_for_surface(
             return str(dashboard.get("next_action") or relay_summary.get("next_action", ""))
         return str(dispatches[surface].get("status_template", {}).get("next_action", ""))
     if surface == "local_cli":
-        return "Remain authoritative for commits, pushes, tests, and integration; continue refreshing runtime federation state."
+        return str(
+            inbox_status.get("next_action")
+            or "Remain authoritative for commits, pushes, tests, and integration; continue refreshing runtime federation state."
+        )
     if surface == "safari_cloud":
         return str(dashboard.get("next_action") or relay_summary.get("next_action", ""))
     if surface == "desktop_app":
-        return str(contact.get("actionable_detail") or contact.get("detail") or "Report Desktop Codex app status only.")
+        return str(
+            contact.get("actionable_detail")
+            or contact.get("detail")
+            or inbox_status.get("next_action")
+            or "Report Desktop Codex app status only."
+        )
     if surface == "mobile":
-        return "Collect user-facing priorities, approvals, blockers, and completion follow-up into FederationInbox/mobile/status.json."
+        return str(
+            inbox_status.get("next_action")
+            or "Collect user-facing priorities, approvals, blockers, and completion follow-up into FederationInbox/mobile/status.json."
+        )
     if surface == "chatgpt_bridge":
-        return "Review coordination state, propose task splits, and return advisory planning feedback without direct pushes."
+        return str(
+            inbox_status.get("next_action")
+            or "Review coordination state, propose task splits, and return advisory planning feedback without direct pushes."
+        )
+    return ""
+
+
+def status_for_surface(
+    surface: str,
+    dashboard: dict[str, Any],
+    contact: dict[str, Any],
+    inbox_status: dict[str, Any],
+) -> str:
+    contact_status = dashboard.get("contact_surfaces", {}).get(
+        surface,
+        contact.get("actionable_status") or contact.get("status", ""),
+    )
+    if contact_status:
+        return str(contact_status)
+    if not inbox_status:
+        return ""
+    if inbox_status.get("blocker"):
+        return "blocked"
+    if inbox_status.get("type") == "status":
+        return "reported"
+    return str(inbox_status.get("type") or "reported")
+
+
+def detail_for_surface(contact: dict[str, Any], inbox_status: dict[str, Any]) -> str:
+    if contact.get("actionable_detail") or contact.get("detail"):
+        return str(contact.get("actionable_detail") or contact.get("detail"))
+    if inbox_status.get("blocker"):
+        return str(inbox_status.get("blocker", ""))
+    status_short = inbox_status.get("status_short") or ()
+    if status_short:
+        return "; ".join(str(item) for item in status_short)
     return ""
 
 
@@ -81,23 +146,29 @@ def build_surface_packet(
     relay_summary: dict[str, Any],
     dispatch: dict[str, Any],
     contacts: dict[str, dict[str, Any]],
+    inbox_statuses: dict[str, dict[str, Any]],
     dispatches: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     contact = contacts.get(surface, {})
+    inbox_status = inbox_statuses.get(surface, {})
     role = surface_role(dispatch, surface)
     return {
         "surface": surface,
         "role": role.get("role", ""),
         "handoff_type": role.get("handoff_type", ""),
-        "status": dashboard.get("contact_surfaces", {}).get(surface, contact.get("actionable_status") or contact.get("status", "")),
+        "status": status_for_surface(surface, dashboard, contact, inbox_status),
         "required": surface in dispatches or surface in dashboard.get("required_packets", ()),
         "constraints": role.get("constraints", ()),
         "may_execute": role.get("may_execute", ()),
         "must_report": role.get("must_report", ()),
-        "next_action": next_action_for_surface(surface, dashboard, relay_summary, contact, dispatches),
+        "next_action": next_action_for_surface(surface, dashboard, relay_summary, contact, inbox_status, dispatches),
         "command": command_for_surface(surface, dashboard, relay_summary, dispatches),
-        "expected_path": dispatches.get(surface, {}).get("expected_path", ""),
-        "detail": contact.get("actionable_detail") or contact.get("detail", ""),
+        "expected_path": dispatches.get(surface, {}).get("expected_path", inbox_status.get("_path", "")),
+        "detail": detail_for_surface(contact, inbox_status),
+        "packet_path": inbox_status.get("_path", ""),
+        "packet_commit": inbox_status.get("commit", ""),
+        "packet_generated_at": inbox_status.get("generated_at", ""),
+        "blocker": inbox_status.get("blocker", ""),
     }
 
 
@@ -106,11 +177,13 @@ def build_handoff(
     contact_report: dict[str, Any],
     relay_summary: dict[str, Any],
     dispatch: dict[str, Any],
+    inbox_statuses: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     dispatches = dispatch_by_agent(dispatch)
     contacts = contact_by_surface(contact_report)
+    inbox_statuses = inbox_statuses or {}
     surfaces = tuple(
-        build_surface_packet(surface, dashboard, relay_summary, dispatch, contacts, dispatches)
+        build_surface_packet(surface, dashboard, relay_summary, dispatch, contacts, inbox_statuses, dispatches)
         for surface in SURFACE_ORDER
     )
     return {
@@ -161,6 +234,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--contact-report", type=Path, default=Path("reports/federation_contact_report.json"))
     parser.add_argument("--relay-summary", type=Path, default=Path("reports/federation_relay_summary.json"))
     parser.add_argument("--dispatch", type=Path, default=Path("FederationDispatch/dispatch.json"))
+    parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
     parser.add_argument("--json-output", type=Path, default=Path("reports/federation_operator_handoff_latest.json"))
     parser.add_argument("--text-output", type=Path, default=Path("reports/federation_operator_handoff_latest.txt"))
     parser.add_argument("--print", action="store_true", dest="print_result")
@@ -174,6 +248,7 @@ def main() -> None:
         load_json(args.contact_report),
         load_json(args.relay_summary),
         load_json(args.dispatch),
+        load_inbox_statuses(args.inbox),
     )
     write_outputs(payload, args.json_output, args.text_output)
     if args.print_result:

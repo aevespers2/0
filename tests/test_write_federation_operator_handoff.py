@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from scripts.write_federation_operator_handoff import build_handoff, build_text, write_outputs
+from scripts.write_federation_operator_handoff import build_handoff, build_text, load_inbox_statuses, write_outputs
 
 
 def test_build_handoff_summarizes_all_surface_roles() -> None:
@@ -66,20 +66,53 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
         ],
     }
 
-    payload = build_handoff(dashboard, contact_report, relay_summary, dispatch)
+    inbox_statuses = {
+        "local_cli": {
+            "type": "status",
+            "commit": "abc123",
+            "generated_at": "2026-06-04T00:00:00Z",
+            "next_action": "keep integrating",
+            "_path": "FederationInbox/local/status.json",
+        },
+        "mobile": {
+            "type": "status",
+            "commit": "abc123",
+            "status_short": ["## main...origin/main"],
+            "next_action": "collect priorities",
+            "_path": "FederationInbox/mobile/status.json",
+        },
+        "chatgpt_bridge": {
+            "type": "status",
+            "commit": "old123",
+            "blocker": "sandbox_write_boundary",
+            "next_action": "relay bridge status",
+            "_path": "FederationInbox/bridge/status.json",
+        },
+    }
+
+    payload = build_handoff(dashboard, contact_report, relay_summary, dispatch, inbox_statuses)
 
     surfaces = {item["surface"]: item for item in payload["surfaces"]}
     assert payload["schema"] == "codex_federation_operator_handoff.v1"
     assert payload["mirrors_synchronized"] is True
     assert surfaces["local_cli"]["role"] == "authoritative_integrator"
+    assert surfaces["local_cli"]["status"] == "reported"
+    assert surfaces["local_cli"]["next_action"] == "keep integrating"
+    assert surfaces["local_cli"]["packet_commit"] == "abc123"
     assert surfaces["safari_cloud"]["status"] == "blocked"
     assert surfaces["safari_cloud"]["required"] is True
     assert surfaces["safari_cloud"]["expected_path"] == "FederationInbox/safari/status.json"
     assert "--clipboard" in surfaces["safari_cloud"]["command"]
     assert surfaces["safari_cloud"]["next_action"] == "copy Safari packet"
     assert surfaces["desktop_app"]["detail"] == "no window"
+    assert surfaces["mobile"]["status"] == "reported"
+    assert surfaces["mobile"]["detail"] == "## main...origin/main"
+    assert surfaces["mobile"]["expected_path"] == "FederationInbox/mobile/status.json"
     assert surfaces["mobile"]["command"].startswith("python3 scripts/write_mobile_federation_status.py")
     assert surfaces["chatgpt_bridge"]["role"] == "planning_and_dispatch_coordinator"
+    assert surfaces["chatgpt_bridge"]["status"] == "blocked"
+    assert surfaces["chatgpt_bridge"]["blocker"] == "sandbox_write_boundary"
+    assert surfaces["chatgpt_bridge"]["next_action"] == "relay bridge status"
 
 
 def test_build_text_lists_surface_actions() -> None:
@@ -114,3 +147,19 @@ def test_write_outputs_creates_json_and_text(tmp_path) -> None:
 
     assert json.loads(json_output.read_text(encoding="utf-8"))["schema"] == "example"
     assert "Federation Operator Handoff" in text_output.read_text(encoding="utf-8")
+
+
+def test_load_inbox_statuses_maps_surface_directories(tmp_path) -> None:
+    inbox = tmp_path / "FederationInbox"
+    bridge_status = inbox / "bridge" / "status.json"
+    mobile_status = inbox / "mobile" / "status.json"
+    bridge_status.parent.mkdir(parents=True)
+    mobile_status.parent.mkdir(parents=True)
+    bridge_status.write_text(json.dumps({"agent": "chatgpt_bridge", "type": "status"}), encoding="utf-8")
+    mobile_status.write_text(json.dumps({"agent": "mobile", "type": "status"}), encoding="utf-8")
+
+    statuses = load_inbox_statuses(inbox)
+
+    assert statuses["chatgpt_bridge"]["agent"] == "chatgpt_bridge"
+    assert statuses["chatgpt_bridge"]["_path"].endswith("FederationInbox/bridge/status.json")
+    assert statuses["mobile"]["agent"] == "mobile"
