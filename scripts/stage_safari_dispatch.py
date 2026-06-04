@@ -81,9 +81,26 @@ def safari_probe_script(handoff_text: str) -> str:
       data: text
     }}));
   }}
-  const labels = [...document.querySelectorAll('button')]
-    .map(b => b.getAttribute('aria-label') || b.textContent.trim())
-    .filter(Boolean);
+  const buttons = [...document.querySelectorAll('button')].map((button, index) => ({{
+    index,
+    label: button.getAttribute('aria-label') || button.textContent.trim(),
+    disabled: button.disabled,
+    ariaDisabled: button.getAttribute('aria-disabled') || '',
+    testid: button.getAttribute('data-testid') || '',
+    id: button.id || ''
+  }})).filter(item => item.label || item.testid || item.id);
+  const sendButton = buttons.find(item =>
+    (
+      item.testid === 'send-button' ||
+      item.id === 'composer-submit-button' ||
+      String(item.label).toLowerCase().includes('send')
+    ) &&
+    !String(item.label).toLowerCase().includes('stop')
+  );
+  const stopVisible = buttons.some(item =>
+    String(item.label).toLowerCase().includes('stop answering') ||
+    item.testid === 'stop-button'
+  );
   return JSON.stringify({{
     staged: true,
     reason: '',
@@ -93,16 +110,11 @@ def safari_probe_script(handoff_text: str) -> str:
     composer_contains_handoff: textarea
       ? textarea.value.includes('Federation handoff from Local CLI')
       : editable.textContent.includes('Federation handoff from Local CLI'),
-    send_button_visible: labels.some(label => label.toLowerCase().includes('send')),
-    send_button_enabled: [...document.querySelectorAll('button')].some(button => {{
-      const label = button.getAttribute('aria-label') || button.textContent.trim();
-      return label.toLowerCase().includes('send') &&
-        !label.toLowerCase().includes('stop') &&
-        !button.disabled &&
-        button.getAttribute('aria-disabled') !== 'true';
-    }}),
-    stop_answering_visible: labels.some(label => label.toLowerCase().includes('stop answering')),
-    labels: labels.slice(-20)
+    send_button_visible: Boolean(sendButton),
+    send_button_enabled: Boolean(sendButton) && !sendButton.disabled && sendButton.ariaDisabled !== 'true',
+    send_button_index: sendButton ? sendButton.index : -1,
+    stop_answering_visible: stopVisible,
+    labels: buttons.map(item => item.label).filter(Boolean).slice(-20)
   }});
 }})()
 """

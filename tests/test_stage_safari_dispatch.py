@@ -39,6 +39,10 @@ def test_safari_probe_script_embeds_json_escaped_handoff() -> None:
     assert "composer_contains_handoff" in script
     assert "HTMLTextAreaElement.prototype" in script
     assert "send_button_enabled" in script
+    assert "send-button" in script
+    assert "composer-submit-button" in script
+    assert "ariaDisabled" in script
+    assert "send_button_index" in script
 
 
 def test_stage_dispatch_reports_disabled_send_button(monkeypatch, tmp_path) -> None:

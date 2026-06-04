@@ -20,6 +20,7 @@ def build_handoff(
     expected_path = relay_summary.get("dispatch_expected_path", "FederationInbox/safari/status.json")
     relay_evidence = relay_summary.get("latest_contact_evidence", {})
     nudge_after = nudge.get("after", {})
+    target_url = str(relay_evidence.get("target_url") or nudge_after.get("url") or "")
     send_disabled = (
         relay_evidence.get("composer_contains_handoff") == "true"
         and relay_evidence.get("send_button_enabled") == "false"
@@ -33,6 +34,11 @@ def build_handoff(
         "Confirm the federation handoff text is still in the composer.",
         "If ChatGPT enables Send, send the handoff.",
         f"After Safari responds, collect or transcribe the status packet to {expected_path}.",
+        (
+            "If Send remains disabled but a Safari response packet can be copied, save the text and run: "
+            "python3 scripts/extract_safari_ack.py --text-file <copied-response.txt> "
+            f"--source-url \"{target_url}\" --write-status --print"
+        ),
         "Do not push directly from Safari; export patch proposals for Local CLI review.",
     ]
     return {
@@ -41,7 +47,12 @@ def build_handoff(
         "status": status,
         "ready_for_remote_write": bool(dashboard.get("ready_for_remote_write", False)),
         "expected_packet": expected_path,
+        "manual_ingest_command": (
+            "python3 scripts/extract_safari_ack.py --text-file <copied-response.txt> "
+            f"--source-url \"{target_url}\" --write-status --print"
+        ),
         "next_action": dashboard.get("next_action") or relay_summary.get("next_action", ""),
+        "target_url": target_url,
         "composer_contains_handoff": (
             relay_evidence.get("composer_contains_handoff") == "true"
             or nudge_after.get("composer_contains_handoff") is True

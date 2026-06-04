@@ -311,9 +311,9 @@ stale state.
 The same target check is enforced while watching sendability and extracting
 acknowledgments, so a later Safari tab drift cannot produce a false status
 packet.
-Sendability records visible and enabled states separately because ChatGPT may
-render the submit control as `Send prompt` / `send-button` while it remains
-disabled.
+Safari staging and sendability records visible and enabled states separately
+because ChatGPT may render the submit control as `Send prompt` / `send-button`
+while it remains disabled.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

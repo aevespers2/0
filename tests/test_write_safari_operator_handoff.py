@@ -14,6 +14,7 @@ def test_build_handoff_summarizes_send_disabled_state() -> None:
             "latest_contact_evidence": {
                 "composer_contains_handoff": "true",
                 "send_button_enabled": "false",
+                "target_url": "https://chatgpt.com/c/example",
             },
         },
         {"sendable": False, "attempts": [{"result": {"strategy": "input_events"}}]},
@@ -24,6 +25,10 @@ def test_build_handoff_summarizes_send_disabled_state() -> None:
     assert payload["nudge_attempt_count"] == 1
     assert payload["composer_contains_handoff"] is True
     assert payload["send_button_enabled"] is False
+    assert payload["target_url"] == "https://chatgpt.com/c/example"
+    assert "extract_safari_ack.py" in payload["manual_ingest_command"]
+    assert "--write-status" in payload["manual_ingest_command"]
+    assert any("copied-response.txt" in item for item in payload["instructions"])
 
 
 def test_build_text_includes_next_action() -> None:
@@ -33,6 +38,7 @@ def test_build_text_includes_next_action() -> None:
             "status": "blocked_send_disabled",
             "expected_packet": "FederationInbox/safari/status.json",
             "next_action": "send it",
+            "manual_ingest_command": "python3 scripts/extract_safari_ack.py --text-file copied.txt",
             "instructions": ["one", "two"],
         }
     )

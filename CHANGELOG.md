@@ -64,4 +64,5 @@
 - Documented copied Safari packet ingestion for composer-blocked relay recovery.
 - Safari dispatch staging now validates the configured target conversation URL before reporting a staged handoff.
 - Safari sendability watching and acknowledgment extraction now validate the configured target conversation before sending or writing status packets.
-- Safari sendability watching now distinguishes visible send controls from enabled controls using `data-testid`, button id, labels, and disabled state.
+- Safari staging and sendability watching now distinguish visible send controls from enabled controls using `data-testid`, button id, labels, and disabled state.
+- Safari operator handoffs now include a copied-response ingestion command for send-disabled recovery.
