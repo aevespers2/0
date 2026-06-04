@@ -71,3 +71,5 @@
 - Federation relay/dashboard next actions now route send-disabled Safari recovery through validated clipboard packet ingestion.
 - Federation dispatch writing now prunes stale per-surface dispatch packets so contact evidence cannot embed obsolete head-specific instructions.
 - Federation contact reports now preserve actionable current-head surface state, so dashboards show Safari as blocked even after later no-candidate acknowledgment probes.
+- Added all-surface operator handoffs (`scripts/write_federation_operator_handoff.py`) and refreshed them from Safari/post-push cycles.
+- Safari sendability evidence now records candidate send controls for browser-button drift diagnosis while retaining fail-closed click behavior.

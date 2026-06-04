@@ -1,0 +1,186 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+
+SURFACE_ORDER = ("local_cli", "safari_cloud", "desktop_app", "mobile", "chatgpt_bridge")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def dispatch_by_agent(dispatch: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {str(item.get("agent", "")): item for item in dispatch.get("dispatches", ()) if item.get("agent")}
+
+
+def contact_by_surface(contact_report: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {str(item.get("surface", "")): item for item in contact_report.get("surfaces", ()) if item.get("surface")}
+
+
+def surface_role(dispatch: dict[str, Any], surface: str) -> dict[str, Any]:
+    return dispatch.get("parallel_work", {}).get("surfaces", {}).get(surface, {})
+
+
+def command_for_surface(
+    surface: str,
+    dashboard: dict[str, Any],
+    relay_summary: dict[str, Any],
+    dispatches: dict[str, dict[str, Any]],
+) -> str:
+    if surface == "safari_cloud" and dashboard.get("relay_status") == "blocked":
+        evidence = relay_summary.get("latest_contact_evidence", {})
+        source_url = str(evidence.get("target_url") or evidence.get("url") or "")
+        source_arg = f' --source-url "{source_url}"' if source_url else ""
+        return f"python3 scripts/extract_safari_ack.py --clipboard{source_arg} --write-status --print"
+    if surface in dispatches:
+        return str(dispatches[surface].get("command", ""))
+    if surface == "local_cli":
+        return "python3 scripts/run_federation_post_push_refresh.py --print"
+    if surface == "desktop_app":
+        return "python3 scripts/probe_desktop_codex_app.py --print"
+    if surface == "mobile":
+        return "python3 scripts/write_mobile_federation_status.py --output FederationInbox/mobile/status.json"
+    if surface == "chatgpt_bridge":
+        return "python3 scripts/emit_bridge_signal.py --print"
+    return ""
+
+
+def next_action_for_surface(
+    surface: str,
+    dashboard: dict[str, Any],
+    relay_summary: dict[str, Any],
+    contact: dict[str, Any],
+    dispatches: dict[str, dict[str, Any]],
+) -> str:
+    if surface in dispatches:
+        if surface == "safari_cloud" and dashboard.get("relay_status") == "blocked":
+            return str(dashboard.get("next_action") or relay_summary.get("next_action", ""))
+        return str(dispatches[surface].get("status_template", {}).get("next_action", ""))
+    if surface == "local_cli":
+        return "Remain authoritative for commits, pushes, tests, and integration; continue refreshing runtime federation state."
+    if surface == "safari_cloud":
+        return str(dashboard.get("next_action") or relay_summary.get("next_action", ""))
+    if surface == "desktop_app":
+        return str(contact.get("actionable_detail") or contact.get("detail") or "Report Desktop Codex app status only.")
+    if surface == "mobile":
+        return "Collect user-facing priorities, approvals, blockers, and completion follow-up into FederationInbox/mobile/status.json."
+    if surface == "chatgpt_bridge":
+        return "Review coordination state, propose task splits, and return advisory planning feedback without direct pushes."
+    return ""
+
+
+def build_surface_packet(
+    surface: str,
+    dashboard: dict[str, Any],
+    relay_summary: dict[str, Any],
+    dispatch: dict[str, Any],
+    contacts: dict[str, dict[str, Any]],
+    dispatches: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    contact = contacts.get(surface, {})
+    role = surface_role(dispatch, surface)
+    return {
+        "surface": surface,
+        "role": role.get("role", ""),
+        "handoff_type": role.get("handoff_type", ""),
+        "status": dashboard.get("contact_surfaces", {}).get(surface, contact.get("actionable_status") or contact.get("status", "")),
+        "required": surface in dispatches or surface in dashboard.get("required_packets", ()),
+        "constraints": role.get("constraints", ()),
+        "may_execute": role.get("may_execute", ()),
+        "must_report": role.get("must_report", ()),
+        "next_action": next_action_for_surface(surface, dashboard, relay_summary, contact, dispatches),
+        "command": command_for_surface(surface, dashboard, relay_summary, dispatches),
+        "expected_path": dispatches.get(surface, {}).get("expected_path", ""),
+        "detail": contact.get("actionable_detail") or contact.get("detail", ""),
+    }
+
+
+def build_handoff(
+    dashboard: dict[str, Any],
+    contact_report: dict[str, Any],
+    relay_summary: dict[str, Any],
+    dispatch: dict[str, Any],
+) -> dict[str, Any]:
+    dispatches = dispatch_by_agent(dispatch)
+    contacts = contact_by_surface(contact_report)
+    surfaces = tuple(
+        build_surface_packet(surface, dashboard, relay_summary, dispatch, contacts, dispatches)
+        for surface in SURFACE_ORDER
+    )
+    return {
+        "schema": "codex_federation_operator_handoff.v1",
+        "authoritative_head": dashboard.get("authoritative_head") or dispatch.get("authoritative_head", ""),
+        "ready_for_remote_write": bool(dashboard.get("ready_for_remote_write", False)),
+        "readiness_blockers": dashboard.get("readiness_blockers", ()),
+        "mirrors_synchronized": bool(dashboard.get("mirrors_synchronized", False)),
+        "contact_evidence_fresh": bool(dashboard.get("contact_evidence_fresh", False)),
+        "next_action": dashboard.get("next_action", ""),
+        "coordination_rule": dispatch.get("parallel_work", {}).get("coordination_rule", ""),
+        "merge_rule": dispatch.get("parallel_work", {}).get("merge_rule", ""),
+        "surfaces": surfaces,
+    }
+
+
+def build_text(payload: dict[str, Any]) -> str:
+    lines = [
+        "Federation Operator Handoff",
+        f"Head: {payload.get('authoritative_head', '')}",
+        f"Ready for remote write: {str(payload.get('ready_for_remote_write', False)).lower()}",
+        f"Mirrors synchronized: {str(payload.get('mirrors_synchronized', False)).lower()}",
+        f"Next action: {payload.get('next_action', '')}",
+        "",
+        "Surfaces:",
+    ]
+    for surface in payload.get("surfaces", ()):
+        lines.extend(
+            [
+                f"- {surface.get('surface', '')}: {surface.get('status', '')} / {surface.get('role', '')}",
+                f"  action: {surface.get('next_action', '')}",
+                f"  command: {surface.get('command', '')}",
+            ]
+        )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_outputs(payload: dict[str, Any], json_output: Path, text_output: Path) -> None:
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    text_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    text_output.write_text(build_text(payload), encoding="utf-8")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Write an all-surface federation operator handoff.")
+    parser.add_argument("--dashboard", type=Path, default=Path("reports/federation_dashboard.json"))
+    parser.add_argument("--contact-report", type=Path, default=Path("reports/federation_contact_report.json"))
+    parser.add_argument("--relay-summary", type=Path, default=Path("reports/federation_relay_summary.json"))
+    parser.add_argument("--dispatch", type=Path, default=Path("FederationDispatch/dispatch.json"))
+    parser.add_argument("--json-output", type=Path, default=Path("reports/federation_operator_handoff_latest.json"))
+    parser.add_argument("--text-output", type=Path, default=Path("reports/federation_operator_handoff_latest.txt"))
+    parser.add_argument("--print", action="store_true", dest="print_result")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    payload = build_handoff(
+        load_json(args.dashboard),
+        load_json(args.contact_report),
+        load_json(args.relay_summary),
+        load_json(args.dispatch),
+    )
+    write_outputs(payload, args.json_output, args.text_output)
+    if args.print_result:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(args.json_output)
+
+
+if __name__ == "__main__":
+    main()

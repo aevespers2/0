@@ -20,6 +20,9 @@ def test_probe_script_checks_send_and_stop_state() -> None:
     assert "send_button_label" in script
     assert "send_button_id" in script
     assert "send_button_testid" in script
+    assert "send_button_candidate_count" in script
+    assert "send_button_candidates" in script
+    assert "type === 'submit'" in script
 
 
 def test_click_script_refuses_non_send_button() -> None:
@@ -30,6 +33,7 @@ def test_click_script_refuses_non_send_button() -> None:
     assert "send-button" in script
     assert "composer-submit-button" in script
     assert "aria-disabled" in script
+    assert "normalizedId.includes('submit')" in script
 
 
 def test_wait_for_sendable_waits_for_enabled_send_button(monkeypatch) -> None:
@@ -108,6 +112,8 @@ def test_watch_reports_visible_disabled_send_as_blocked(monkeypatch, tmp_path) -
             "send_button_id": "composer-submit-button",
             "send_button_testid": "send-button",
             "send_button_aria_disabled": "",
+            "send_button_candidate_count": 1,
+            "send_button_candidates": [{"index": 1, "label": "Send prompt"}],
             "send_button_index": 1,
             "stop_answering_visible": False,
         },
@@ -134,3 +140,5 @@ def test_watch_reports_visible_disabled_send_as_blocked(monkeypatch, tmp_path) -
     assert event["evidence"]["send_button_label"] == "Send prompt"
     assert event["evidence"]["send_button_id"] == "composer-submit-button"
     assert event["evidence"]["send_button_testid"] == "send-button"
+    assert event["evidence"]["send_button_candidate_count"] == "1"
+    assert "Send prompt" in event["evidence"]["send_button_candidates"]

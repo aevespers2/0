@@ -208,6 +208,17 @@ python3 scripts/run_federation_post_push_refresh.py --print
 Use `--no-safari-contact` or `--no-desktop-contact` when running without those
 interactive surfaces available.
 
+Write one current operator handoff across Local CLI, Safari/cloud Codex,
+Desktop Codex, mobile, and the bridge:
+
+```bash
+python3 scripts/write_federation_operator_handoff.py --print
+```
+
+This emits ignored runtime reports under `reports/` and keeps Safari on the
+clipboard-validated recovery path when the browser send control is blocked or
+has drifted.
+
 Record a browser/app contact attempt:
 
 ```bash
@@ -319,6 +330,8 @@ packet.
 Safari staging and sendability records visible and enabled states separately
 because ChatGPT may render the submit control as `Send prompt` / `send-button`
 while it remains disabled.
+Sendability probes also record candidate send controls so browser-button drift
+can be diagnosed without clicking an unsafe control.
 
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 

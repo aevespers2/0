@@ -19,22 +19,39 @@ def safari_probe_script() -> str:
 (() => {
   const textarea = document.querySelector('textarea');
   const text = textarea ? textarea.value : '';
+  const normalize = (value) => String(value || '').trim().toLowerCase();
+  const knownSendMarkers = ['send-button', 'composer-submit-button'];
+  const isSendCandidate = (item) => {
+    const label = normalize(item.label);
+    const testid = normalize(item.testid);
+    const id = normalize(item.id);
+    const title = normalize(item.title);
+    const type = normalize(item.type);
+    const sendish = (
+      knownSendMarkers.includes(testid) ||
+      knownSendMarkers.includes(id) ||
+      testid.includes('send') ||
+      id.includes('send') ||
+      id.includes('submit') ||
+      title.includes('send') ||
+      label.includes('send') ||
+      label.includes('submit') ||
+      type === 'submit'
+    );
+    return sendish && !label.includes('stop') && !testid.includes('stop') && !id.includes('stop');
+  };
   const buttons = [...document.querySelectorAll('button')].map((button, index) => ({
     index,
     label: button.getAttribute('aria-label') || button.textContent.trim(),
     disabled: button.disabled,
     ariaDisabled: button.getAttribute('aria-disabled') || '',
     testid: button.getAttribute('data-testid') || '',
-    id: button.id || ''
+    id: button.id || '',
+    title: button.getAttribute('title') || '',
+    type: button.getAttribute('type') || ''
   })).filter(item => item.label || item.testid || item.id);
-  const sendButton = buttons.find(item =>
-    (
-      item.testid === 'send-button' ||
-      item.id === 'composer-submit-button' ||
-      String(item.label).toLowerCase().includes('send')
-    ) &&
-    !String(item.label).toLowerCase().includes('stop')
-  );
+  const sendCandidates = buttons.filter(isSendCandidate);
+  const sendButton = sendCandidates[0];
   const stopVisible = buttons.some(item =>
     String(item.label).toLowerCase().includes('stop answering') ||
     item.testid === 'stop-button'
@@ -52,6 +69,8 @@ def safari_probe_script() -> str:
     send_button_testid: sendButton ? sendButton.testid : '',
     send_button_aria_disabled: sendButton ? sendButton.ariaDisabled : '',
     send_button_index: sendButton ? sendButton.index : -1,
+    send_button_candidate_count: sendCandidates.length,
+    send_button_candidates: sendCandidates.slice(0, 5),
     stop_answering_visible: stopVisible,
     labels: buttons.map(item => item.label).filter(Boolean).slice(-20)
   });
@@ -65,13 +84,27 @@ def safari_click_send_script(button_index: int) -> str:
   const buttons = [...document.querySelectorAll('button')];
   const button = buttons[{button_index}];
   if (!button) return JSON.stringify({{clicked: false, reason: 'button_not_found'}});
+  const normalize = (value) => String(value || '').trim().toLowerCase();
   const label = button.getAttribute('aria-label') || button.textContent.trim();
   const testid = button.getAttribute('data-testid') || '';
   const id = button.id || '';
-  const isSend = testid === 'send-button' ||
-    id === 'composer-submit-button' ||
-    String(label).toLowerCase().includes('send');
-  if (!isSend || String(label).toLowerCase().includes('stop')) {{
+  const title = button.getAttribute('title') || '';
+  const type = button.getAttribute('type') || '';
+  const knownSendMarkers = ['send-button', 'composer-submit-button'];
+  const normalizedLabel = normalize(label);
+  const normalizedTestid = normalize(testid);
+  const normalizedId = normalize(id);
+  const normalizedTitle = normalize(title);
+  const isSend = knownSendMarkers.includes(normalizedTestid) ||
+    knownSendMarkers.includes(normalizedId) ||
+    normalizedTestid.includes('send') ||
+    normalizedId.includes('send') ||
+    normalizedId.includes('submit') ||
+    normalizedTitle.includes('send') ||
+    normalizedLabel.includes('send') ||
+    normalizedLabel.includes('submit') ||
+    normalize(type) === 'submit';
+  if (!isSend || normalizedLabel.includes('stop') || normalizedTestid.includes('stop') || normalizedId.includes('stop')) {{
     return JSON.stringify({{clicked: false, reason: 'button_not_send', label}});
   }}
   if (button.disabled || button.getAttribute('aria-disabled') === 'true') {{
@@ -154,6 +187,8 @@ def record_probe(
             f"send_button_id={probe.get('send_button_id', '')}",
             f"send_button_testid={probe.get('send_button_testid', '')}",
             f"send_button_aria_disabled={probe.get('send_button_aria_disabled', '')}",
+            f"send_button_candidate_count={probe.get('send_button_candidate_count', 0)}",
+            f"send_button_candidates={json.dumps(probe.get('send_button_candidates', ()), sort_keys=True)}",
             f"stop_answering_visible={str(probe.get('stop_answering_visible', False)).lower()}",
             f"target_url={target_url}",
             f"target_url_matched={str(target_matched).lower()}",

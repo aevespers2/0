@@ -54,6 +54,8 @@ def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
             return result({"ready_for_remote_write": False, "next_action": "Continue watching."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "blocked_send_disabled"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Continue watching."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -71,9 +73,11 @@ def test_cycle_runs_watch_extract_and_summary(monkeypatch, tmp_path) -> None:
     assert any("write_federation_dashboard.py" in item for command in calls for item in command)
     assert any("focus_safari_target.py" in item for command in calls for item in command)
     assert any("write_safari_operator_handoff.py" in item for command in calls for item in command)
+    assert any("write_federation_operator_handoff.py" in item for command in calls for item in command)
     assert any("reports/safari_operator_handoff_latest.json" in item for command in calls for item in command)
     assert any("reports/safari_operator_handoff_latest.txt" in item for command in calls for item in command)
     assert summary["operator_handoff"]["returncode"] == 0
+    assert summary["federation_operator_handoff"]["returncode"] == 0
 
 
 def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None:
@@ -93,6 +97,8 @@ def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None
             return result({"ready_for_remote_write": True, "next_action": "No required federation packets are pending."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "ready"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "No required federation packets are pending."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -108,6 +114,7 @@ def test_cycle_passes_send_and_write_status_flags(monkeypatch, tmp_path) -> None
     assert any("--write-status" in command for command in calls)
     assert any("--refresh-mirrors" in command for command in calls)
     assert any("write_safari_operator_handoff.py" in item for command in calls for item in command)
+    assert any("write_federation_operator_handoff.py" in item for command in calls for item in command)
     assert any("focus_safari_target.py" in item for command in calls for item in command)
 
 
@@ -148,6 +155,8 @@ def test_cycle_refuses_to_stage_when_safari_target_focus_fails(monkeypatch, tmp_
             return result({"ready_for_remote_write": False, "next_action": "Restore Safari target."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "target_focus_failed"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Restore Safari target."})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -180,6 +189,8 @@ def test_cycle_passes_safari_target_options(monkeypatch, tmp_path) -> None:
             return result({"ready_for_remote_write": False, "next_action": "Still disabled."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "blocked_send_disabled"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Still disabled."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -233,6 +244,8 @@ def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_p
             return result({"ready_for_remote_write": False, "next_action": "Restore Safari composer."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "staging_failed"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Restore Safari composer."})
         raise AssertionError(f"unexpected command after stage failure: {command}")
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -244,6 +257,7 @@ def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_p
     assert "refusing to watch" in summary["skip_reason"]
     assert summary["dashboard_next_action"] == "Restore Safari composer."
     assert summary["operator_handoff"]["returncode"] == 0
+    assert summary["federation_operator_handoff"]["returncode"] == 0
     assert not any("watch_safari_dispatch_send.py" in item for command in calls for item in command)
     assert not any("extract_safari_ack.py" in item for command in calls for item in command)
 
@@ -280,6 +294,8 @@ def test_cycle_recovers_composer_once_after_stage_failure(monkeypatch, tmp_path)
             return result({"ready_for_remote_write": False, "next_action": "Continue."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "blocked_send_disabled"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Continue."})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -291,6 +307,7 @@ def test_cycle_recovers_composer_once_after_stage_failure(monkeypatch, tmp_path)
     assert summary["watch_status"] == "blocked"
     assert any("recover_safari_composer.py" in item for command in calls for item in command)
     assert any("write_safari_operator_handoff.py" in item for command in calls for item in command)
+    assert any("write_federation_operator_handoff.py" in item for command in calls for item in command)
 
 
 def test_cycle_runs_sendability_nudge_after_blocked_watch(monkeypatch, tmp_path) -> None:
@@ -312,6 +329,8 @@ def test_cycle_runs_sendability_nudge_after_blocked_watch(monkeypatch, tmp_path)
             return result({"ready_for_remote_write": False, "next_action": "Still disabled."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "blocked_send_disabled"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Still disabled."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -321,6 +340,7 @@ def test_cycle_runs_sendability_nudge_after_blocked_watch(monkeypatch, tmp_path)
     assert summary["watch_status"] == "blocked"
     assert summary["sendability_nudge"]["returncode"] == 0
     assert summary["operator_handoff"]["returncode"] == 0
+    assert summary["federation_operator_handoff"]["returncode"] == 0
     assert sum(any("watch_safari_dispatch_send.py" in item for item in command) for command in calls) == 1
 
 
@@ -344,6 +364,8 @@ def test_cycle_rewatches_when_sendability_nudge_recovers(monkeypatch, tmp_path) 
             return result({"ready_for_remote_write": False, "next_action": "Send staged."})
         if any("write_safari_operator_handoff.py" in item for item in command):
             return result({"status": "staged"})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Send staged."})
         return result({})
 
     monkeypatch.setattr(run_safari_sync_cycle, "run_command", fake_run)
@@ -352,4 +374,5 @@ def test_cycle_rewatches_when_sendability_nudge_recovers(monkeypatch, tmp_path) 
 
     assert summary["watch_status"] == "staged"
     assert summary["operator_handoff"]["returncode"] == 0
+    assert summary["federation_operator_handoff"]["returncode"] == 0
     assert sum(any("watch_safari_dispatch_send.py" in item for item in command) for command in calls) == 2

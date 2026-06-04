@@ -51,6 +51,10 @@ def write_operator_handoff(repo: Path) -> dict[str, Any]:
     )
 
 
+def write_federation_operator_handoff(repo: Path) -> dict[str, Any]:
+    return run_command(["python3", "scripts/write_federation_operator_handoff.py", "--print"], repo)
+
+
 def focus_safari_target(args: argparse.Namespace) -> dict[str, Any]:
     if args.no_focus_safari_target:
         return skipped_command("Safari target focus disabled")
@@ -100,6 +104,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_report": skipped,
             "dashboard": skipped,
             "operator_handoff": skipped,
+            "federation_operator_handoff": skipped,
         }
 
     target_focus = focus_safari_target(args)
@@ -113,6 +118,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             args.repo,
         )
         operator_handoff = write_operator_handoff(args.repo)
+        federation_operator_handoff = write_federation_operator_handoff(args.repo)
         summary_payload = parse_json_stdout(summary)
         contact_payload = parse_json_stdout(contact_report)
         dashboard_payload = parse_json_stdout(dashboard)
@@ -146,6 +152,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_report": contact_report,
             "dashboard": dashboard,
             "operator_handoff": operator_handoff,
+            "federation_operator_handoff": federation_operator_handoff,
         }
 
     stage = stage_safari_dispatch(args)
@@ -166,6 +173,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             args.repo,
         )
         operator_handoff = write_operator_handoff(args.repo)
+        federation_operator_handoff = write_federation_operator_handoff(args.repo)
         summary_payload = parse_json_stdout(summary)
         contact_payload = parse_json_stdout(contact_report)
         dashboard_payload = parse_json_stdout(dashboard)
@@ -199,6 +207,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_report": contact_report,
             "dashboard": dashboard,
             "operator_handoff": operator_handoff,
+            "federation_operator_handoff": federation_operator_handoff,
         }
 
     watch_command = [
@@ -244,6 +253,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         args.repo,
     )
     operator_handoff = write_operator_handoff(args.repo)
+    federation_operator_handoff = write_federation_operator_handoff(args.repo)
 
     watch_payload = parse_json_stdout(watch)
     extract_payload = parse_json_stdout(extract)
@@ -258,7 +268,17 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "write_status_requested": args.write_status,
         "commands_succeeded": all(
             command_succeeded(item)
-            for item in (routine, stage, watch, extract, summary, contact_report, dashboard, operator_handoff)
+            for item in (
+                routine,
+                stage,
+                watch,
+                extract,
+                summary,
+                contact_report,
+                dashboard,
+                operator_handoff,
+                federation_operator_handoff,
+            )
         ),
         "watch_status": contact.get("status", ""),
         "watch_detail": contact.get("detail", ""),
@@ -284,6 +304,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "contact_report": contact_report,
         "dashboard": dashboard,
         "operator_handoff": operator_handoff,
+        "federation_operator_handoff": federation_operator_handoff,
     }
 
 

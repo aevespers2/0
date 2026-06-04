@@ -79,14 +79,20 @@ def run_refresh(args: argparse.Namespace) -> dict[str, Any]:
         ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
         args.repo,
     )
+    operator_handoff = run_command(
+        ["python3", "scripts/write_federation_operator_handoff.py", "--print"],
+        args.repo,
+    )
 
     mirror_payload = parse_json_stdout(mirrors)
     contact_payload = parse_json_stdout(contact_report)
     dashboard_payload = parse_json_stdout(dashboard)
+    operator_payload = parse_json_stdout(operator_handoff)
     return {
         "schema": "codex_federation_post_push_refresh.v1",
         "commands_succeeded": all(
-            command_succeeded(item) for item in (mirrors, routine, safari_sync, contact_report, dashboard)
+            command_succeeded(item)
+            for item in (mirrors, routine, safari_sync, contact_report, dashboard, operator_handoff)
         ),
         "authoritative_head": dashboard_payload.get(
             "authoritative_head",
@@ -98,11 +104,13 @@ def run_refresh(args: argparse.Namespace) -> dict[str, Any]:
         "ready_for_remote_write": bool(dashboard_payload.get("ready_for_remote_write", False)),
         "readiness_blockers": dashboard_payload.get("readiness_blockers", ()),
         "next_action": dashboard_payload.get("next_action", ""),
+        "operator_handoff_next_action": operator_payload.get("next_action", ""),
         "mirrors": mirrors,
         "routine": routine,
         "safari_sync": safari_sync,
         "contact_report": contact_report,
         "dashboard": dashboard,
+        "operator_handoff": operator_handoff,
     }
 
 

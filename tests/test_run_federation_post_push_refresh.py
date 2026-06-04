@@ -48,6 +48,8 @@ def test_post_push_refresh_runs_runtime_refresh_sequence(monkeypatch, tmp_path) 
                     "next_action": "Collect Safari status.",
                 }
             )
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": "Collect Safari status."})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_federation_post_push_refresh, "run_command", fake_run)
@@ -64,6 +66,8 @@ def test_post_push_refresh_runs_runtime_refresh_sequence(monkeypatch, tmp_path) 
     assert any("--refresh-mirrors" in command for command in calls)
     assert any("run_safari_sync_cycle.py" in item for command in calls for item in command)
     assert any("--watch-timeout" in command for command in calls)
+    assert any("write_federation_operator_handoff.py" in item for command in calls for item in command)
+    assert summary["operator_handoff_next_action"] == "Collect Safari status."
 
 
 def test_post_push_refresh_can_skip_desktop_contact(monkeypatch, tmp_path) -> None:
@@ -81,6 +85,8 @@ def test_post_push_refresh_can_skip_desktop_contact(monkeypatch, tmp_path) -> No
             return result({"all_contacts_fresh": True})
         if any("write_federation_dashboard.py" in item for item in command):
             return result({"authoritative_head": "abc123", "readiness_blockers": []})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": ""})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_federation_post_push_refresh, "run_command", fake_run)
@@ -104,6 +110,8 @@ def test_post_push_refresh_can_skip_safari_contact(monkeypatch, tmp_path) -> Non
             return result({"all_contacts_fresh": True})
         if any("write_federation_dashboard.py" in item for item in command):
             return result({"authoritative_head": "abc123", "readiness_blockers": []})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({"next_action": ""})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_federation_post_push_refresh, "run_command", fake_run)
@@ -127,6 +135,8 @@ def test_post_push_refresh_preserves_failed_command_status(monkeypatch, tmp_path
             return result({"all_contacts_fresh": False})
         if any("write_federation_dashboard.py" in item for item in command):
             return result({"authoritative_head": "abc123", "readiness_blockers": ["public mirrors out of sync"]})
+        if any("write_federation_operator_handoff.py" in item for item in command):
+            return result({})
         raise AssertionError(command)
 
     monkeypatch.setattr(run_federation_post_push_refresh, "run_command", fake_run)
