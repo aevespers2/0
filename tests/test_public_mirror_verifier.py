@@ -75,3 +75,52 @@ def test_verify_manifest_reports_mismatched_heads(monkeypatch, tmp_path) -> None
 
     assert not result["synchronized"]
     assert result["mismatches"][0]["name"] == "mirror"
+
+
+def test_verify_manifest_retries_transient_remote_failure(monkeypatch, tmp_path) -> None:
+    manifest = write_manifest(tmp_path)
+    remote_calls = 0
+
+    def fake_run(args, cwd, check, text, stdout, stderr):
+        nonlocal remote_calls
+        if args[:3] == ["git", "rev-parse", "HEAD"]:
+            return subprocess.CompletedProcess(args=args, returncode=0, stdout="abc123\n", stderr="")
+        if args[:2] == ["git", "ls-remote"]:
+            remote_calls += 1
+            if remote_calls == 1:
+                raise subprocess.CalledProcessError(128, args, stderr="temporary ssh failure")
+            return subprocess.CompletedProcess(
+                args=args,
+                returncode=0,
+                stdout="abc123\trefs/heads/main\n",
+                stderr="",
+            )
+        raise AssertionError(args)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    result = verify_manifest(manifest, tmp_path, attempts=2, retry_delay=0)
+
+    assert result["synchronized"] is True
+    assert result["errors"] == []
+    assert remote_calls == 3
+
+
+def test_verify_manifest_reports_persistent_remote_failure(monkeypatch, tmp_path) -> None:
+    manifest = write_manifest(tmp_path)
+
+    def fake_run(args, cwd, check, text, stdout, stderr):
+        if args[:3] == ["git", "rev-parse", "HEAD"]:
+            return subprocess.CompletedProcess(args=args, returncode=0, stdout="abc123\n", stderr="")
+        if args[:2] == ["git", "ls-remote"]:
+            raise subprocess.CalledProcessError(128, args, stderr="ssh failure")
+        raise AssertionError(args)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    result = verify_manifest(manifest, tmp_path, attempts=2, retry_delay=0)
+
+    assert result["synchronized"] is False
+    assert result["mismatches"] == []
+    assert len(result["errors"]) == 2
+    assert result["errors"][0]["name"] == "origin"

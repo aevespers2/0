@@ -77,6 +77,9 @@ Verify public mirror heads from a local checkout with both remotes reachable:
 python3 scripts/verify_public_mirrors.py --pretty
 ```
 
+The verifier retries transient remote-head reads by default. Use `--attempts`
+and `--retry-delay` to tune that behavior for constrained networks.
+
 Evaluate federation inbox messages with Local CLI as the authoritative writer:
 
 ```bash
