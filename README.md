@@ -314,6 +314,17 @@ Add `--write-status` only when the visible Safari response contains a valid
 `codex_federation_message.v1` packet that should be transcribed to
 `FederationInbox/safari/status.json`.
 
+If Safari cannot send from the composer but a packet can be copied out of the
+conversation or another surface, ingest that text through the same validator:
+
+```bash
+python3 scripts/extract_safari_ack.py \
+  --text-file /path/to/copied-safari-response.txt \
+  --source-url "https://chatgpt.com/c/..." \
+  --write-status \
+  --print
+```
+
 Enforce remote-write readiness before push (this is the authoritative gate):
 
 ```bash

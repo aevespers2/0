@@ -330,6 +330,18 @@ Use `--write-status` only to transcribe a visible, valid
 `codex_federation_message.v1` Safari packet into
 `FederationInbox/safari/status.json`.
 
+If the ChatGPT composer is blocked but Safari output can be copied manually,
+feed the copied text through the same validator instead of hand-writing the
+inbox file:
+
+```bash
+python3 scripts/extract_safari_ack.py \
+  --text-file /path/to/copied-safari-response.txt \
+  --source-url "https://chatgpt.com/c/..." \
+  --write-status \
+  --print
+```
+
 ## Continuous Integration
 
 The repository now has a shared CI entry point:

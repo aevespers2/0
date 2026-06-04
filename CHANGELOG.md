@@ -33,6 +33,7 @@
 - Added `scripts/nudge_safari_sendability.py` to try bounded input-event nudges when Safari has a staged handoff but disabled send.
 - Added `scripts/write_safari_operator_handoff.py` to distill Safari send-disabled relay evidence into JSON and text handoff artifacts.
 - Added `FederationRelay/safari_target.json` and `scripts/focus_safari_target.py` to recover Safari target-tab drift before staging.
+- Added manual text/stdin ingestion to `scripts/extract_safari_ack.py` so copied Safari packets are validated before writing `FederationInbox/safari/status.json`.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -60,3 +61,4 @@
 - Public mirror verification now retries transient remote-head reads and reports persistent read failures as structured mirror errors.
 - Added `scripts/run_federation_post_push_refresh.py` to refresh ignored runtime status, Safari/Desktop contact, and dashboard artifacts after mirrored pushes.
 - Safari sync cycles now focus or reopen the configured target conversation before staging handoffs.
+- Documented copied Safari packet ingestion for composer-blocked relay recovery.

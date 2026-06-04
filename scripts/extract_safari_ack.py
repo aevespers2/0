@@ -56,6 +56,38 @@ def run_osascript(javascript: str) -> dict[str, Any]:
     return json.loads(result.stdout.strip())
 
 
+def snapshot_from_text(text: str, *, url: str = "", title: str = "manual Safari packet input") -> dict[str, Any]:
+    return {
+        "url": url,
+        "title": title,
+        "composer_length": 0,
+        "message_count": 1 if text.strip() else 0,
+        "messages": [{"index": 0, "role": "assistant", "text": text}],
+    }
+
+
+def snapshot_from_source(args: argparse.Namespace) -> dict[str, Any]:
+    sources = tuple(
+        item
+        for item in (
+            bool(args.text_file),
+            bool(args.stdin),
+        )
+        if item
+    )
+    if len(sources) > 1:
+        raise ValueError("choose only one manual input source")
+    if args.text_file:
+        return snapshot_from_text(
+            args.text_file.read_text(encoding="utf-8"),
+            url=args.source_url,
+            title=f"manual Safari packet input: {args.text_file}",
+        )
+    if args.stdin:
+        return snapshot_from_text(sys.stdin.read(), url=args.source_url)
+    return run_osascript(safari_messages_script())
+
+
 def iter_json_objects(text: str) -> tuple[dict[str, Any], ...]:
     objects: list[dict[str, Any]] = []
     stack = 0
@@ -155,7 +187,7 @@ def record_ack(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
-    snapshot = run_osascript(safari_messages_script())
+    snapshot = snapshot_from_source(args)
     candidate = extract_candidate(snapshot, args.authoritative_head)
     written_path = ""
     if candidate and args.write_status:
@@ -184,6 +216,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--authoritative-head", default="")
     parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
     parser.add_argument("--write-status", action="store_true")
+    parser.add_argument("--text-file", type=Path, help="Read copied Safari response text from this file instead of live Safari.")
+    parser.add_argument("--stdin", action="store_true", help="Read copied Safari response text from stdin instead of live Safari.")
+    parser.add_argument("--source-url", default="", help="Optional Safari conversation URL for manual text input evidence.")
     parser.add_argument("--log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
     parser.add_argument("--latest", type=Path, default=Path("reports/federation_contact_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")

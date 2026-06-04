@@ -48,6 +48,57 @@ def test_write_status_packet_validates_and_targets_safari_status(tmp_path) -> No
     assert json.loads(path.read_text(encoding="utf-8"))["agent"] == "safari_cloud"
 
 
+def test_run_ingests_copied_text_file_and_writes_status(tmp_path) -> None:
+    payload = {
+        "schema": "codex_federation_message.v1",
+        "agent": "safari_cloud",
+        "type": "status",
+        "workstream": "Autonomous VNext",
+        "cwd": "/workspace/0",
+        "branch": "work",
+        "commit": "abc123",
+        "status_short": [],
+        "remote": "",
+        "blocker": "",
+        "next_action": "Export patch proposals.",
+    }
+    text_file = tmp_path / "safari-response.txt"
+    text_file.write_text(f"Here is the packet:\n{json.dumps(payload)}\n", encoding="utf-8")
+    args = argparse.Namespace(
+        dispatch=tmp_path / "missing.json",
+        authoritative_head="abc123",
+        inbox=tmp_path / "FederationInbox",
+        write_status=True,
+        text_file=text_file,
+        stdin=False,
+        source_url="https://chatgpt.com/c/test",
+        log=tmp_path / "contact.jsonl",
+        latest=tmp_path / "latest.json",
+    )
+
+    result = extract_safari_ack.run(args)
+
+    status_path = tmp_path / "FederationInbox" / "safari" / "status.json"
+    assert result["written_path"] == str(status_path)
+    assert result["contact_event"]["status"] == "acknowledged"
+    assert json.loads(status_path.read_text(encoding="utf-8")) == payload
+
+
+def test_snapshot_source_rejects_multiple_manual_inputs(tmp_path) -> None:
+    args = argparse.Namespace(
+        text_file=tmp_path / "safari-response.txt",
+        stdin=True,
+        source_url="",
+    )
+
+    try:
+        extract_safari_ack.snapshot_from_source(args)
+    except ValueError as exc:
+        assert str(exc) == "choose only one manual input source"
+    else:
+        raise AssertionError("expected manual input conflict to fail closed")
+
+
 def test_run_records_observed_without_candidate(monkeypatch, tmp_path) -> None:
     monkeypatch.setattr(
         extract_safari_ack,
@@ -64,6 +115,9 @@ def test_run_records_observed_without_candidate(monkeypatch, tmp_path) -> None:
         authoritative_head="abc123",
         inbox=tmp_path / "FederationInbox",
         write_status=False,
+        text_file=None,
+        stdin=False,
+        source_url="",
         log=tmp_path / "contact.jsonl",
         latest=tmp_path / "latest.json",
     )
