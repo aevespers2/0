@@ -61,6 +61,8 @@ def test_stage_dispatch_reports_disabled_send_button(monkeypatch, tmp_path) -> N
     result = stage_dispatch(
         argparse.Namespace(
             dispatch=dispatch,
+            target=tmp_path / "missing-target.json",
+            url="",
             log=tmp_path / "contact.jsonl",
             latest=tmp_path / "latest.json",
             print_result=True,
@@ -71,3 +73,47 @@ def test_stage_dispatch_reports_disabled_send_button(monkeypatch, tmp_path) -> N
     assert event["status"] == "staged"
     assert "visible but disabled" in event["detail"]
     assert event["evidence"]["send_button_enabled"] == "false"
+
+
+def test_stage_dispatch_fails_when_current_tab_does_not_match_target(monkeypatch, tmp_path) -> None:
+    dispatch = tmp_path / "dispatch.json"
+    dispatch.write_text(json.dumps(dispatch_payload()), encoding="utf-8")
+    target = tmp_path / "target.json"
+    target.write_text(
+        json.dumps(
+            {
+                "schema": "codex_safari_target.v1",
+                "target_url": "https://chatgpt.com/c/example",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "scripts.stage_safari_dispatch.run_osascript",
+        lambda script: {
+            "staged": True,
+            "title": "ChatGPT",
+            "url": "https://chatgpt.com/",
+            "composer_contains_handoff": True,
+            "send_button_visible": True,
+            "send_button_enabled": False,
+            "stop_answering_visible": False,
+        },
+    )
+
+    result = stage_dispatch(
+        argparse.Namespace(
+            dispatch=dispatch,
+            target=target,
+            url="",
+            log=tmp_path / "contact.jsonl",
+            latest=tmp_path / "latest.json",
+            print_result=True,
+        )
+    )
+
+    event = result["contact_event"]
+    assert event["status"] == "failed"
+    assert "wrong tab" in event["detail"]
+    assert event["evidence"]["target_url_matched"] == "false"

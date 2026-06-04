@@ -197,6 +197,11 @@ def test_cycle_passes_safari_target_options(monkeypatch, tmp_path) -> None:
     assert "--url" in focus_call
     assert "https://chatgpt.com/c/example" in focus_call
     assert "--no-open-if-missing" in focus_call
+    stage_call = next(command for command in calls if any("stage_safari_dispatch.py" in item for item in command))
+    assert "--target" in stage_call
+    assert str(tmp_path / "FederationRelay" / "safari_target.json") in stage_call
+    assert "--url" in stage_call
+    assert "https://chatgpt.com/c/example" in stage_call
 
 
 def test_cycle_refuses_to_watch_when_stage_semantically_fails(monkeypatch, tmp_path) -> None:

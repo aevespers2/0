@@ -62,3 +62,4 @@
 - Added `scripts/run_federation_post_push_refresh.py` to refresh ignored runtime status, Safari/Desktop contact, and dashboard artifacts after mirrored pushes.
 - Safari sync cycles now focus or reopen the configured target conversation before staging handoffs.
 - Documented copied Safari packet ingestion for composer-blocked relay recovery.
+- Safari dispatch staging now validates the configured target conversation URL before reporting a staged handoff.

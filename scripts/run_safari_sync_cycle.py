@@ -62,6 +62,13 @@ def focus_safari_target(args: argparse.Namespace) -> dict[str, Any]:
     return run_command(command, args.repo)
 
 
+def stage_safari_dispatch(args: argparse.Namespace) -> dict[str, Any]:
+    command = ["python3", "scripts/stage_safari_dispatch.py", "--target", str(args.safari_target), "--print"]
+    if args.safari_url:
+        command.extend(["--url", args.safari_url])
+    return run_command(command, args.repo)
+
+
 def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     routine = run_command(["python3", "scripts/run_federation_routine.py", "--print"], args.repo)
     if not command_succeeded(routine):
@@ -141,14 +148,14 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "operator_handoff": operator_handoff,
         }
 
-    stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
+    stage = stage_safari_dispatch(args)
     recovery = skipped_command("Safari dispatch staging succeeded; recovery not needed")
     if not stage_succeeded(stage) and args.recover_composer:
         recovery = run_command(["python3", "scripts/recover_safari_composer.py", "--print"], args.repo)
         if command_succeeded(recovery):
             recovery_payload = parse_json_stdout(recovery)
             if recovery_payload.get("recovered"):
-                stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
+                stage = stage_safari_dispatch(args)
     if not stage_succeeded(stage):
         reason = "Safari dispatch staging failed; refusing to watch or extract stale state"
         skipped = skipped_command(reason)

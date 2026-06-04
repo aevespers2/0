@@ -304,6 +304,11 @@ for an explicit Safari acknowledgment, attempts one composer recovery when
 staging fails, and rewrites the relay summary, contact report, dashboard, and
 runtime Safari operator handoff.
 
+Safari staging is target-checked against
+`FederationRelay/safari_target.json`; a handoff inserted into a different
+ChatGPT URL is recorded as failed so the sync cycle will not watch or extract
+stale state.
+
 Extract an explicit Safari status acknowledgment from the visible ChatGPT tab:
 
 ```bash
