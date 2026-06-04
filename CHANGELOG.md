@@ -73,3 +73,4 @@
 - Federation contact reports now preserve actionable current-head surface state, so dashboards show Safari as blocked even after later no-candidate acknowledgment probes.
 - Added all-surface operator handoffs (`scripts/write_federation_operator_handoff.py`) and refreshed them from Safari/post-push cycles.
 - Safari sendability evidence now records candidate send controls for browser-button drift diagnosis while retaining fail-closed click behavior.
+- Federation operator handoffs now mark inbox packets stale when their commit differs from the authoritative head.

@@ -113,11 +113,17 @@ def status_for_surface(
     dashboard: dict[str, Any],
     contact: dict[str, Any],
     inbox_status: dict[str, Any],
+    authoritative_head: str,
 ) -> str:
     contact_status = dashboard.get("contact_surfaces", {}).get(
         surface,
         contact.get("actionable_status") or contact.get("status", ""),
     )
+    packet_stale = packet_is_stale(inbox_status, authoritative_head)
+    if packet_stale and inbox_status.get("blocker"):
+        return "stale_blocked"
+    if packet_stale:
+        return "stale"
     if contact_status:
         return str(contact_status)
     if not inbox_status:
@@ -127,6 +133,11 @@ def status_for_surface(
     if inbox_status.get("type") == "status":
         return "reported"
     return str(inbox_status.get("type") or "reported")
+
+
+def packet_is_stale(inbox_status: dict[str, Any], authoritative_head: str) -> bool:
+    packet_commit = str(inbox_status.get("commit", "") or "")
+    return bool(packet_commit and authoritative_head and packet_commit != authoritative_head)
 
 
 def detail_for_surface(contact: dict[str, Any], inbox_status: dict[str, Any]) -> str:
@@ -148,15 +159,17 @@ def build_surface_packet(
     contacts: dict[str, dict[str, Any]],
     inbox_statuses: dict[str, dict[str, Any]],
     dispatches: dict[str, dict[str, Any]],
+    authoritative_head: str,
 ) -> dict[str, Any]:
     contact = contacts.get(surface, {})
     inbox_status = inbox_statuses.get(surface, {})
     role = surface_role(dispatch, surface)
+    packet_stale = packet_is_stale(inbox_status, authoritative_head)
     return {
         "surface": surface,
         "role": role.get("role", ""),
         "handoff_type": role.get("handoff_type", ""),
-        "status": status_for_surface(surface, dashboard, contact, inbox_status),
+        "status": status_for_surface(surface, dashboard, contact, inbox_status, authoritative_head),
         "required": surface in dispatches or surface in dashboard.get("required_packets", ()),
         "constraints": role.get("constraints", ()),
         "may_execute": role.get("may_execute", ()),
@@ -168,6 +181,8 @@ def build_surface_packet(
         "packet_path": inbox_status.get("_path", ""),
         "packet_commit": inbox_status.get("commit", ""),
         "packet_generated_at": inbox_status.get("generated_at", ""),
+        "packet_fresh": bool(inbox_status.get("commit")) and not packet_stale,
+        "packet_stale": packet_stale,
         "blocker": inbox_status.get("blocker", ""),
     }
 
@@ -182,13 +197,23 @@ def build_handoff(
     dispatches = dispatch_by_agent(dispatch)
     contacts = contact_by_surface(contact_report)
     inbox_statuses = inbox_statuses or {}
+    authoritative_head = str(dashboard.get("authoritative_head") or dispatch.get("authoritative_head", ""))
     surfaces = tuple(
-        build_surface_packet(surface, dashboard, relay_summary, dispatch, contacts, inbox_statuses, dispatches)
+        build_surface_packet(
+            surface,
+            dashboard,
+            relay_summary,
+            dispatch,
+            contacts,
+            inbox_statuses,
+            dispatches,
+            authoritative_head,
+        )
         for surface in SURFACE_ORDER
     )
     return {
         "schema": "codex_federation_operator_handoff.v1",
-        "authoritative_head": dashboard.get("authoritative_head") or dispatch.get("authoritative_head", ""),
+        "authoritative_head": authoritative_head,
         "ready_for_remote_write": bool(dashboard.get("ready_for_remote_write", False)),
         "readiness_blockers": dashboard.get("readiness_blockers", ()),
         "mirrors_synchronized": bool(dashboard.get("mirrors_synchronized", False)),

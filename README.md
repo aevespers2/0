@@ -218,6 +218,9 @@ python3 scripts/write_federation_operator_handoff.py --print
 This emits ignored runtime reports under `reports/` and keeps Safari on the
 clipboard-validated recovery path when the browser send control is blocked or
 has drifted.
+The handoff also compares inbox packet commits against the authoritative head
+and marks stale packets explicitly, including stale blocked bridge/status
+packets.
 
 Record a browser/app contact attempt:
 

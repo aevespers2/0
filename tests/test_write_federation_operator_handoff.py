@@ -99,6 +99,8 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["local_cli"]["status"] == "reported"
     assert surfaces["local_cli"]["next_action"] == "keep integrating"
     assert surfaces["local_cli"]["packet_commit"] == "abc123"
+    assert surfaces["local_cli"]["packet_fresh"] is True
+    assert surfaces["local_cli"]["packet_stale"] is False
     assert surfaces["safari_cloud"]["status"] == "blocked"
     assert surfaces["safari_cloud"]["required"] is True
     assert surfaces["safari_cloud"]["expected_path"] == "FederationInbox/safari/status.json"
@@ -108,10 +110,13 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["mobile"]["status"] == "reported"
     assert surfaces["mobile"]["detail"] == "## main...origin/main"
     assert surfaces["mobile"]["expected_path"] == "FederationInbox/mobile/status.json"
+    assert surfaces["mobile"]["packet_fresh"] is True
     assert surfaces["mobile"]["command"].startswith("python3 scripts/write_mobile_federation_status.py")
     assert surfaces["chatgpt_bridge"]["role"] == "planning_and_dispatch_coordinator"
-    assert surfaces["chatgpt_bridge"]["status"] == "blocked"
+    assert surfaces["chatgpt_bridge"]["status"] == "stale_blocked"
     assert surfaces["chatgpt_bridge"]["blocker"] == "sandbox_write_boundary"
+    assert surfaces["chatgpt_bridge"]["packet_fresh"] is False
+    assert surfaces["chatgpt_bridge"]["packet_stale"] is True
     assert surfaces["chatgpt_bridge"]["next_action"] == "relay bridge status"
 
 
