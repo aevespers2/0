@@ -66,4 +66,5 @@
 - Safari dispatch staging now validates the configured target conversation URL before reporting a staged handoff.
 - Safari sendability watching and acknowledgment extraction now validate the configured target conversation before sending or writing status packets.
 - Safari staging and sendability watching now distinguish visible send controls from enabled controls using `data-testid`, button id, labels, and disabled state.
+- Safari staging and sendability evidence now records send-button identity fields (`label`, `id`, `data-testid`, disabled state, and `aria-disabled`) for browser-button drift diagnosis.
 - Safari operator handoffs now include a copied-response ingestion command for send-disabled recovery.

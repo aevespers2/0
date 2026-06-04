@@ -16,6 +16,10 @@ def test_probe_script_checks_send_and_stop_state() -> None:
     assert "composer-submit-button" in script
     assert "sendButton.disabled" in script
     assert "ariaDisabled" in script
+    assert "send_button_disabled" in script
+    assert "send_button_label" in script
+    assert "send_button_id" in script
+    assert "send_button_testid" in script
 
 
 def test_click_script_refuses_non_send_button() -> None:
@@ -99,6 +103,11 @@ def test_watch_reports_visible_disabled_send_as_blocked(monkeypatch, tmp_path) -
             "composer_contains_handoff": True,
             "send_button_visible": True,
             "send_button_enabled": False,
+            "send_button_disabled": True,
+            "send_button_label": "Send prompt",
+            "send_button_id": "composer-submit-button",
+            "send_button_testid": "send-button",
+            "send_button_aria_disabled": "",
             "send_button_index": 1,
             "stop_answering_visible": False,
         },
@@ -121,3 +130,7 @@ def test_watch_reports_visible_disabled_send_as_blocked(monkeypatch, tmp_path) -
     assert event["status"] == "blocked"
     assert event["evidence"]["send_button_visible"] == "true"
     assert event["evidence"]["send_button_enabled"] == "false"
+    assert event["evidence"]["send_button_disabled"] == "true"
+    assert event["evidence"]["send_button_label"] == "Send prompt"
+    assert event["evidence"]["send_button_id"] == "composer-submit-button"
+    assert event["evidence"]["send_button_testid"] == "send-button"

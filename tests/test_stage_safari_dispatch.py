@@ -42,6 +42,10 @@ def test_safari_probe_script_embeds_json_escaped_handoff() -> None:
     assert "send-button" in script
     assert "composer-submit-button" in script
     assert "ariaDisabled" in script
+    assert "send_button_disabled" in script
+    assert "send_button_label" in script
+    assert "send_button_id" in script
+    assert "send_button_testid" in script
     assert "send_button_index" in script
 
 
@@ -58,6 +62,11 @@ def test_stage_dispatch_reports_disabled_send_button(monkeypatch, tmp_path) -> N
             "composer_contains_handoff": True,
             "send_button_visible": True,
             "send_button_enabled": False,
+            "send_button_disabled": True,
+            "send_button_label": "Send prompt",
+            "send_button_id": "composer-submit-button",
+            "send_button_testid": "send-button",
+            "send_button_aria_disabled": "",
             "stop_answering_visible": False,
         },
     )
@@ -77,6 +86,10 @@ def test_stage_dispatch_reports_disabled_send_button(monkeypatch, tmp_path) -> N
     assert event["status"] == "staged"
     assert "visible but disabled" in event["detail"]
     assert event["evidence"]["send_button_enabled"] == "false"
+    assert event["evidence"]["send_button_disabled"] == "true"
+    assert event["evidence"]["send_button_label"] == "Send prompt"
+    assert event["evidence"]["send_button_id"] == "composer-submit-button"
+    assert event["evidence"]["send_button_testid"] == "send-button"
 
 
 def test_stage_dispatch_fails_when_current_tab_does_not_match_target(monkeypatch, tmp_path) -> None:
