@@ -67,12 +67,24 @@ def snapshot_from_text(text: str, *, url: str = "", title: str = "manual Safari 
     }
 
 
+def read_clipboard() -> str:
+    result = subprocess.run(
+        ["pbpaste"],
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    return result.stdout
+
+
 def snapshot_from_source(args: argparse.Namespace) -> dict[str, Any]:
     sources = tuple(
         item
         for item in (
             bool(args.text_file),
             bool(args.stdin),
+            bool(args.clipboard),
         )
         if item
     )
@@ -86,6 +98,12 @@ def snapshot_from_source(args: argparse.Namespace) -> dict[str, Any]:
         )
     if args.stdin:
         return snapshot_from_text(sys.stdin.read(), url=args.source_url)
+    if args.clipboard:
+        return snapshot_from_text(
+            read_clipboard(),
+            url=args.source_url,
+            title="manual Safari packet input: clipboard",
+        )
     return run_osascript(safari_messages_script())
 
 
@@ -245,6 +263,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--write-status", action="store_true")
     parser.add_argument("--text-file", type=Path, help="Read copied Safari response text from this file instead of live Safari.")
     parser.add_argument("--stdin", action="store_true", help="Read copied Safari response text from stdin instead of live Safari.")
+    parser.add_argument("--clipboard", action="store_true", help="Read copied Safari response text from the macOS clipboard.")
     parser.add_argument("--source-url", default="", help="Optional Safari conversation URL for manual text input evidence.")
     parser.add_argument("--target", type=Path, default=Path("FederationRelay/safari_target.json"))
     parser.add_argument("--url", default="")

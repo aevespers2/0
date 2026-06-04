@@ -335,11 +335,14 @@ conversation or another surface, ingest that text through the same validator:
 
 ```bash
 python3 scripts/extract_safari_ack.py \
-  --text-file /path/to/copied-safari-response.txt \
+  --clipboard \
   --source-url "https://chatgpt.com/c/..." \
   --write-status \
   --print
 ```
+
+Use `--text-file /path/to/copied-safari-response.txt` instead of `--clipboard`
+when you need an auditable saved copy of the copied response.
 
 Enforce remote-write readiness before push (this is the authoritative gate):
 

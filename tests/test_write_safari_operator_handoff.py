@@ -27,7 +27,9 @@ def test_build_handoff_summarizes_send_disabled_state() -> None:
     assert payload["send_button_enabled"] is False
     assert payload["target_url"] == "https://chatgpt.com/c/example"
     assert "extract_safari_ack.py" in payload["manual_ingest_command"]
+    assert "--clipboard" in payload["manual_ingest_command"]
     assert "--write-status" in payload["manual_ingest_command"]
+    assert "--text-file" in payload["manual_file_ingest_command"]
     assert any("copied-response.txt" in item for item in payload["instructions"])
 
 

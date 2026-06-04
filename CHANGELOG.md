@@ -34,7 +34,7 @@
 - Added `scripts/nudge_safari_sendability.py` to try bounded input-event nudges when Safari has a staged handoff but disabled send.
 - Added `scripts/write_safari_operator_handoff.py` to distill Safari send-disabled relay evidence into JSON and text handoff artifacts.
 - Added `FederationRelay/safari_target.json` and `scripts/focus_safari_target.py` to recover Safari target-tab drift before staging.
-- Added manual text/stdin ingestion to `scripts/extract_safari_ack.py` so copied Safari packets are validated before writing `FederationInbox/safari/status.json`.
+- Added manual text/stdin/clipboard ingestion to `scripts/extract_safari_ack.py` so copied Safari packets are validated before writing `FederationInbox/safari/status.json`.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -67,4 +67,4 @@
 - Safari sendability watching and acknowledgment extraction now validate the configured target conversation before sending or writing status packets.
 - Safari staging and sendability watching now distinguish visible send controls from enabled controls using `data-testid`, button id, labels, and disabled state.
 - Safari staging and sendability evidence now records send-button identity fields (`label`, `id`, `data-testid`, disabled state, and `aria-disabled`) for browser-button drift diagnosis.
-- Safari operator handoffs now include a copied-response ingestion command for send-disabled recovery.
+- Safari operator handoffs now include clipboard and file copied-response ingestion commands for send-disabled recovery.

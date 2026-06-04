@@ -71,6 +71,7 @@ def test_run_ingests_copied_text_file_and_writes_status(tmp_path) -> None:
         write_status=True,
         text_file=text_file,
         stdin=False,
+        clipboard=False,
         source_url="https://chatgpt.com/c/test",
         target=tmp_path / "missing-target.json",
         url="",
@@ -86,10 +87,54 @@ def test_run_ingests_copied_text_file_and_writes_status(tmp_path) -> None:
     assert json.loads(status_path.read_text(encoding="utf-8")) == payload
 
 
+def test_run_ingests_clipboard_text_and_writes_status(monkeypatch, tmp_path) -> None:
+    payload = {
+        "schema": "codex_federation_message.v1",
+        "agent": "safari_cloud",
+        "type": "status",
+        "workstream": "Autonomous VNext",
+        "cwd": "/workspace/0",
+        "branch": "work",
+        "commit": "abc123",
+        "status_short": [],
+        "remote": "",
+        "blocker": "",
+        "next_action": "Export patch proposals.",
+    }
+    monkeypatch.setattr(
+        extract_safari_ack,
+        "read_clipboard",
+        lambda: f"Copied packet:\n{json.dumps(payload)}\n",
+    )
+    args = argparse.Namespace(
+        dispatch=tmp_path / "missing.json",
+        authoritative_head="abc123",
+        inbox=tmp_path / "FederationInbox",
+        write_status=True,
+        text_file=None,
+        stdin=False,
+        clipboard=True,
+        source_url="https://chatgpt.com/c/test",
+        target=tmp_path / "missing-target.json",
+        url="",
+        log=tmp_path / "contact.jsonl",
+        latest=tmp_path / "latest.json",
+    )
+
+    result = extract_safari_ack.run(args)
+
+    status_path = tmp_path / "FederationInbox" / "safari" / "status.json"
+    assert result["written_path"] == str(status_path)
+    assert result["contact_event"]["status"] == "acknowledged"
+    assert result["contact_event"]["evidence"]["title"] == "manual Safari packet input: clipboard"
+    assert json.loads(status_path.read_text(encoding="utf-8")) == payload
+
+
 def test_snapshot_source_rejects_multiple_manual_inputs(tmp_path) -> None:
     args = argparse.Namespace(
         text_file=tmp_path / "safari-response.txt",
         stdin=True,
+        clipboard=True,
         source_url="",
         target=tmp_path / "missing-target.json",
         url="",
@@ -121,6 +166,7 @@ def test_run_records_observed_without_candidate(monkeypatch, tmp_path) -> None:
         write_status=False,
         text_file=None,
         stdin=False,
+        clipboard=False,
         source_url="",
         target=tmp_path / "missing-target.json",
         url="",
@@ -159,6 +205,7 @@ def test_run_refuses_to_extract_from_wrong_target_url(monkeypatch, tmp_path) -> 
         write_status=True,
         text_file=None,
         stdin=False,
+        clipboard=False,
         source_url="",
         target=tmp_path / "missing-target.json",
         url="https://chatgpt.com/c/expected",

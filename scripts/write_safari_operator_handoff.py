@@ -35,8 +35,12 @@ def build_handoff(
         "If ChatGPT enables Send, send the handoff.",
         f"After Safari responds, collect or transcribe the status packet to {expected_path}.",
         (
-            "If Send remains disabled but a Safari response packet can be copied, save the text and run: "
-            "python3 scripts/extract_safari_ack.py --text-file <copied-response.txt> "
+            "If Send remains disabled but a Safari response packet can be copied, copy it and run: "
+            "python3 scripts/extract_safari_ack.py --clipboard "
+            f"--source-url \"{target_url}\" --write-status --print"
+        ),
+        (
+            "File fallback: python3 scripts/extract_safari_ack.py --text-file <copied-response.txt> "
             f"--source-url \"{target_url}\" --write-status --print"
         ),
         "Do not push directly from Safari; export patch proposals for Local CLI review.",
@@ -48,6 +52,10 @@ def build_handoff(
         "ready_for_remote_write": bool(dashboard.get("ready_for_remote_write", False)),
         "expected_packet": expected_path,
         "manual_ingest_command": (
+            "python3 scripts/extract_safari_ack.py --clipboard "
+            f"--source-url \"{target_url}\" --write-status --print"
+        ),
+        "manual_file_ingest_command": (
             "python3 scripts/extract_safari_ack.py --text-file <copied-response.txt> "
             f"--source-url \"{target_url}\" --write-status --print"
         ),
