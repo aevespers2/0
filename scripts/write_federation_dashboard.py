@@ -32,7 +32,7 @@ def git_head(repo: Path) -> str:
 
 def contact_surfaces(contact_report: dict[str, Any]) -> dict[str, str]:
     return {
-        str(item.get("surface", "")): str(item.get("status", ""))
+        str(item.get("surface", "")): str(item.get("actionable_status") or item.get("status", ""))
         for item in contact_report.get("surfaces", ())
         if item.get("surface")
     }

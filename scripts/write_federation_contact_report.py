@@ -4,7 +4,12 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import sys
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.write_federation_relay_summary import load_latest_contact_for_surface
 
 
 DEFAULT_SURFACES = ("safari_cloud", "desktop_app")
@@ -32,9 +37,24 @@ def contact_path(latest_dir: Path, surface: str) -> Path:
     return latest_dir / f"{surface}.json"
 
 
-def summarize_surface(surface: str, latest_dir: Path, authoritative_head: str) -> dict[str, Any]:
+def summarize_surface(
+    surface: str,
+    latest_dir: Path,
+    authoritative_head: str,
+    contact_log: Path | None = None,
+) -> dict[str, Any]:
     path = contact_path(latest_dir, surface)
     contact = load_json(path)
+    actionable = (
+        load_latest_contact_for_surface(
+            latest_dir.parent / "federation_contact_latest.json",
+            contact_log,
+            surface,
+            authoritative_head,
+        )
+        if contact_log
+        else contact
+    )
     head = str(contact.get("authoritative_head", ""))
     status = str(contact.get("status", "missing" if not contact else ""))
     return {
@@ -47,6 +67,9 @@ def summarize_surface(surface: str, latest_dir: Path, authoritative_head: str) -
         "authoritative_head": head,
         "fresh": bool(contact) and head == authoritative_head,
         "evidence": contact.get("evidence", {}),
+        "actionable_status": actionable.get("status", "") if actionable else "",
+        "actionable_detail": actionable.get("detail", "") if actionable else "",
+        "actionable_evidence": actionable.get("evidence", {}) if actionable else {},
     }
 
 
@@ -54,9 +77,10 @@ def build_report(
     latest_dir: Path,
     authoritative_head: str,
     surfaces: tuple[str, ...] = DEFAULT_SURFACES,
+    contact_log: Path | None = None,
 ) -> dict[str, Any]:
     surface_reports = tuple(
-        summarize_surface(surface, latest_dir, authoritative_head) for surface in surfaces
+        summarize_surface(surface, latest_dir, authoritative_head, contact_log) for surface in surfaces
     )
     missing = tuple(item["surface"] for item in surface_reports if not item["present"])
     stale = tuple(item["surface"] for item in surface_reports if item["present"] and not item["fresh"])
@@ -80,6 +104,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Write a compact per-surface federation contact report.")
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--latest-dir", type=Path, default=Path("reports/federation_contact_latest"))
+    parser.add_argument("--contact-log", type=Path, default=Path("reports/federation_contact_log.jsonl"))
     parser.add_argument("--authoritative-head", default="")
     parser.add_argument("--surface", action="append", default=[])
     parser.add_argument("--output", type=Path, default=Path("reports/federation_contact_report.json"))
@@ -91,7 +116,7 @@ def main() -> None:
     args = parse_args()
     head = args.authoritative_head or git_head(args.repo)
     surfaces = tuple(args.surface) if args.surface else DEFAULT_SURFACES
-    report = build_report(args.latest_dir, head, surfaces)
+    report = build_report(args.latest_dir, head, surfaces, args.contact_log)
     write_report(report, args.output)
     if args.print_report:
         print(json.dumps(report, indent=2, sort_keys=True))

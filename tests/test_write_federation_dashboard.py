@@ -45,6 +45,20 @@ def test_contact_surfaces_ignores_empty_surface_names() -> None:
     assert contact_surfaces({"surfaces": ({"surface": "", "status": "missing"},)}) == {}
 
 
+def test_contact_surfaces_prefers_actionable_status() -> None:
+    report = {
+        "surfaces": (
+            {"surface": "safari_cloud", "status": "observed", "actionable_status": "blocked"},
+            {"surface": "desktop_app", "status": "observed", "actionable_status": ""},
+        )
+    }
+
+    assert contact_surfaces(report) == {
+        "safari_cloud": "blocked",
+        "desktop_app": "observed",
+    }
+
+
 def test_effective_readiness_blockers_removes_synced_mirror_blocker() -> None:
     blockers = effective_readiness_blockers(
         {
