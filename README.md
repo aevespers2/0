@@ -252,6 +252,10 @@ Write a compact federation dashboard:
 python3 scripts/write_federation_dashboard.py --refresh-mirrors --print
 ```
 
+The dashboard includes packet recovery summaries (`packet_missing_surfaces`,
+`packet_stale_surfaces`, and `packet_recovery_required_surfaces`) for compact
+surface routing.
+
 Probe the macOS Codex desktop app and record live app evidence:
 
 ```bash

@@ -7,6 +7,7 @@ from scripts.write_federation_dashboard import (
     contact_surfaces,
     effective_readiness_blockers,
     load_or_verify_mirrors,
+    packet_recovery_summary,
     write_dashboard,
 )
 
@@ -31,7 +32,12 @@ def test_build_dashboard_summarizes_operational_state() -> None:
     }
     mirrors = {"synchronized": True}
 
-    dashboard = build_dashboard(state, relay, contact, mirrors, "abc123")
+    inbox_statuses = {
+        "local_cli": {"commit": "abc123"},
+        "chatgpt_bridge": {"commit": "old123"},
+    }
+
+    dashboard = build_dashboard(state, relay, contact, mirrors, "abc123", inbox_statuses)
 
     assert dashboard["schema"] == "codex_federation_dashboard.v1"
     assert dashboard["authoritative_head"] == "abc123"
@@ -39,6 +45,9 @@ def test_build_dashboard_summarizes_operational_state() -> None:
     assert dashboard["contact_evidence_fresh"] is True
     assert dashboard["contact_surfaces"]["desktop_app"] == "observed"
     assert dashboard["required_packets"] == ("safari_cloud",)
+    assert dashboard["packet_missing_surfaces"] == ("safari_cloud",)
+    assert dashboard["packet_stale_surfaces"] == ("chatgpt_bridge",)
+    assert dashboard["packet_recovery_required_surfaces"] == ("safari_cloud", "chatgpt_bridge")
 
 
 def test_contact_surfaces_ignores_empty_surface_names() -> None:
@@ -71,6 +80,21 @@ def test_effective_readiness_blockers_removes_synced_mirror_blocker() -> None:
     )
 
     assert blockers == ("required federation packets pending",)
+
+
+def test_packet_recovery_summary_deduplicates_missing_and_stale() -> None:
+    summary = packet_recovery_summary(
+        {
+            "safari_cloud": {"commit": "old"},
+            "mobile": {"commit": "head"},
+        },
+        ("safari_cloud", "chatgpt_bridge"),
+        "head",
+    )
+
+    assert summary["packet_missing_surfaces"] == ("chatgpt_bridge",)
+    assert summary["packet_stale_surfaces"] == ("safari_cloud",)
+    assert summary["packet_recovery_required_surfaces"] == ("chatgpt_bridge", "safari_cloud")
 
 
 def test_load_or_verify_mirrors_uses_saved_report(tmp_path, monkeypatch) -> None:

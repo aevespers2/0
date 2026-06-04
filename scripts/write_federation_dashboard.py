@@ -10,6 +10,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.verify_public_mirrors import verify_manifest
+from scripts.write_federation_operator_handoff import load_inbox_statuses, packet_is_stale
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -47,15 +48,36 @@ def effective_readiness_blockers(
     return blockers
 
 
+def packet_recovery_summary(
+    inbox_statuses: dict[str, dict[str, Any]],
+    required_packets: tuple[str, ...],
+    authoritative_head: str,
+) -> dict[str, tuple[str, ...]]:
+    missing = tuple(surface for surface in required_packets if surface not in inbox_statuses)
+    stale = tuple(
+        surface
+        for surface, packet in inbox_statuses.items()
+        if packet_is_stale(packet, authoritative_head)
+    )
+    recovery_required = tuple(dict.fromkeys((*missing, *stale)))
+    return {
+        "packet_missing_surfaces": missing,
+        "packet_stale_surfaces": stale,
+        "packet_recovery_required_surfaces": recovery_required,
+    }
+
+
 def build_dashboard(
     state_report: dict[str, Any],
     relay_summary: dict[str, Any],
     contact_report: dict[str, Any],
     mirror_report: dict[str, Any],
     authoritative_head: str,
+    inbox_statuses: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     required_packets = tuple(relay_summary.get("required_packets", ()))
     readiness_blockers = effective_readiness_blockers(state_report, mirror_report)
+    packet_summary = packet_recovery_summary(inbox_statuses or {}, required_packets, authoritative_head)
     return {
         "schema": "codex_federation_dashboard.v1",
         "authoritative_head": authoritative_head,
@@ -67,6 +89,7 @@ def build_dashboard(
         "relay_target": relay_summary.get("dispatch_agent", ""),
         "relay_status": relay_summary.get("latest_contact_status", ""),
         "required_packets": required_packets,
+        **packet_summary,
         "next_action": relay_summary.get("next_action", ""),
     }
 
@@ -89,6 +112,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--state-report", type=Path, default=Path("reports/federation_state_report.json"))
     parser.add_argument("--relay-summary", type=Path, default=Path("reports/federation_relay_summary.json"))
     parser.add_argument("--contact-report", type=Path, default=Path("reports/federation_contact_report.json"))
+    parser.add_argument("--inbox", type=Path, default=Path("FederationInbox"))
     parser.add_argument("--mirror-report", type=Path, default=Path("reports/public_mirror_verification.json"))
     parser.add_argument("--mirror-manifest", type=Path, default=Path("public_mirrors.json"))
     parser.add_argument("--refresh-mirrors", action="store_true")
@@ -106,6 +130,7 @@ def main() -> None:
         load_json(args.contact_report),
         load_or_verify_mirrors(args.mirror_report, args.repo, args.mirror_manifest, args.refresh_mirrors),
         head,
+        load_inbox_statuses(args.inbox),
     )
     write_dashboard(dashboard, args.output)
     if args.print_dashboard:
