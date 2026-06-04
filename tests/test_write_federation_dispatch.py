@@ -95,6 +95,51 @@ def test_write_dispatch_creates_aggregate_and_surface_packets(tmp_path) -> None:
     assert surface["schema"] == "codex_federation_surface_dispatch.v1"
     assert surface["parallel_work"]["surfaces"]["mobile"]["role"] == "user_facing_followup"
     assert surface["dispatch"]["agent"] == "mobile"
+    assert "pruned" not in written
+
+
+def test_write_dispatch_prunes_stale_surface_packets(tmp_path) -> None:
+    root = tmp_path / "FederationDispatch"
+    stale_desktop = root / "desktop" / "dispatch.json"
+    stale_safari = root / "safari" / "dispatch.json"
+    stale_desktop.parent.mkdir(parents=True)
+    stale_safari.parent.mkdir(parents=True)
+    stale_desktop.write_text('{"authoritative_head":"old"}\n', encoding="utf-8")
+    stale_safari.write_text('{"authoritative_head":"old"}\n', encoding="utf-8")
+    payload = {
+        "schema": "codex_federation_dispatch.v1",
+        "generated_at": "2026-06-02T00:00:00Z",
+        "authoritative_head": "abc123",
+        "parallel_work": parallel_work_allocation("abc123"),
+        "ready_for_remote_write": False,
+        "readiness_blockers": ("required federation packets pending",),
+        "dispatch_count": 1,
+        "dispatches": [
+            {
+                "agent": "mobile",
+                "surface_dir": "mobile",
+                "packet_type": "status_refresh",
+                "priority": "required",
+                "details": "refresh mobile",
+                "expected_path": "FederationInbox/mobile/status.json",
+                "command": "python3 scripts/write_mobile_federation_status.py",
+                "status_template": {
+                    "schema": "codex_federation_message.v1",
+                    "agent": "mobile",
+                    "type": "status",
+                    "commit": "abc123",
+                },
+                "handoff_text": "Federation dispatch for mobile.",
+            }
+        ],
+    }
+
+    written = write_dispatch(payload, root)
+
+    assert not stale_desktop.exists()
+    assert not stale_safari.exists()
+    assert (root / "mobile" / "dispatch.json").exists()
+    assert written["pruned"] == (str(stale_desktop), str(stale_safari))
 
 
 def test_command_for_known_surfaces() -> None:

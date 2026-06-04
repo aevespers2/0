@@ -271,11 +271,24 @@ def build_dispatch(
     }
 
 
-def write_dispatch(payload: dict[str, Any], output_root: Path) -> dict[str, str]:
+def prune_stale_surface_dispatches(output_root: Path, active_surface_dirs: set[str]) -> tuple[str, ...]:
+    pruned: list[str] = []
+    for surface_dir in set(SURFACE_TO_DIR.values()):
+        if surface_dir in active_surface_dirs:
+            continue
+        path = output_root / surface_dir / "dispatch.json"
+        if path.exists():
+            path.unlink()
+            pruned.append(str(path))
+    return tuple(sorted(pruned))
+
+
+def write_dispatch(payload: dict[str, Any], output_root: Path) -> dict[str, Any]:
     output_root.mkdir(parents=True, exist_ok=True)
     aggregate = output_root / "dispatch.json"
     aggregate.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    written = {"aggregate": str(aggregate)}
+    written: dict[str, Any] = {"aggregate": str(aggregate)}
+    active_surface_dirs = {str(dispatch["surface_dir"]) for dispatch in payload["dispatches"]}
 
     for dispatch in payload["dispatches"]:
         surface_dir = output_root / dispatch["surface_dir"]
@@ -290,6 +303,10 @@ def write_dispatch(payload: dict[str, Any], output_root: Path) -> dict[str, str]
         }
         path.write_text(json.dumps(surface_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         written[dispatch["agent"]] = str(path)
+
+    pruned = prune_stale_surface_dispatches(output_root, active_surface_dirs)
+    if pruned:
+        written["pruned"] = pruned
 
     return written
 

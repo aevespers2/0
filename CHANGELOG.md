@@ -69,3 +69,4 @@
 - Safari staging and sendability evidence now records send-button identity fields (`label`, `id`, `data-testid`, disabled state, and `aria-disabled`) for browser-button drift diagnosis.
 - Safari operator handoffs now include clipboard and file copied-response ingestion commands for send-disabled recovery.
 - Federation relay/dashboard next actions now route send-disabled Safari recovery through validated clipboard packet ingestion.
+- Federation dispatch writing now prunes stale per-surface dispatch packets so contact evidence cannot embed obsolete head-specific instructions.
