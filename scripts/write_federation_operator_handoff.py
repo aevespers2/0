@@ -50,6 +50,7 @@ def command_for_surface(
     dashboard: dict[str, Any],
     relay_summary: dict[str, Any],
     dispatches: dict[str, dict[str, Any]],
+    authoritative_head: str,
 ) -> str:
     if surface == "safari_cloud" and dashboard.get("relay_status") == "blocked":
         evidence = relay_summary.get("latest_contact_evidence", {})
@@ -65,7 +66,8 @@ def command_for_surface(
     if surface == "mobile":
         return "python3 scripts/write_mobile_federation_status.py --output FederationInbox/mobile/status.json"
     if surface == "chatgpt_bridge":
-        return "python3 scripts/emit_bridge_signal.py --print"
+        head_arg = f' --authoritative-head "{authoritative_head}"' if authoritative_head else ""
+        return f"python3 scripts/emit_bridge_signal.py{head_arg} --print"
     return ""
 
 
@@ -140,6 +142,18 @@ def packet_is_stale(inbox_status: dict[str, Any], authoritative_head: str) -> bo
     return bool(packet_commit and authoritative_head and packet_commit != authoritative_head)
 
 
+def stale_packet_next_action(surface: str, inbox_status: dict[str, Any], authoritative_head: str) -> str:
+    path = str(inbox_status.get("_path", ""))
+    packet_commit = str(inbox_status.get("commit", ""))
+    surface_name = surface
+    return (
+        f"Refresh {surface_name} status at {path or 'its FederationInbox status path'} "
+        f"from packet commit {packet_commit or 'unknown'} to authoritative head {authoritative_head}; "
+        "if the surface cannot write directly, submit an equivalent codex_federation_message.v1 status packet "
+        "through Local CLI for validation."
+    )
+
+
 def detail_for_surface(contact: dict[str, Any], inbox_status: dict[str, Any]) -> str:
     if contact.get("actionable_detail") or contact.get("detail"):
         return str(contact.get("actionable_detail") or contact.get("detail"))
@@ -165,6 +179,9 @@ def build_surface_packet(
     inbox_status = inbox_statuses.get(surface, {})
     role = surface_role(dispatch, surface)
     packet_stale = packet_is_stale(inbox_status, authoritative_head)
+    next_action = next_action_for_surface(surface, dashboard, relay_summary, contact, inbox_status, dispatches)
+    if packet_stale:
+        next_action = stale_packet_next_action(surface, inbox_status, authoritative_head)
     return {
         "surface": surface,
         "role": role.get("role", ""),
@@ -174,8 +191,8 @@ def build_surface_packet(
         "constraints": role.get("constraints", ()),
         "may_execute": role.get("may_execute", ()),
         "must_report": role.get("must_report", ()),
-        "next_action": next_action_for_surface(surface, dashboard, relay_summary, contact, inbox_status, dispatches),
-        "command": command_for_surface(surface, dashboard, relay_summary, dispatches),
+        "next_action": next_action,
+        "command": command_for_surface(surface, dashboard, relay_summary, dispatches, authoritative_head),
         "expected_path": dispatches.get(surface, {}).get("expected_path", inbox_status.get("_path", "")),
         "detail": detail_for_surface(contact, inbox_status),
         "packet_path": inbox_status.get("_path", ""),
@@ -183,6 +200,12 @@ def build_surface_packet(
         "packet_generated_at": inbox_status.get("generated_at", ""),
         "packet_fresh": bool(inbox_status.get("commit")) and not packet_stale,
         "packet_stale": packet_stale,
+        "packet_expected_commit": authoritative_head,
+        "packet_stale_reason": (
+            f"packet commit {inbox_status.get('commit', '')} differs from authoritative head {authoritative_head}"
+            if packet_stale
+            else ""
+        ),
         "blocker": inbox_status.get("blocker", ""),
     }
 

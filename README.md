@@ -221,6 +221,9 @@ has drifted.
 The handoff also compares inbox packet commits against the authoritative head
 and marks stale packets explicitly, including stale blocked bridge/status
 packets.
+Stale packet rows include the expected commit, stale reason, and a recovery
+instruction to refresh the status packet or relay an equivalent packet through
+Local CLI.
 
 Record a browser/app contact attempt:
 

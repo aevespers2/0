@@ -101,6 +101,7 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["local_cli"]["packet_commit"] == "abc123"
     assert surfaces["local_cli"]["packet_fresh"] is True
     assert surfaces["local_cli"]["packet_stale"] is False
+    assert surfaces["local_cli"]["packet_expected_commit"] == "abc123"
     assert surfaces["safari_cloud"]["status"] == "blocked"
     assert surfaces["safari_cloud"]["required"] is True
     assert surfaces["safari_cloud"]["expected_path"] == "FederationInbox/safari/status.json"
@@ -117,7 +118,14 @@ def test_build_handoff_summarizes_all_surface_roles() -> None:
     assert surfaces["chatgpt_bridge"]["blocker"] == "sandbox_write_boundary"
     assert surfaces["chatgpt_bridge"]["packet_fresh"] is False
     assert surfaces["chatgpt_bridge"]["packet_stale"] is True
-    assert surfaces["chatgpt_bridge"]["next_action"] == "relay bridge status"
+    assert "from packet commit old123 to authoritative head abc123" in surfaces["chatgpt_bridge"]["next_action"]
+    assert "codex_federation_message.v1" in surfaces["chatgpt_bridge"]["next_action"]
+    assert surfaces["chatgpt_bridge"]["packet_stale_reason"] == (
+        "packet commit old123 differs from authoritative head abc123"
+    )
+    assert surfaces["chatgpt_bridge"]["command"] == (
+        'python3 scripts/emit_bridge_signal.py --authoritative-head "abc123" --print'
+    )
 
 
 def test_build_text_lists_surface_actions() -> None:
