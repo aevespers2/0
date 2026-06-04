@@ -11,6 +11,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
 - [FederationDispatch/](FederationDispatch): local_cli-generated per-surface routing instructions.
 - [FederationRelay/](FederationRelay): UI/browser/app contact evidence for surface handoffs.
+- [FederationRelay/safari_target.json](FederationRelay/safari_target.json): configured Safari ChatGPT target conversation.
 - [FederationPatches/](FederationPatches): patch exchange area for advisory/cloud proposals.
 - [autonomous_vnext/policy.py](autonomous_vnext/policy.py): deny-by-default policy evaluator.
 - [autonomous_vnext/audit.py](autonomous_vnext/audit.py): append-only JSONL audit writer.
@@ -244,6 +245,12 @@ Refresh and stage Safari's current dispatch in the Safari composer:
 
 ```bash
 python3 scripts/stage_safari_dispatch.py --print
+```
+
+Focus or reopen the configured Safari target conversation before staging:
+
+```bash
+python3 scripts/focus_safari_target.py --print
 ```
 
 Watch Safari until the staged dispatch is sendable:

@@ -32,6 +32,7 @@
 - Added `scripts/recover_desktop_codex_app.py` to reopen and re-probe Desktop Codex when no accessible window is reported.
 - Added `scripts/nudge_safari_sendability.py` to try bounded input-event nudges when Safari has a staged handoff but disabled send.
 - Added `scripts/write_safari_operator_handoff.py` to distill Safari send-disabled relay evidence into JSON and text handoff artifacts.
+- Added `FederationRelay/safari_target.json` and `scripts/focus_safari_target.py` to recover Safari target-tab drift before staging.
 
 ### Updated
 - Federation assessment now separates `stale_surfaces` and `explicitly_blocked_surfaces` in kernel/state report paths.
@@ -58,3 +59,4 @@
 - Local federation routines now refresh Desktop Codex app contact evidence, with `--no-desktop-contact` for constrained environments.
 - Public mirror verification now retries transient remote-head reads and reports persistent read failures as structured mirror errors.
 - Added `scripts/run_federation_post_push_refresh.py` to refresh ignored runtime status, Safari/Desktop contact, and dashboard artifacts after mirrored pushes.
+- Safari sync cycles now focus or reopen the configured target conversation before staging handoffs.

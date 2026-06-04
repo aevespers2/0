@@ -51,6 +51,17 @@ def write_operator_handoff(repo: Path) -> dict[str, Any]:
     )
 
 
+def focus_safari_target(args: argparse.Namespace) -> dict[str, Any]:
+    if args.no_focus_safari_target:
+        return skipped_command("Safari target focus disabled")
+    command = ["python3", "scripts/focus_safari_target.py", "--target", str(args.safari_target), "--print"]
+    if args.safari_url:
+        command.extend(["--url", args.safari_url])
+    if args.no_open_safari_target:
+        command.append("--no-open-if-missing")
+    return run_command(command, args.repo)
+
+
 def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
     routine = run_command(["python3", "scripts/run_federation_routine.py", "--print"], args.repo)
     if not command_succeeded(routine):
@@ -74,6 +85,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_evidence_fresh": False,
             "dashboard_next_action": "",
             "routine": routine,
+            "focus_safari_target": skipped,
             "stage": skipped,
             "watch": skipped,
             "extract": skipped,
@@ -81,6 +93,52 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_report": skipped,
             "dashboard": skipped,
             "operator_handoff": skipped,
+        }
+
+    target_focus = focus_safari_target(args)
+    if not command_succeeded(target_focus):
+        reason = "Safari target focus failed; refusing to stage dispatch in an unverified tab"
+        skipped = skipped_command(reason)
+        summary = run_command(["python3", "scripts/write_federation_relay_summary.py", "--print"], args.repo)
+        contact_report = run_command(["python3", "scripts/write_federation_contact_report.py", "--print"], args.repo)
+        dashboard = run_command(
+            ["python3", "scripts/write_federation_dashboard.py", "--refresh-mirrors", "--print"],
+            args.repo,
+        )
+        operator_handoff = write_operator_handoff(args.repo)
+        summary_payload = parse_json_stdout(summary)
+        contact_payload = parse_json_stdout(contact_report)
+        dashboard_payload = parse_json_stdout(dashboard)
+        return {
+            "schema": "codex_safari_sync_cycle.v1",
+            "send_requested": args.send,
+            "write_status_requested": args.write_status,
+            "commands_succeeded": False,
+            "target_focus_failed": True,
+            "skip_reason": reason,
+            "watch_status": "",
+            "watch_detail": "",
+            "ack_candidate_found": False,
+            "ack_written_path": "",
+            "relay_next_action": summary_payload.get("next_action", ""),
+            "ready_for_remote_write": dashboard_payload.get(
+                "ready_for_remote_write",
+                summary_payload.get("ready_for_remote_write", False),
+            ),
+            "required_packets": summary_payload.get("required_packets", ()),
+            "missing_surfaces": summary_payload.get("missing_surfaces", ()),
+            "contact_evidence_fresh": contact_payload.get("all_contacts_fresh", False),
+            "dashboard_next_action": dashboard_payload.get("next_action", ""),
+            "routine": routine,
+            "focus_safari_target": target_focus,
+            "stage": skipped,
+            "recovery": skipped,
+            "watch": skipped,
+            "extract": skipped,
+            "relay_summary": summary,
+            "contact_report": contact_report,
+            "dashboard": dashboard,
+            "operator_handoff": operator_handoff,
         }
 
     stage = run_command(["python3", "scripts/stage_safari_dispatch.py", "--print"], args.repo)
@@ -125,6 +183,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
             "contact_evidence_fresh": contact_payload.get("all_contacts_fresh", False),
             "dashboard_next_action": dashboard_payload.get("next_action", ""),
             "routine": routine,
+            "focus_safari_target": target_focus,
             "stage": stage,
             "recovery": recovery,
             "watch": skipped,
@@ -196,6 +255,7 @@ def run_cycle(args: argparse.Namespace) -> dict[str, Any]:
         "contact_evidence_fresh": contact_payload.get("all_contacts_fresh", False),
         "dashboard_next_action": dashboard_payload.get("next_action", ""),
         "routine": routine,
+        "focus_safari_target": target_focus,
         "stage": stage,
         "recovery": recovery,
         "watch": watch,
@@ -221,6 +281,10 @@ def parse_args() -> argparse.Namespace:
     parser.set_defaults(recover_composer=True)
     parser.add_argument("--no-nudge-sendability", action="store_false", dest="nudge_sendability")
     parser.set_defaults(nudge_sendability=True)
+    parser.add_argument("--safari-target", type=Path, default=Path("FederationRelay/safari_target.json"))
+    parser.add_argument("--safari-url", default="")
+    parser.add_argument("--no-focus-safari-target", action="store_true")
+    parser.add_argument("--no-open-safari-target", action="store_true")
     parser.add_argument("--output", type=Path, default=Path("reports/safari_sync_cycle_latest.json"))
     parser.add_argument("--print", action="store_true", dest="print_result")
     return parser.parse_args()
