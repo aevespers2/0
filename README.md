@@ -397,3 +397,12 @@ Run status emission for desktop in a safe-check mode that blocks wrong checkouts
 python3 scripts/write_desktop_federation_status.py \
   --repo /Users/ALISTAIRE/aevespers2-0
 ```
+
+## MCP Communication Fabric Templates
+
+This repo now includes two public-ready advanced MCP server starter packages:
+
+- [`packages/communication-fabric-mcp-template`](packages/communication-fabric-mcp-template): a reusable TypeScript MCP communication fabric with policy, consent, audit, continuity-memory, and secure routing primitives.
+- [`packages/lifetime-network-mcp-server`](packages/lifetime-network-mcp-server): an unofficial Lifetime television/digital-platform-focused communication fabric based on public platform research, replacing the earlier mistaken network-count framing.
+
+The tailored research brief lives at [`docs/lifetime-network-television-research.md`](docs/lifetime-network-television-research.md). Both packages are designed for public sharing: they avoid affiliation claims, keep secrets out of source control, default external actions to draft-only, and require human consent for sensitive operations.
