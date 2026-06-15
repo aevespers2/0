@@ -1,0 +1,13 @@
+{
+  "name": "communication-fabric-mcp-template",
+  "version": "0.2.0",
+  "private": false,
+  "type": "module",
+  "description": "Public-ready advanced MCP communication fabric template with identity graph, continuity memory, consent, policy, and audit primitives.",
+  "bin": { "communication-fabric-mcp": "dist/server.js" },
+  "scripts": { "build": "tsc -p tsconfig.json", "start": "node dist/server.js", "dev": "tsx src/server.ts" },
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.0.0", "zod": "^3.23.8" },
+  "devDependencies": { "@types/node": "^22.0.0", "tsx": "^4.16.0", "typescript": "^5.5.0" },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}

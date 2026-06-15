@@ -1,0 +1,15 @@
+{
+  "positioning": "Unofficial prototype for Lifetime television and digital-platform communication workflows.",
+  "ecosystemNodes": [
+    "person", "organization", "device", "show", "movie", "clip", "schedule_event", "provider", "app_platform", "rights_window", "document", "message", "memory", "evidence", "repository", "agent", "institution"
+  ],
+  "platforms": ["web", "iPhone", "iPad", "Android", "Kindle Fire", "Apple TV", "Roku", "Android TV", "Amazon Fire TV", "Chromecast", "Samsung TV", "FAST", "AVOD", "SVOD", "VOD", "TV Everywhere"],
+  "workflows": ["editorial brief", "content-fit review", "schedule-aware outreach", "app feedback packet", "rights-sensitive routing", "evidence-backed stakeholder message", "agent handoff"],
+  "guardrails": [
+    "Unofficial concept until reviewed and approved.",
+    "Do not claim affiliation, partnership, endorsement, or access to internal systems.",
+    "Do not bypass TV-provider authentication, rights windows, geofencing, or entitlements.",
+    "Draft only for external communications unless a human grants explicit consent.",
+    "Attach public source links or approved artifacts to every factual claim."
+  ]
+}
