@@ -8,6 +8,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [mission_contract.schema.json](mission_contract.schema.json): mission intake contract.
 - [action_record.schema.json](action_record.schema.json): append-only execution/audit event contract.
 - [public_mirrors.json](public_mirrors.json): public dual-redundancy mirror manifest.
+- [docs/scientific-discovery-repo-roadmap.md](docs/scientific-discovery-repo-roadmap.md): actionable roadmap for ClimateSheafFM and adjacent scientific-discovery repositories.
 - [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
 - [FederationDispatch/](FederationDispatch): local_cli-generated per-surface routing instructions.
 - [FederationRelay/](FederationRelay): UI/browser/app contact evidence for surface handoffs.
