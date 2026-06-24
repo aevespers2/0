@@ -7,6 +7,7 @@ Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent.
 - [AUTONOMOUS_VNEXT.md](AUTONOMOUS_VNEXT.md): architecture, guardrails, risk rubric, and build checklist.
 - [mission_contract.schema.json](mission_contract.schema.json): mission intake contract.
 - [action_record.schema.json](action_record.schema.json): append-only execution/audit event contract.
+- [docs/scientific-repository-roadmap.md](docs/scientific-repository-roadmap.md): composable 2026 scientific repository roadmap for mRNA, perovskites, sheaf climate, QML, gene editing, and self-driving discovery systems.
 - [public_mirrors.json](public_mirrors.json): public dual-redundancy mirror manifest.
 - [FederationInbox/](FederationInbox): repository-tracked status and patch-proposal inbox for Codex surfaces.
 - [FederationDispatch/](FederationDispatch): local_cli-generated per-surface routing instructions.
