@@ -3,20 +3,22 @@
 All notable product, architecture, implementation, release, and deployment changes are recorded here.
 
 ## Unreleased
+
 ### Product
-- Product objectives, MVP scope, priorities, success criteria, and non-goals are maintained by the Product Manager.
+- 2026-07-16 — Defined the first product outcome as one reproducible, policy-gated, reversible local mission from contract intake through evidence report.
+- 2026-07-16 — Kept scientific-discovery roadmap pull requests as proposals rather than active priorities until the Autonomous vNext health, safety, federation, and packaging baseline is accepted.
 
 ### Architecture
-- Architecture decisions and task sequencing are maintained through `taskchain.md`.
+- Replaced the generic greenfield roadmap with a sequence aligned to the substantial existing Phase-0 implementation.
 
 ### Implementation
-- Builder work is tracked through `punchlist.md` with verification evidence.
+- No new implementation capability is claimed; existing source and tests remain candidate inputs pending current verification.
 
 ### Release
-- Release readiness, versioning, artifacts, and rollback criteria are tracked in `release.md`.
+- The `0.0.1-baseline` candidate remains blocked until clean-environment tests, security checks, documentation verification, provenance, and rollback evidence pass.
 
 ### Deployment
-- Deployment environments, health checks, validation, and rollback events are tracked in `deploy.md`.
+- No remote publishing or deployment is authorized by the MVP directive.
 
 ## Entry Format
 - Date
