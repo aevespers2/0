@@ -3,57 +3,67 @@
 ## Current Decision
 Status: `BLOCKED`
 
-No work is currently eligible for release. `taskchain.md` has P0-P5 marked `READY`, but `punchlist.md` contains no completed items or evidence log entries, and the reviewed head commit `a2772cdb13a99b5993868026df73572d5f9ae784` has no reported commit-status checks.
+Autonomous vNext has a defined purpose and a substantial Phase-0 implementation, but no release is eligible. P0 remains `READY`, every repository-health punch-list phase is unchecked, the evidence log is empty, and no current build, test, security, documentation, or provenance result is attached to reviewed implementation head `957c836d51b676680d99e0e3faa62b8014da7e5b`.
 
 ## Versioning
 - Scheme: Semantic Versioning.
-- First eligible candidate: `0.0.1-baseline`.
-- A tag may be created only after P0 receives a reproducible PASS or approved CONDITIONAL PASS and the release gates below are satisfied.
+- First eligible baseline candidate: `0.0.1-baseline`.
+- A functional pre-release may follow only after the baseline identifies the supported Python/platform matrix and verifies the public APIs and federation boundaries.
+- Do not tag merely because source files, tests, or a workflow are present; the recorded candidate commit must satisfy every included gate.
 
 ## Candidate Scope
-- Repository inventory and purpose statement.
-- Reproducible environment and dependency baseline.
-- Build, static-analysis, and complete test results.
-- Workflow and supply-chain security assessment.
-- Documentation verification and clone-to-smoke-test instructions.
-- Baseline report tied to an immutable commit.
+- Mission and action-record schemas.
+- Deny-by-default policy, planning, execution, audit, reflection, memory, and deterministic cognitive-runtime primitives.
+- Local-authoritative federation status, proposal validation, dispatch, relay, recovery, and patch-application controls.
+- Reproducible environment and dependency inventory.
+- Full tests, cognitive-runtime smoke test, federation checks, security assessment, and documentation verification.
+- Provenance-linked baseline report, checksums, and rollback instructions.
+
+## Existing Candidate Assets
+- `README.md` and `AUTONOMOUS_VNEXT.md` define the product purpose, architecture, non-goals, and operator commands.
+- Mission/action schemas, runtime modules, federation utilities, tests, and `.github/workflows/autonomous-vnext-ci.yml` are present.
+- Apache-2.0 licensing is present.
+
+These assets are implemented inputs to the baseline; they are not selected as releasable work until the commands and gates below are independently reproduced at one immutable commit.
 
 ## Selected Completed Work
-None. Coordination files and `changelog.md` exist, but they are not a substitute for implementation or verification evidence.
+None. No task is `DONE`, and no evidence bundle ties the existing implementation to a clean environment, current CI run, security review, artifact hashes, and release approval.
 
 ## Planned Changelog Entries
-- `Added`: reproducible repository-health baseline and verification commands.
-- `Security`: dependency, secret, workflow-permission, and supply-chain findings.
-- `Documentation`: verified setup, test, and rollback instructions.
-- `Release`: provenance-linked baseline artifact and checksum manifest.
+- `Added`: verified Phase-0 mission, policy, audit, cognitive-runtime, and federation baseline.
+- `Security`: deny-by-default command/path review, secret scan, dependency review, workflow-permission review, and guarded patch-application findings.
+- `Documentation`: verified setup, supported platforms, operator workflow, limitations, and rollback instructions.
+- `Release`: provenance manifest, baseline reports, checksums, and candidate decision.
 
 ## Acceptance Gates
 | Gate | Status | Requirement |
 |---|---|---|
-| Task completion | FAIL | P0 phases completed and linked to commits. |
-| Build/static validation | NO EVIDENCE | Build, formatting, lint, type, and configuration checks recorded. |
-| Tests | NO EVIDENCE | Full suite and smoke test reproducible from a clean environment. |
-| Security | NO EVIDENCE | Dependency, secret, workflow, and unsafe-boundary checks completed. |
-| Documentation | NO EVIDENCE | README commands, prerequisites, license, and release notes verified. |
-| Provenance | NO EVIDENCE | Commit, tool versions, artifact hashes, and generation commands recorded. |
-| Repository-specific criteria | FAIL | P0 baseline report and go/no-go decision are absent. |
-| Approval | PENDING | Release approval recorded only after all blocking gates pass. |
+| Task completion | FAIL | P0 phases completed, evidence logged, and P0 marked `DONE` or approved `CONDITIONAL PASS`. |
+| Environment/dependencies | NO EVIDENCE | Supported Python/platform matrix and clean setup commands recorded; undeclared requirements classified. |
+| Build/static validation | NO EVIDENCE | Schema/JSON checks, formatting/lint/type checks where configured, and workflow syntax results recorded. |
+| Tests/smoke | NO EVIDENCE | Full pytest suite, cognitive-runtime smoke, and federation checks pass from a clean environment. |
+| Security | NO EVIDENCE | Secret, dependency, command/path, subprocess, network, workflow-permission, and patch-application boundaries reviewed. |
+| Documentation | PARTIAL | Purpose, architecture, commands, and license exist; commands, platform assumptions, generated-output policy, and rollback remain unverified. |
+| Provenance | NO EVIDENCE | Candidate commit, tool/runtime versions, commands, exit codes, reports, artifact hashes, and repository URL recorded. |
+| Repository-specific criteria | FAIL | Local-authoritative federation behavior, stale-head rejection, idempotency, and rollback are not attached to a current evidence bundle. |
+| Approval | PENDING | Explicit release approval after all blocking gates pass. |
 
 ## Artifact Requirements
-- Baseline report in Markdown and machine-readable JSON where practical.
-- Test and static-analysis reports.
-- Dependency/security scan reports.
-- Checksums for generated artifacts.
-- Provenance manifest containing commit SHA, runtime/tool versions, commands, timestamps, and repository URL.
+- Repository-health report in Markdown and machine-readable JSON.
+- Complete test, smoke, static-validation, and federation reports.
+- Dependency inventory, secret/security report, and workflow-permission review.
+- Source archive and any generated reports with SHA-256 checksums.
+- Provenance manifest containing commit SHA, Python/OS/tool versions, commands, timestamps, repository URL, and artifact hashes.
 
 ## Rollback Criteria
-Rollback or withdraw the candidate if any verification is non-reproducible, a severe security finding is unresolved, documentation cannot reproduce the smoke test, or artifact hashes do not match. Before the first release, rollback means deleting the candidate tag/release and returning to the reviewed pre-release commit; no production migration is authorized.
+Withdraw the candidate if verification is non-reproducible, policy can be bypassed, patch validation accepts stale or unapproved input, federation actions duplicate or exceed authority, a severe security finding remains, documented commands fail, or artifact hashes differ. Before the first verified tag, rollback means deleting the candidate tag/release and returning to the reviewed pre-release commit while preserving failed-candidate evidence.
 
 ## Unresolved Blockers
-- P0 punch-list phases are entirely unchecked.
-- No build, test, security, documentation, or provenance evidence is recorded.
-- No commit status or CI result is attached to the reviewed head commit.
-- Repository purpose and first user-facing release outcome remain undefined.
+- P0 and all nine punch-list phases remain unchecked; the evidence log is empty.
+- The current CI workflow and pytest suite have not been linked to a successful run for the candidate commit.
+- No clean-environment dependency/runtime baseline, security scan, or provenance bundle is recorded.
+- macOS/Safari/Desktop relay behavior is platform-specific and lacks current release evidence.
+- Generated and ignored runtime reports are not packaged under an explicit artifact-retention and checksum policy.
 
 ## Release Log
-- 2026-07-16: Candidate evaluated and held `BLOCKED`; no completed work selected.
+- 2026-07-16: Reconciled the release plan with the implemented Autonomous vNext surface; candidate remains `BLOCKED` pending the full P0 evidence baseline.
