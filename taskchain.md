@@ -1,26 +1,34 @@
 # Task Chain
 
+## Product directive
+
+- **Next objective:** Establish a reproducible health baseline for Autonomous vNext, then verify one end-to-end local mission that is policy-gated, reversible, and fully evidenced.
+- **User outcome:** An operator can submit an explicit mission contract and receive a bounded plan, policy decision, execution result, audit record, and rollback path without hidden authority or silent remote action.
+- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk plan selection; local executor checks; append-only audit/evidence; deterministic cognitive runtime; federation proposal validation; one read-only or local-check mission from intake through report.
+- **Priority:** Repository health and the core autonomous-builder contract remain ahead of new scientific domain engines or portfolio roadmaps.
+- **Success criteria:** clean setup is documented; the complete suite and smoke paths pass at one immutable commit; policy denial and stop conditions are tested; federation rejects stale or invalid proposals; evidence includes commands, versions, hashes, and rollback instructions.
+- **Non-goals:** credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, or implementation of the ClimateSheafFM/composable-discovery proposals before the core baseline is accepted.
+- **Release rationale:** The first release should prove trustworthy bounded execution rather than maximize feature breadth. A verified control loop is the reusable foundation for every later domain-specific agent.
+
 ## MVP Roadmap
+
 | Priority | Task | Depends on | Status |
 |---|---|---|---|
-| P0 | Repository health baseline (CI, dependencies, tests, security scan) | — | READY |
-| P1 | Define product vision, scope, and MVP acceptance criteria | P0 | READY |
-| P2 | Establish architecture, package layout, coding standards, and ADRs | P1 | READY |
-| P3 | Bootstrap project structure, build system, linting, formatting, and test harness | P2 | READY |
-| P4 | Define configuration, secrets, and environment management | P3 | READY |
-| P5 | Implement core domain model and schemas | P3 | READY |
-| P6 | Implement persistence layer and migrations | P5 | PROPOSED |
-| P7 | Implement service layer and APIs | P5,P6 | PROPOSED |
-| P8 | Implement authentication, authorization, and auditing | P7 | PROPOSED |
-| P9 | Build CLI/UI and user workflows | P7 | PROPOSED |
-| P10 | Logging, metrics, tracing, and health endpoints | P7 | PROPOSED |
-| P11 | Unit, integration, and end-to-end tests | P3-P10 | PROPOSED |
-| P12 | Documentation, examples, onboarding, and architecture diagrams | P2-P11 | PROPOSED |
-| P13 | Packaging, release automation, versioning, and GitHub Actions hardening | P11,P12 | PROPOSED |
-| P14 | MVP validation, performance baseline, bug triage, and release candidate | P13 | PROPOSED |
+| P0 | Repository health baseline for the implemented Autonomous vNext surface | — | READY |
+| P1 | Verify one end-to-end bounded mission and evidence bundle | P0 | PROPOSED |
+| P2 | Establish architecture/package/contract compatibility and ADR baseline | P1 | PROPOSED |
+| P3 | Harden configuration, secrets, command/path policy, federation, and rollback | P2 | PROPOSED |
+| P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
+| P5 | Evaluate domain-specific roadmaps as separate product proposals | P4 | BLOCKED |
+
+## Portfolio proposal rule
+
+Open pull requests proposing ClimateSheafFM or a broader composable scientific-discovery stack remain preserved as research proposals. They do not become active implementation priorities until P0-P4 produce a verified platform baseline and the Architect documents the new repository or package boundary.
 
 ## Builder Rules
-Builders only execute READY tasks. The Architect decomposes the current READY task into phases and punch-list items before implementation.
+
+Builders execute only the highest-priority unblocked task. Each task must name files, tests, constraints, stop conditions, evidence, and rollback guidance. Scope must not be widened to absorb a roadmap proposal or unrelated test failure.
 
 ## Builder Log
-Record commits, evidence, verification, blockers, and follow-up work.
+
+Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
