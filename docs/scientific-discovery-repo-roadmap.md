@@ -17,8 +17,8 @@ federation primitives.
 
 ### Why Start Here
 
-- It targets practical adaptation needs: rainfall, precipitation, atmospheric
-  rivers, and other extreme-event forecasts.
+- It targets synthetic and retrospective research benchmarks for rainfall,
+  precipitation, atmospheric rivers, and other extreme-event scenarios.
 - It can be built around public reanalysis and satellite datasets before any
   sensitive or proprietary data is required.
 - It supports reproducible benchmarks and visible progress through notebooks,
@@ -28,10 +28,12 @@ federation primitives.
 
 ## Project Definition
 
-ClimateSheafFM is a modular package for physically constrained, interpretable
-spatiotemporal weather and climate prediction. The initial scope is rainfall and
-extreme precipitation, with extension points for drought, heat stress, renewable
-energy forecasting, and crop resilience.
+ClimateSheafFM is a modular research package for physically constrained,
+interpretable spatiotemporal weather and climate benchmarking. The initial scope
+is synthetic and retrospective rainfall and extreme-precipitation evaluation,
+with research extension points for drought, heat stress, renewable-energy data,
+and crop-resilience studies. It is not an operational forecasting or emergency-
+response system.
 
 ### Core Modules
 
@@ -43,8 +45,8 @@ energy forecasting, and crop resilience.
    watersheds, storm corridors, lag windows, or sensor networks.
 4. Topological feature extractors for threshold-light detection of atmospheric
    rivers, blocking patterns, and persistent precipitation structures.
-5. Uncertainty and calibration reports for forecast intervals, regional bias,
-   and event-level reliability.
+5. Uncertainty and calibration reports for predictive intervals under benchmark
+   conditions, regional bias, and event-level reliability.
 6. Benchmark runners that produce reproducible metrics, artifacts, and audit
    records for each experiment.
 
@@ -91,7 +93,9 @@ can reuse.
 Climate tools can influence public planning decisions, so the repository should
 make uncertainty and limitations visible from the start.
 
-- Label outputs as research forecasts unless independently validated.
+- Label outputs as research-only benchmark results unless independently validated.
+- State that outputs are not intended for emergency response, public planning, or
+  operational forecasting.
 - Track dataset lineage, preprocessing choices, and model configuration.
 - Include regional performance slices to expose bias or failure modes.
 - Require benchmark reports for changes that alter model behavior.
