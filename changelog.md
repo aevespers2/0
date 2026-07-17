@@ -10,6 +10,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-16 — Classified draft PR #6, which proposes Repository `0` as a myelination/proposal layer and adds VTX envelope artifacts, as review-only work outside the active P0-P4 MVP; no portfolio reprioritization was made.
 - 2026-07-16 — Retained that scope decision after the draft advanced: the current head fails CI, so no VTX/private-authority implementation is eligible to merge into the bounded-mission baseline.
 - 2026-07-17 — Advanced the existing repository-health objective from `READY` to `IN PROGRESS` after PR #7 submitted a bounded Phase 1 inventory candidate; no product priority changed.
+- 2026-07-17 — Retained P0 priority after the Node/TypeScript inventory and release-language corrections. The next action is exact-head verification and review disposition, not additional inventory or P1 work.
 
 ### Architecture
 - Replaced the generic greenfield roadmap with a sequence aligned to the substantial existing Phase-0 implementation.
@@ -20,18 +21,21 @@ All notable product, architecture, implementation, release, and deployment chang
 - No released implementation capability is claimed; existing source and tests remain candidate inputs pending current verification.
 - 2026-07-16 — Observed draft PR #6 adding proposed architecture documents, VTX envelope/schema primitives, a Muse credential-gateway policy, safeguards, and tests. These remain unmerged candidate artifacts.
 - 2026-07-17 — Observed PR #7 adding a documentation-only repository-health report and P0 progress records. The change remains a candidate and does not modify runtime, schema, workflow, dependency, credential, network, or deployment behavior.
+- 2026-07-17 — The same PR corrected its documentation inventory to include both TypeScript/npm packages, scripts, dependency ranges, strict `ES2022`/`NodeNext` configuration, Node `>=20`, missing lockfiles, and exact source blobs.
 
 ### Evidence
 - 2026-07-16 — Earlier draft head `dbd8186caa2017f4dcc2f53e2ae25ce5ec244be8` completed Autonomous vNext CI run `29544823133` successfully, but that result is superseded for submission review because the branch advanced.
 - 2026-07-16 — Current draft head `09038ac55c7945b2abb013d59cf9a1b270a9e717` failed Autonomous vNext CI run `29546692277` during tests; the cognitive-runtime smoke and all federation validation steps were skipped.
 - 2026-07-16 — Neither the earlier successful run nor the current failing run establishes signature verification, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` interoperability, secure transport, revocation, or deployable GitHub authority.
 - 2026-07-17 — PR #7 submitted head `37f19f8c9560f2194bbdbf599e644d122324b994` completed Autonomous vNext CI run `29565948627` successfully.
-- 2026-07-17 — Independent review found the claimed language/package/runtime inventory incomplete because it omits the repository's Node/TypeScript/npm packages, their manifests and scripts, and the declared Node `>=20` runtime. The review thread remains unresolved, so the first Phase 1 inventory item is not accepted.
+- 2026-07-17 — Independent review found the claimed language/package/runtime inventory incomplete because it omitted the repository's Node/TypeScript/npm packages, their manifests and scripts, and the declared Node `>=20` runtime.
+- 2026-07-17 — The content omission was corrected in the same PR, but the earlier passing run applies only to the superseded head. No successful workflow run or commit status is attached to the final corrected head yet, and review-thread resolution remains open.
 
 ### Release
 - The `0.0.1-baseline` candidate remains blocked until clean-environment tests, security checks, documentation verification, provenance, and rollback evidence pass.
 - 2026-07-16 — Draft PR #6 is excluded from the current release scope unless later accepted through the architecture/security chain with reconciled cross-repository fixtures, exact-head passing evidence, and explicit authority approval.
-- 2026-07-17 — A passing PR #7 workflow does not make the repository release-ready. The inventory must be corrected, the review finding resolved, and the remaining P0 phases completed; `release.md` should be reconciled only after accepted evidence replaces its stale no-evidence statements.
+- 2026-07-17 — A passing workflow on PR #7's earlier head does not make the repository release-ready. Exact-head verification must be repeated after the inventory correction.
+- 2026-07-17 — Reconciled `release.md` in commit `44fe21666769fa9ef101220afe528fe3920ca5b3` so it no longer treats the corrected Node/TypeScript inventory as missing. Release remains blocked by final-head CI, mergeability, review disposition, and the remaining P0 phases.
 
 ### Deployment
 - No remote publishing or deployment is authorized by the MVP directive.
