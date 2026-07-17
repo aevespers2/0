@@ -4,9 +4,9 @@
 
 Status: `BLOCKED — HEALTH BASELINE, SECURITY, AND END-TO-END EVIDENCE REQUIRED`
 
-Autonomous vNext has a substantial Phase-0 implementation and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence report. P0 is now `IN PROGRESS`, but no release is eligible. PR #7 at submitted head `37f19f8c9560f2194bbdbf599e644d122324b994` provides a documentation-only Phase 1 inventory candidate and exact-head Autonomous vNext CI run `29565948627` completed successfully, including tests, cognitive-runtime smoke, federation/status writers, proposal verification, relay checks, guarded patch application, and the federation state report.
+Autonomous vNext has a substantial Phase-0 implementation and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence report. P0 is `IN PROGRESS`, but no release is eligible. PR #7 now contains a documentation-only correction that records both Python and Node/TypeScript/npm surfaces, including the two MCP package manifests, scripts, dependency ranges, strict `ES2022`/`NodeNext` configuration, missing package lockfiles, and declared Node `>=20` runtime.
 
-That evidence does not complete or accept the repository-health baseline. One unresolved current review thread shows that the claimed language/package/runtime inventory omits the Node/TypeScript/npm surfaces under `packages/communication-fabric-mcp-template` and `packages/lifetime-network-mcp-server`, including their manifests, TypeScript sources, scripts, and declared Node `>=20` runtime. GitHub currently reports PR #7 non-mergeable. The candidate must be corrected on the same review path, reverified if its head changes, and accepted before any Phase 1 item or release scope is treated as complete.
+The correction resolves the content omission but is not yet accepted evidence. Autonomous vNext CI run `29565948627` passed only on earlier head `37f19f8c9560f2194bbdbf599e644d122324b994`; it does not verify the corrected submitted state. The corrected lineage beginning at `d4898cc2d96efd8ab1c6c796b03aee22d1287a6e` currently has no attached successful workflow run or commit status, GitHub reports the PR non-mergeable, and review-thread disposition remains open. The final corrected head must pass exact-head verification before Phase 1 item 1 can be accepted.
 
 Draft PR #6 remains outside this candidate. Its proposed VTX envelope, Repository `0` proposal layer, private-authority publication design, and credential-gateway safeguards require a separately approved Repository `0` → Repository `1` contract. Head `09038ac55c7945b2abb013d59cf9a1b270a9e717` has failing Autonomous vNext CI run `29546692277`: the test step failed and all smoke and federation validation steps were skipped.
 
@@ -14,7 +14,7 @@ Draft PR #6 remains outside this candidate. Its proposed VTX envelope, Repositor
 
 - Scheme: Semantic Versioning.
 - First eligible candidate: `0.0.1-baseline`.
-- PR #7 may contribute repository-health documentation only after its inventory is corrected, the review finding is resolved, and exact-head evidence is retained.
+- PR #7 may contribute repository-health documentation only after the corrected final head passes exact-head verification and its review threads are resolved.
 - Draft VTX/private-authority work is excluded from `0.0.1-baseline` and requires a later separately versioned architecture/security decision.
 - Domain-specific scientific engines remain separate proposals until the core P0-P4 platform baseline is accepted.
 - Tag only an immutable commit satisfying every included gate.
@@ -35,7 +35,7 @@ Draft PR #6 remains outside this candidate. Its proposed VTX envelope, Repositor
 
 ## Selected Completed Work
 
-None accepted for release. PR #7 records useful candidate inventory and a successful exact-head CI run, but its first Phase 1 item is incomplete because the Node/TypeScript/npm surface is omitted, the review thread is unresolved, and the PR is currently non-mergeable. Existing source, tests, workflows, federation utilities, documentation, and Apache-2.0 licensing remain candidate inputs rather than releasable completed work.
+None accepted for release. PR #7 now contains the corrected language/package/runtime inventory, but the correction has no successful workflow or commit status attached to its final submitted head, the review threads are unresolved, and the PR is currently non-mergeable. Existing source, tests, workflows, federation utilities, documentation, and Apache-2.0 licensing remain candidate inputs rather than releasable completed work.
 
 ## Planned Changelog Entries
 
@@ -50,19 +50,19 @@ None accepted for release. PR #7 records useful candidate inventory and a succes
 | Gate | Status | Requirement |
 |---|---|---|
 | Task completion | FAIL | P0 is completed with evidence; included P1-P4 work is `DONE`. |
-| Repository inventory | REVIEW | PR #7 records a bounded inventory candidate, but it must include or explicitly evidence exclusion of all Node/TypeScript/npm surfaces and resolve the current review thread. |
-| Environment/build | PARTIAL | Exact-head CI succeeded for PR #7, but clean setup, manifest/lockfile consistency, Node build paths, schema/configuration checks, static validation, and supported platform matrix remain incomplete. |
-| Tests/smoke | PARTIAL | Run `29565948627` passed configured tests and smoke checks at PR #7 head; the complete P0 baseline, policy-denial paths, one end-to-end bounded mission, and release-candidate replay remain unverified. Draft PR #6 still fails during tests. |
+| Repository inventory | REVIEW | The Python and Node/TypeScript/npm content correction is present, but the final corrected head must pass exact-head CI and both review threads must be resolved. |
+| Environment/build | PARTIAL | Manifest and runtime evidence is recorded, but the corrected head has no attached workflow; clean setup, lockfile consistency, Node build paths, schema/configuration checks, static validation, and supported platform matrix remain incomplete. |
+| Tests/smoke | STALE | Run `29565948627` passed configured tests and smoke checks on an earlier head only. The final corrected head, complete P0 baseline, policy-denial paths, one end-to-end bounded mission, and release-candidate replay remain unverified. Draft PR #6 still fails during tests. |
 | Security | NO EVIDENCE | Secrets, Python and npm dependencies, commands/paths, subprocesses, network, workflow permissions, patch application, generated artifacts, and authority boundaries are reviewed at the final candidate. |
 | Federation/rollback | NO EVIDENCE | Stale proposals fail closed; retries are idempotent; one mission rollback restores the prior verified state. |
 | Cross-repository contract | BLOCKED | Repository `0`/`1` authority, route semantics, package/schema ownership, and negative compatibility fixtures are approved before any VTX work is included. |
-| Documentation | REVIEW | Purpose and an initial inventory exist, but the inventory is materially incomplete and setup, platform assumptions, generated-output policy, and recovery remain unverified. |
-| Provenance | PARTIAL | PR #7 records source/blob identities and exact-head workflow evidence; complete commands, versions, reports, artifact hashes, attestations, and final-candidate provenance are absent. |
+| Documentation | REVIEW | Purpose and the corrected initial language/package/runtime inventory exist; setup, platform assumptions, generated-output policy, recovery, exact-head verification, and review disposition remain incomplete. |
+| Provenance | PARTIAL | PR #7 records source/blob identities and earlier-head workflow evidence; final-head workflow logs, complete commands, versions, reports, artifact hashes, attestations, and final-candidate provenance are absent. |
 | Approval | PENDING | Explicit approval after all blocking gates pass. |
 
 ## Artifact Requirements
 
-- Corrected Markdown and machine-readable repository-health report covering Python, Node/TypeScript/npm, manifests, lockfiles, workflows, runtimes, deployment descriptors, and generated outputs.
+- Accepted Markdown and machine-readable repository-health report covering Python, Node/TypeScript/npm, manifests, lockfiles, workflows, runtimes, deployment descriptors, and generated outputs.
 - Complete static, build, test, smoke, federation, security, documentation, and rollback reports at one immutable release-candidate commit.
 - Representative mission contract, action records, and evidence report containing no secrets.
 - Source archive, Python and npm dependency/SBOM records where applicable, SHA-256 checksums, and provenance manifest.
@@ -75,7 +75,8 @@ Withdraw the candidate if repository inventory omits an active language, package
 
 ## Unresolved Blockers
 
-- PR #7 omits the Node/TypeScript/npm packages and Node `>=20` runtime from the claimed Phase 1 inventory; one current review thread is unresolved and GitHub reports the PR non-mergeable.
+- PR #7's corrected final head has no attached successful workflow run or commit status; the earlier passing run applies only to a superseded head.
+- The Node/TypeScript omission thread and the release-reconciliation thread remain unresolved; GitHub reports the PR non-mergeable.
 - P0 and the remaining repository-health phases are incomplete.
 - No complete clean-environment build/static/security/documentation/provenance bundle exists across both Python and Node surfaces.
 - One complete policy-gated mission and its rollback path have not been verified.
@@ -89,4 +90,5 @@ Withdraw the candidate if repository inventory omits an active language, package
 
 - 2026-07-16: Aligned the release scope with the approved bounded-mission MVP; candidate remained blocked pending repository health and end-to-end evidence.
 - 2026-07-16: Excluded draft PR #6 from `0.0.1-baseline`, recorded the Repository `0`/`1` route-contract decision gate, and marked its current failing CI run as an important release blocker.
-- 2026-07-17: Recorded PR #7 as a bounded P0 health candidate. Exact-head CI passed, but the first inventory item remains unaccepted because Node/TypeScript/npm and Node `>=20` are omitted, the review finding is unresolved, and the PR is currently non-mergeable.
+- 2026-07-17: Recorded PR #7 as a bounded P0 health candidate. The earlier submitted head passed CI but omitted Node/TypeScript/npm evidence.
+- 2026-07-17: Reconciled the release gate after the package inventory correction. The correction is present, but acceptance remains blocked until the final corrected head passes exact-head CI and both review threads are resolved.
