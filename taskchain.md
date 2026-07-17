@@ -23,15 +23,15 @@
 
 ## P0 health-baseline candidate — PR #7
 
-**Status:** `REVIEW — CONTENT CORRECTED, EXACT-HEAD EVIDENCE AND THREAD DISPOSITION REQUIRED`
+**Status:** `REVIEW — CONTENT CORRECTED, EXACT-HEAD EVIDENCE AND FINAL THREAD DISPOSITION REQUIRED`
 
 PR #7 remains the single bounded Phase 1 inventory path. Autonomous vNext CI run `29565948627` passed only on superseded head `37f19f8c9560f2194bbdbf599e644d122324b994`; it does not verify the current correction lineage.
 
-The inventory now records the Python/pip surface, both Node/TypeScript/npm packages and Node `>=20`, and the executable `.githooks/pre-push` Bash gate with its `scripts/setup_federation_git_hooks.py` activation path. The hook is documented as operator-activated local configuration rather than automatically active for every clone. The punch-list item has been restored to pending, so the next directory-inventory task remains blocked until exact-head verification and review closure.
+The inventory records the Python/pip surface, both Node/TypeScript/npm packages and Node `>=20`, and the executable `.githooks/pre-push` Bash gate with its `scripts/setup_federation_git_hooks.py` activation path. The release gate now preserves every material review-thread blocker, requires Bash hook/setup coverage in the accepted health artifact, and the rollback instructions cover every file modified by the candidate. The punch-list item remains pending, so the next directory-inventory task is blocked until exact-head verification and review closure.
 
-The remaining correction began at `e4cef7e6c0c286b1259b1469c58205a60de60fe8`; `punchlist.md` was corrected at `b86b7e9f01dac2d25ffcd810d5ce0e139b46e7a9`. These are documentation-only changes and do not modify runtime, workflow, package, schema, credential, network, or deployment behavior.
+The source-inventory correction began at `e4cef7e6c0c286b1259b1469c58205a60de60fe8`; the release and rollback review corrections are recorded in `7a44041a99e980751928063f76867c143b318572` and `1d7a94e18bf5b11cf71c998cfb7f1257fc292f53`. These are documentation-only changes and do not modify runtime, workflow, package, schema, credential, network, or deployment behavior.
 
-**Directive:** obtain a successful workflow run attached to the final submitted head, resolve the original Node/TypeScript thread after exact-head evidence is present, resolve the premature-completion and missing-Bash threads against the corrected content, and only then mark Phase 1 item 1 complete and continue to the top-level directory and responsibility inventory. Do not start P1 or treat any earlier workflow as release readiness. The product objective and portfolio priority are unchanged.
+**Directive:** obtain a successful workflow run attached to the final submitted head, resolve the original Node/TypeScript thread after exact-head evidence is present, resolve every corrected material thread against the final content, and only then mark Phase 1 item 1 complete and continue to the top-level directory and responsibility inventory. Do not start P1 or treat any earlier workflow as release readiness. The product objective and portfolio priority are unchanged.
 
 ## Cross-repository scope gate — draft PR #6
 
@@ -61,3 +61,4 @@ Record commits, exact commands/results, workflow links, artifact hashes, policy 
 - 2026-07-17 — Reviewed PR #7 at submitted head `37f19f8c9560f2194bbdbf599e644d122324b994`. Exact-head CI run `29565948627` passed, but the Phase 1 language/package/runtime inventory omitted the repository's Node/TypeScript/npm packages and Node `>=20` declaration. P0 advanced to `IN PROGRESS`; the same PR was required to be corrected and reverified.
 - 2026-07-17 — Re-reviewed PR #7 at head `71ba0563bbbedfa1554c3f0edce70962fc199dc8`. The Node/TypeScript correction was present, but the active Bash pre-push hook remained omitted and the punch list prematurely marked the inventory item complete. No successful exact-head status was attached and three review threads remained unresolved.
 - 2026-07-17 — Implemented the bounded remaining inventory correction on the same PR. `docs/repository-health-baseline.md` now records `.githooks/pre-push`, `/usr/bin/env bash`, strict shell behavior, the two delegated Python checks, `scripts/setup_federation_git_hooks.py`, local `core.hooksPath` activation, exact source blobs, and untested portability limitations. `punchlist.md` is pending again. Exact-head workflow evidence and thread disposition remain required before the directory inventory begins.
+- 2026-07-17 — Implemented the bounded release/rollback review correction: `release.md` now retains every material thread as an acceptance blocker and requires Bash hook/setup coverage in the health artifact; `docs/repository-health-baseline.md` now rolls back `release.md` and `changelog.md` with the rest of the candidate. Direct content replay passed; exact-head CI and final material-thread disposition remain open.
