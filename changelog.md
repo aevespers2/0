@@ -32,19 +32,19 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-16 — Neither the earlier successful run nor the current failing run establishes signature verification, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` interoperability, secure transport, revocation, or deployable GitHub authority.
 - 2026-07-17 — PR #7 submitted head `37f19f8c9560f2194bbdbf599e644d122324b994` completed Autonomous vNext CI run `29565948627` successfully.
 - 2026-07-17 — Independent review found the original language/package/runtime inventory incomplete; later review also found the Bash hook and acceptance-state omissions.
-- 2026-07-17 — PR #7 current head `991216f8c9f72a3bcb23b745f148697659217322` contains the bounded content corrections, but has no attached workflow run or commit status, is non-mergeable, and retains two unresolved threads: exact-head disposition of the original Node/TypeScript finding and final disposition of the corrected rollback-scope finding.
-- 2026-07-17 — PR #8 current head `f291db0446d84005a3764795ca880cafeec1ad4c` completed Portfolio Health Candidate CI run `29583289679` and Autonomous vNext CI run `29583289637` successfully, but neither run retained artifacts. The checks validate compilation and registry structure rather than enumeration, finding semantics, issue lifecycle, credential scope, failure recovery, or behavioral fixtures.
+- 2026-07-17 — PR #7 current head `991216f8c9f72a3bcb23b745f148697659217322` contains the bounded content corrections and is consistently identified in the PR body, but has no attached workflow run or commit status, is non-mergeable, and retains one unresolved Node/TypeScript review thread pending exact-head verification. The corrected rollback-scope thread is resolved.
+- 2026-07-17 — PR #8 current head `f291db0446d84005a3764795ca880cafeec1ad4c` completed Portfolio Health Candidate CI run `29583289679` and Autonomous vNext CI run `29583289637` successfully, but neither run retained artifacts. The checks validate compilation and registry structure rather than enumeration, finding semantics, issue lifecycle, credential scope, failure recovery, or behavioral fixtures; GitHub currently reports the draft non-mergeable.
 
 ### Release
 - The `0.0.1-baseline` candidate remains blocked until clean-environment tests, security checks, documentation verification, provenance, and rollback evidence pass.
 - 2026-07-16 — Draft PR #6 is excluded from the current release scope unless later accepted through the architecture/security chain with reconciled cross-repository fixtures, exact-head passing evidence, and explicit authority approval.
-- 2026-07-17 — A passing workflow on PR #7's earlier head does not make the repository release-ready. The final submitted head must pass attached exact-head CI and all material review threads must be resolved before additional P0 inventory begins.
+- 2026-07-17 — A passing workflow on PR #7's earlier head does not make the repository release-ready. The final submitted head must pass attached exact-head CI and the remaining material review thread must be resolved before additional P0 inventory begins.
 - 2026-07-17 — Draft PR #8 is excluded from the Autonomous vNext release. Its scanner, registry, scheduled workflow, token boundary, and issue lifecycle require a separately approved governance product and retained behavioral evidence.
 
 ### Deployment
 - No remote publishing or deployment is authorized by the MVP directive.
 - 2026-07-16 — Private-authority publication, GitHub adapters, webhooks, keys, and remote writes remain proposals only.
-- 2026-07-17 — No deployment was attempted for PR #7; current-head verification and review closure remain blocking.
+- 2026-07-17 — No deployment was attempted for PR #7; current-head verification and final review closure remain blocking.
 - 2026-07-17 — No portfolio-wide token, six-hour schedule, central issue mutation, or automated recovery closure from PR #8 is authorized. The draft remains inert until ownership, least privilege, opt-in scope, tests, failure recovery, retained evidence, and rollback are approved.
 
 ## Entry Format
