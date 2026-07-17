@@ -5,10 +5,10 @@
 - **Next objective:** Establish a reproducible health baseline for Autonomous vNext, then verify one end-to-end local mission that is policy-gated, reversible, and fully evidenced.
 - **User outcome:** An operator can submit an explicit mission contract and receive a bounded plan, policy decision, execution result, audit record, and rollback path without hidden authority or silent remote action.
 - **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk plan selection; local executor checks; append-only audit/evidence; deterministic cognitive runtime; federation proposal validation; one read-only or local-check mission from intake through report.
-- **Priority:** Repository health and the core autonomous-builder contract remain ahead of new scientific domain engines or portfolio roadmaps.
+- **Priority:** Repository health and the core autonomous-builder contract remain ahead of new scientific domain engines, portfolio roadmaps, or cross-repository publication infrastructure.
 - **Success criteria:** clean setup is documented; the complete suite and smoke paths pass at one immutable commit; policy denial and stop conditions are tested; federation rejects stale or invalid proposals; evidence includes commands, versions, hashes, and rollback instructions.
-- **Non-goals:** credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, or implementation of the ClimateSheafFM/composable-discovery proposals before the core baseline is accepted.
-- **Release rationale:** The first release should prove trustworthy bounded execution rather than maximize feature breadth. A verified control loop is the reusable foundation for every later domain-specific agent.
+- **Non-goals:** credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, or implementation of the ClimateSheafFM/composable-discovery proposals or a private publication authority before the core baseline is accepted.
+- **Release rationale:** The first release should prove trustworthy bounded execution rather than maximize feature breadth. A verified control loop is the reusable foundation for every later domain-specific agent or cross-repository adapter.
 
 ## MVP Roadmap
 
@@ -19,15 +19,25 @@
 | P2 | Establish architecture/package/contract compatibility and ADR baseline | P1 | PROPOSED |
 | P3 | Harden configuration, secrets, command/path policy, federation, and rollback | P2 | PROPOSED |
 | P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
-| P5 | Evaluate domain-specific roadmaps as separate product proposals | P4 | BLOCKED |
+| P5 | Evaluate domain-specific roadmaps and remote publication adapters as separate product proposals | P4 | BLOCKED |
+
+## Cross-repository scope gate — draft PR #6
+
+**Status:** `REVIEW — NOT PART OF THE ACTIVE MVP`
+
+Draft PR #6 introduces a proposed Repository `0` myelination/proposal boundary, a VTX envelope schema and serialization primitive, and private-authority publication design documents. Its head has a successful Autonomous vNext CI run, but that verifies the branch's configured tests and smoke steps only; it does not establish cryptographic signatures, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` compatibility, a secure transport, or deployable GitHub integration.
+
+A contract mismatch must be resolved before merge: PR #6 documents the expected route as `0:working -> 0:proposal -> 1:quarantine`, while Repository `1` draft PR #1 currently models a direct `0:working -> 1:quarantine` transition and does not define a `proposal` partition edge. The Architect must select one canonical state machine or explicitly distinguish Repository `0`'s local staging state from the cross-repository transition contract.
+
+**Directive:** preserve PR #6 as a draft proposal without changing P0-P4 priority. Do not merge runtime/schema changes until Repository `1`'s product authority is approved, package and schema ownership are assigned, route semantics are reconciled, negative compatibility fixtures exist, and the proposal is decomposed under the appropriate later architecture/security task. Documentation may be split into an ADR-only change if it clearly remains proposed and makes no security or implementation claim.
 
 ## Portfolio proposal rule
 
-Open pull requests proposing ClimateSheafFM or a broader composable scientific-discovery stack remain preserved as research proposals. They do not become active implementation priorities until P0-P4 produce a verified platform baseline and the Architect documents the new repository or package boundary.
+Open pull requests proposing ClimateSheafFM, a broader composable scientific-discovery stack, or remote/private publication infrastructure remain preserved as research or architecture proposals. They do not become active implementation priorities until P0-P4 produce a verified platform baseline and the Architect documents the repository, package, authority, and rollback boundary.
 
 ## Builder Rules
 
-Builders execute only the highest-priority unblocked task. Each task must name files, tests, constraints, stop conditions, evidence, and rollback guidance. Scope must not be widened to absorb a roadmap proposal or unrelated test failure.
+Builders execute only the highest-priority unblocked task. Each task must name files, tests, constraints, stop conditions, evidence, and rollback guidance. Scope must not be widened to absorb a roadmap proposal, cross-repository authority design, or unrelated test failure.
 
 ## Builder Log
 
