@@ -25,11 +25,13 @@
 
 **Status:** `REVIEW — NOT PART OF THE ACTIVE MVP`
 
-Draft PR #6 introduces a proposed Repository `0` myelination/proposal boundary, a VTX envelope schema and serialization primitive, and private-authority publication design documents. Its head has a successful Autonomous vNext CI run, but that verifies the branch's configured tests and smoke steps only; it does not establish cryptographic signatures, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` compatibility, a secure transport, or deployable GitHub integration.
+Draft PR #6 introduces a proposed Repository `0` myelination/proposal boundary, VTX envelope and serialization primitives, private-authority publication design, and a Muse credential-gateway policy. Its current head is `09038ac55c7945b2abb013d59cf9a1b270a9e717`. Autonomous vNext CI run `29546692277` failed during the test step, so the cognitive-runtime smoke and all federation validation steps were skipped. A successful run on an earlier head does not verify the current submitted state.
+
+Even a passing branch workflow would verify only the configured tests and smoke steps. It would not establish cryptographic signatures, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` compatibility, secure transport, revocation, or deployable GitHub integration.
 
 A contract mismatch must be resolved before merge: PR #6 documents the expected route as `0:working -> 0:proposal -> 1:quarantine`, while Repository `1` draft PR #1 currently models a direct `0:working -> 1:quarantine` transition and does not define a `proposal` partition edge. The Architect must select one canonical state machine or explicitly distinguish Repository `0`'s local staging state from the cross-repository transition contract.
 
-**Directive:** preserve PR #6 as a draft proposal without changing P0-P4 priority. Do not merge runtime/schema changes until Repository `1`'s product authority is approved, package and schema ownership are assigned, route semantics are reconciled, negative compatibility fixtures exist, and the proposal is decomposed under the appropriate later architecture/security task. Documentation may be split into an ADR-only change if it clearly remains proposed and makes no security or implementation claim.
+**Directive:** preserve PR #6 as a draft proposal without changing P0-P4 priority. Do not merge runtime/schema changes until the current head passes exact-head CI, Repository `1`'s product authority is approved, package and schema ownership are assigned, route semantics are reconciled, negative compatibility fixtures exist, and the proposal is decomposed under the appropriate later architecture/security task. Documentation may be split into an ADR-only change if it clearly remains proposed and makes no security or implementation claim.
 
 ## Portfolio proposal rule
 
@@ -42,3 +44,5 @@ Builders execute only the highest-priority unblocked task. Each task must name f
 ## Builder Log
 
 Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
+
+- 2026-07-16 — Synchronized draft PR #6 evidence to current head `09038ac55c7945b2abb013d59cf9a1b270a9e717`; CI run `29546692277` failed during tests and skipped all later smoke/federation checks. The draft remains outside the active MVP and portfolio priority is unchanged.
