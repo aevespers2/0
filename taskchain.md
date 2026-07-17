@@ -14,12 +14,22 @@
 
 | Priority | Task | Depends on | Status |
 |---|---|---|---|
-| P0 | Repository health baseline for the implemented Autonomous vNext surface | — | READY |
+| P0 | Repository health baseline for the implemented Autonomous vNext surface | — | IN PROGRESS |
 | P1 | Verify one end-to-end bounded mission and evidence bundle | P0 | PROPOSED |
 | P2 | Establish architecture/package/contract compatibility and ADR baseline | P1 | PROPOSED |
 | P3 | Harden configuration, secrets, command/path policy, federation, and rollback | P2 | PROPOSED |
 | P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
 | P5 | Evaluate domain-specific roadmaps and remote publication adapters as separate product proposals | P4 | BLOCKED |
+
+## P0 health-baseline candidate — PR #7
+
+**Status:** `REVIEW — CORRECTION REQUIRED, NOT ACCEPTED`
+
+PR #7 claims only the first bounded Phase 1 inventory item. Its submitted head `37f19f8c9560f2194bbdbf599e644d122324b994` completed Autonomous vNext CI run `29565948627` successfully, including the configured test, cognitive-runtime smoke, federation/status, guarded-patch, and relay checks. This is useful exact-head candidate evidence, but it does not complete P0 or independently validate every repository-health phase.
+
+An unresolved review finding shows that the inventory omits the existing Node/TypeScript/npm surface under `packages/communication-fabric-mcp-template` and `packages/lifetime-network-mcp-server`, including `package.json`, `tsconfig.json`, TypeScript sources, build/start/dev scripts, and the declared Node `>=20` runtime. Because the claimed item explicitly covers primary languages, package managers, and runtime versions, it cannot be marked complete while that surface is omitted or left without an evidence-backed exclusion.
+
+**Directive:** revise the same PR rather than opening a competing baseline path; add the Node/TypeScript/npm inventory or an explicit bounded exclusion with evidence; rerun exact-head verification if the submitted head changes; resolve the review thread; then continue with the top-level directory and responsibility inventory. Do not start P1 or treat the successful workflow as release readiness. `release.md` remains blocked and must be reconciled with the accepted P0 evidence once this review item is resolved.
 
 ## Cross-repository scope gate — draft PR #6
 
@@ -46,3 +56,4 @@ Builders execute only the highest-priority unblocked task. Each task must name f
 Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
 
 - 2026-07-16 — Synchronized draft PR #6 evidence to current head `09038ac55c7945b2abb013d59cf9a1b270a9e717`; CI run `29546692277` failed during tests and skipped all later smoke/federation checks. The draft remains outside the active MVP and portfolio priority is unchanged.
+- 2026-07-17 — Reviewed PR #7 at submitted head `37f19f8c9560f2194bbdbf599e644d122324b994`. Exact-head CI run `29565948627` passed, but the Phase 1 language/package/runtime inventory omits the repository's Node/TypeScript/npm packages and Node `>=20` declaration. P0 is now `IN PROGRESS`; the same PR must be corrected and reverified before its first inventory item is accepted.
