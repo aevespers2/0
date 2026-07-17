@@ -2,15 +2,15 @@
 
 > **Evidence-only coordination record.** This file does not approve a merge, release, deployment, token, schedule, issue writer, network path, or cross-repository mutation. Repository-local `taskchain.md`, `punchlist.md`, `release.md`, and `deploy.md` remain authoritative for implementation and acceptance details.
 
-Reviewed: **2026-07-17 14:01 PDT**  
+Reviewed: **2026-07-17 15:03 PDT**  
 Scope: **16 owned repositories**  
 Portfolio decision: **No repository is release-ready or deployment-ready.**  
-Current issue evidence: Bridge Issues #4–#9 and #14–#21 remain deferred proposals outside its first-release boundary. QuantumStateObjects now has one canonical exact-head candidate, PR #6, but three unresolved configuration-contract findings block acceptance; QSO-GENOMES PR #2 remains the highest cross-repository unblocker and retains unresolved review findings.
+Current issue evidence: Bridge Issues #4–#9 and #14–#21 remain deferred proposals outside its first-release boundary. QuantumStateObjects now has one canonical exact-head candidate, PR #7, but three unresolved parser/schema-enforcement findings block acceptance. QSO-GENOMES PR #2 remains the highest cross-repository unblocker and is still non-mergeable and unaccepted.
 
 ## Portfolio priority and architecture handoff
 
-1. **QSO-GENOMES:** repair, reconcile, and freeze canonical PR #2 with exact-head, dependency, provenance, immutable-contract, Aequitas, manifest, and downstream-consumer evidence; keep governance PR #3 and Experimenters PR #4 separate and excluded.
-2. **QuantumStateObjects:** repair PR #6's schema/hash-pin mismatch, repository/path contract bypass, and canonical-name casing; rerun exact-head CI, resolve review threads, then complete merged-head and local runtime/message/ledger/freeze evidence. Keep Experimenters PR #3 deferred.
+1. **QSO-GENOMES:** reconcile and freeze canonical PR #2 with exact-head, dependency, provenance, immutable-contract, Aequitas, manifest, negative-fixture, and downstream-consumer evidence; keep governance PR #3 and Experimenters PR #4 separate and excluded.
+2. **QuantumStateObjects:** repair PR #7 strict-UTF-8, complete-schema-field, and integer-version findings; rerun exact-head CI, resolve review threads, then complete merged-head and local runtime/message/ledger/freeze evidence. Keep Experimenters PR #3 deferred.
 3. **QSO-SEEKER:** obtain Architect disposition of the P0 baseline; keep action-orchestration PR #4 outside the hostile-input MVP unless separately chartered.
 4. **QSO-FABRIC:** reproduce and accept the existing four-QSO runtime before considering Experimenters runtime PR #2.
 5. **qso-field.github.io:** review PR #19's link baseline, then continue claim, accessibility, privacy/licensing, reproducibility, and upstream-contract gates.
@@ -19,13 +19,13 @@ Current issue evidence: Bridge Issues #4–#9 and #14–#21 remain deferred prop
 
 ## Shared lifecycle controls
 
-For every repository, the lifecycle record must preserve the product objective, user outcome, MVP boundary, priority, architecture handoff, acceptance criteria, non-goals, versioning and changelog intent, required artifacts, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. No repository may be marked ready until repository-specific tests, security, documentation, provenance, permissions, environment, rollback, and acceptance criteria pass at one immutable source head. Structural planning, local replay, merge-ref CI, exact-head focused tests, or retained candidate artifacts do not authorize release when independent review, merged-head verification, full runtime behavior, upstream contracts, privacy/licensing, or rollback remain incomplete.
+Every repository must preserve its product objective, user outcome, MVP boundary, priority, architecture handoff, acceptance criteria, non-goals, versioning/changelog intent, required artifacts, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. No repository may be marked ready until repository-specific tests, security, documentation, provenance, permissions, environment, rollback, and acceptance criteria pass at one immutable source head. Structural planning, local replay, merge-ref CI, exact-head focused tests, or retained candidate artifacts do not authorize release when independent review, merged-head verification, full runtime behavior, upstream contracts, privacy/licensing, or rollback remain incomplete.
 
 ## aevespers2/0
 
-- **Objective / outcome / MVP / priority:** establish a reproducible Autonomous vNext health baseline and prove one policy-gated, reversible local mission; P0 repository inventory and health precede mission expansion, scientific engines, VTX/private publication, or portfolio governance.
+- **Objective / outcome / MVP / priority:** establish a reproducible Autonomous vNext health baseline and prove one policy-gated, reversible local mission; repository inventory and health precede mission expansion, scientific engines, VTX/private publication, or portfolio governance.
 - **Handoff / acceptance / non-goals:** Architect dispositions PR #7 evidence; clean setup, full tests, policy denial, stop conditions, federation rejection, provenance, and rollback must pass. No credentials, silent remote writes, destructive operations, or owner-wide issue automation.
-- **Release / artifacts / deploy / recovery:** blocked `0.0.1-baseline`; require repository map, exact-head logs, security/static/test reports, mission evidence, source archive, checksums, provenance, review dispositions, bounded health/observability, and rollback. Restore all candidate-touched files and rerun non-mutating validation after rollback.
+- **Release / artifacts / deploy / recovery:** blocked `0.0.1-baseline`; require repository map, exact-head logs, security/static/test reports, mission evidence, source archive, checksums, provenance, review dispositions, bounded health/observability, and rollback. Restore candidate-touched files and rerun non-mutating validation after rollback.
 
 ## aevespers2/1
 
@@ -113,9 +113,9 @@ For every repository, the lifecycle record must preserve the product objective, 
 
 ## aevespers2/QuantumStateObjects
 
-- **Objective / outcome / MVP / priority:** accept one runnable package/configuration candidate, validate local runtime primitives, validate upstream contracts, then run four bounded QSOs. P0-A is final-head acceptance of canonical PR #6; P0-B is local instance/message/ledger/limits/freeze/rollback evidence.
-- **Handoff / acceptance / non-goals:** PR #6 head `6e382853e6746f8eb18e97c64481dccfe6684652` is the sole selected path. Run `29610600428` checked out and asserted the exact head; Python 3.11/3.13 passed 11 tests, CLI/configuration smoke, wheel builds, and retained-artifact upload. Three unresolved P2 findings require schema support for `genome.sha256`, enforcement of the declared QSO-GENOMES repository/path contract, and canonical case-sensitive Atlas/Nova/Orion/Lyra names. Require final-head and merged-head checks, deterministic hashes, message/ledger/limits/freeze/rollback evidence, and no external code execution, network, credentials, or repository writes. No verified four-QSO claim before upstream acceptance.
-- **Release / artifacts / deploy / recovery:** metadata `0.1.0`, first eligible `0.1.0-alpha.1`; candidate artifact digests and wheel hashes are recorded, but source/sdist, merged-head tests, full runtime/freeze/rollback/security reports, event/attribution samples, SBOM, provenance, privacy/license approval, and rollback remain required. `deploy.md` defines a disposable credential-free first target, canonical configuration health checks, observability, rollback, and post-validation; deployment remains prohibited.
+- **Objective / outcome / MVP / priority:** accept one runnable package/configuration candidate, validate local runtime primitives, validate upstream contracts, then run four bounded QSOs. P0-A is final-head acceptance of canonical PR #7; P0-B is local instance/message/ledger/limits/freeze/rollback evidence.
+- **Handoff / acceptance / non-goals:** PR #7 head `80e0546a53c139b26e956bce8f20c41e907739a6` is the sole selected path. Run `29614395650` checked out and asserted the exact head; Python 3.11/3.13 passed 15 tests, default/configuration CLI smoke, wheel builds, and retained-artifact upload. The earlier hash-pin/source/name findings are repaired, but three unresolved P2 findings require strict UTF-8 decoding, enforcement of all schema-required runtime blocks, and integer-only schema versions. Require repaired final-head and merged-head checks, deterministic hashes, message/ledger/limits/freeze/rollback evidence, and no external code execution, network, credentials, or repository writes. No verified four-QSO claim before upstream acceptance.
+- **Release / artifacts / deploy / recovery:** metadata `0.1.0`, first eligible `0.1.0-alpha.1`; candidate artifact digests and wheel hashes are recorded, but repaired exact-head review, source/sdist, merged-head tests, full runtime/freeze/rollback/security reports, event/attribution samples, SBOM, provenance, privacy/license approval, and rollback remain required. `deploy.md` defines a disposable credential-free first target, strict configuration health checks, observability, rollback, and post-validation; deployment remains prohibited.
 
 ## Portfolio release and deployment gates
 
@@ -127,5 +127,5 @@ Any future deployment must begin with bounded non-mutating/manual validation, re
 - **2026-07-17:** recorded qso-field PR #19 as a successful documentation-link candidate while retaining all remaining publication gates.
 - **2026-07-17:** kept QSO-SEEKER PR #4, QSO-FABRIC PR #2, QSO-GENOMES PR #4, QSO-STUDIO PR #1, and QuantumStateObjects PR #3 as deferred candidates that cannot supersede active P0 objectives.
 - **2026-07-17:** corrected the issue review to reflect Bridge's open expansion backlog and completed Bridge's lifecycle planning structure; release and deployment remain blocked.
-- **2026-07-17:** advanced QuantumStateObjects from a missing CLI to a preferred matrix-tested PR #4 candidate, then corrected its exact-head claim after workflow logs proved the synthetic merge ref was tested.
-- **2026-07-17:** advanced QuantumStateObjects again to sole canonical PR #6. Exact-head run `29610600428` passed 11 tests and retained Python 3.11/3.13 artifacts, but three configuration-contract review findings block acceptance. Updated repository-local task, punch, release, changelog, and deployment plans; no release or deployment was authorized.
+- **2026-07-17:** advanced QuantumStateObjects through PR #4 and PR #6 exact-head candidates while preserving review provenance and rejecting superseded branches.
+- **2026-07-17:** advanced QuantumStateObjects to sole canonical PR #7. Exact-head run `29614395650` passed 15 tests and retained Python 3.11/3.13 artifacts, but three new parser/schema-enforcement findings block acceptance. Updated repository-local task, punch, release, changelog, and deployment plans; no release or deployment was authorized.
