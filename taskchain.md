@@ -14,7 +14,7 @@
 
 | Priority | Task | Depends on | Status |
 |---|---|---|---|
-| P0 | Repository health baseline for the implemented Autonomous vNext surface | — | READY |
+| P0 | Repository health baseline for the implemented Autonomous vNext surface | — | IN PROGRESS |
 | P1 | Verify one end-to-end bounded mission and evidence bundle | P0 | PROPOSED |
 | P2 | Establish architecture/package/contract compatibility and ADR baseline | P1 | PROPOSED |
 | P3 | Harden configuration, secrets, command/path policy, federation, and rollback | P2 | PROPOSED |
@@ -46,3 +46,4 @@ Builders execute only the highest-priority unblocked task. Each task must name f
 Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
 
 - 2026-07-16 — Synchronized draft PR #6 evidence to current head `09038ac55c7945b2abb013d59cf9a1b270a9e717`; CI run `29546692277` failed during tests and skipped all later smoke/federation checks. The draft remains outside the active MVP and portfolio priority is unchanged.
+- 2026-07-17 — Claimed P0 Phase 1 item 1 on `builder/repository-purpose-runtime-baseline-v1`. Added `docs/repository-health-baseline.md` against source commit `7333f441138bdc0d596232581c52e5e1134cd142`, recording the repository purpose, `main` default branch, Python/JSON/YAML/Markdown roles, pip-based dependency behavior, absent root Python manifests, Ubuntu/Python 3.11 CI runtime, exact source blob identities, stop condition, and rollback. Documentation-only change; no runtime, schema, workflow, or dependency behavior changed. Next item: inventory top-level directories and responsibility areas.
