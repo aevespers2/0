@@ -8,6 +8,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-16 — Defined the first product outcome as one reproducible, policy-gated, reversible local mission from contract intake through evidence report.
 - 2026-07-16 — Kept scientific-discovery roadmap pull requests as proposals rather than active priorities until the Autonomous vNext health, safety, federation, and packaging baseline is accepted.
 - 2026-07-16 — Classified draft PR #6, which proposes Repository `0` as a myelination/proposal layer and adds VTX envelope artifacts, as review-only work outside the active P0-P4 MVP; no portfolio reprioritization was made.
+- 2026-07-16 — Retained that scope decision after the draft advanced: the current head fails CI, so no VTX/private-authority implementation is eligible to merge into the bounded-mission baseline.
 
 ### Architecture
 - Replaced the generic greenfield roadmap with a sequence aligned to the substantial existing Phase-0 implementation.
@@ -16,15 +17,16 @@ All notable product, architecture, implementation, release, and deployment chang
 
 ### Implementation
 - No released implementation capability is claimed; existing source and tests remain candidate inputs pending current verification.
-- 2026-07-16 — Observed draft PR #6 adding five proposed files: two architecture documents, a VTX package initializer, deterministic envelope/serialization primitives, and an envelope JSON Schema. These remain unmerged candidate artifacts.
+- 2026-07-16 — Observed draft PR #6 adding proposed architecture documents, VTX envelope/schema primitives, a Muse credential-gateway policy, safeguards, and tests. These remain unmerged candidate artifacts.
 
 ### Evidence
-- 2026-07-16 — Draft PR #6 head `dbd8186caa2017f4dcc2f53e2ae25ce5ec244be8` completed Autonomous vNext CI run `29544823133` successfully, including tests, cognitive-runtime smoke, and federation validation steps.
-- 2026-07-16 — The successful workflow does not establish signature verification, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` interoperability, secure transport, or deployable GitHub authority.
+- 2026-07-16 — Earlier draft head `dbd8186caa2017f4dcc2f53e2ae25ce5ec244be8` completed Autonomous vNext CI run `29544823133` successfully, but that result is superseded for submission review because the branch advanced.
+- 2026-07-16 — Current draft head `09038ac55c7945b2abb013d59cf9a1b270a9e717` failed Autonomous vNext CI run `29546692277` during tests; the cognitive-runtime smoke and all federation validation steps were skipped.
+- 2026-07-16 — Neither the earlier successful run nor the current failing run establishes signature verification, replay protection, receipt chaining, durable canonical storage, key custody, Repository `1` interoperability, secure transport, revocation, or deployable GitHub authority.
 
 ### Release
 - The `0.0.1-baseline` candidate remains blocked until clean-environment tests, security checks, documentation verification, provenance, and rollback evidence pass.
-- 2026-07-16 — Draft PR #6 is excluded from the current release scope unless later accepted through the architecture/security chain with reconciled cross-repository fixtures and explicit authority approval.
+- 2026-07-16 — Draft PR #6 is excluded from the current release scope unless later accepted through the architecture/security chain with reconciled cross-repository fixtures, exact-head passing evidence, and explicit authority approval.
 
 ### Deployment
 - No remote publishing or deployment is authorized by the MVP directive.
