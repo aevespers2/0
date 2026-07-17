@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document records the bounded Phase 1 identity and runtime inventory for Repository `0`. It does not claim that the complete P0 health baseline, clean installation, test suite, security review, or release gate has passed.
+This document records the bounded Phase 1 identity, language, package-manager, and runtime inventory for Repository `0`. It does not claim that the complete P0 health baseline, clean installation, test suite, security review, or release gate has passed.
 
 - **Baseline source commit:** `7333f441138bdc0d596232581c52e5e1134cd142`
 - **Builder branch:** `builder/repository-purpose-runtime-baseline-v1`
@@ -12,7 +12,7 @@ This document records the bounded Phase 1 identity and runtime inventory for Rep
 
 ## Purpose
 
-Repository `0` contains Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent. The active product directive prioritizes a reproducible health baseline followed by one bounded local mission that is policy-gated, reversible, and fully evidenced. Existing implementation surfaces include mission and action schemas, deny-by-default policy evaluation, append-only audit records, deterministic planning and cognitive-runtime components, federation proposal validation, and local evidence generation.
+Repository `0` contains Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent. The active product directive prioritizes a reproducible health baseline followed by one bounded local mission that is policy-gated, reversible, and fully evidenced. Existing implementation surfaces include mission and action schemas, deny-by-default policy evaluation, append-only audit records, deterministic planning and cognitive-runtime components, federation proposal validation, local evidence generation, and two standalone TypeScript MCP server packages.
 
 The current MVP explicitly excludes credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, and cross-repository publication authority.
 
@@ -20,54 +20,75 @@ The current MVP explicitly excludes credential discovery, silent pushes or deplo
 
 | Category | Evidence-backed role |
 |---|---|
-| Python | Primary implementation, scripts, CLI entry points, runtime smoke path, and tests. |
-| JSON / JSON Schema | Mission and action contracts, mirror manifests, federation packets, reports, state, and evidence artifacts. |
+| Python | Primary Autonomous vNext implementation, scripts, CLI entry points, runtime smoke path, and tests. |
+| TypeScript | Two standalone MCP server implementations under `packages/communication-fabric-mcp-template` and `packages/lifetime-network-mcp-server`. |
+| JSON / JSON Schema | Mission and action contracts, mirror manifests, federation packets, package manifests, reports, state, and evidence artifacts. |
 | YAML | GitHub Actions workflow configuration. |
-| Markdown | Product, architecture, release, punch-list, task-chain, and operator documentation. |
+| Markdown | Product, architecture, release, punch-list, task-chain, package, and operator documentation. |
 
 This is a source-level inventory, not a GitHub language-statistics claim.
 
 ## Package manager and dependency state
 
+### Python surface
+
 - The configured CI uses `python -m pip` to install `pip` and `pytest` directly.
-- No `pyproject.toml`, `requirements.txt`, or `setup.py` exists at the baseline ref.
-- The repository therefore has no discovered Python package manifest or lockfile in the checked root paths.
-- The package is exercised from the source tree rather than installed as a declared distribution.
+- No root `pyproject.toml`, `requirements.txt`, or `setup.py` exists at the baseline ref.
+- The Python source is exercised from the repository tree rather than installed as a declared distribution.
 - `pytest` is currently unpinned in the workflow, and `pip` is upgraded from the mutable package index during each run.
 - ITensor support is described as optional and dependency-gated; the core tests do not require ITensor bindings.
 
-These observations are inventory findings. Dependency consistency, advisories, reproducible installation, and package-manifest remediation remain Phase 2 work.
+### Node/TypeScript surface
+
+- `packages/communication-fabric-mcp-template/package.json` and `packages/lifetime-network-mcp-server/package.json` define independent npm package surfaces.
+- Both packages declare `build` as `tsc -p tsconfig.json`, `start` as `node dist/server.js`, and `dev` as `tsx src/server.ts`.
+- Both depend on `@modelcontextprotocol/sdk` and `zod`, with TypeScript, `tsx`, and Node type declarations as development dependencies.
+- Both use semver ranges rather than exact versions, and no `package-lock.json` was found in either package at the baseline ref.
+- Both `tsconfig.json` files target `ES2022`, use `NodeNext` module and resolution semantics, enable strict checking, compile `src/**/*.ts`, and emit to `dist/`.
+
+These observations are inventory findings. Dependency consistency, advisories, reproducible installation, lockfile policy, package build verification, and package-manifest remediation remain Phase 2 and Phase 3 work.
 
 ## Runtime baseline
 
-| Surface | Recorded runtime |
-|---|---|
-| GitHub Actions runner | `ubuntu-latest` |
-| GitHub Actions Python | `3.11` |
-| Test command | `python -m pytest -q` |
-| Cognitive smoke command | `python -m autonomous_vnext.cognitive_runtime ...` |
-| Documentation command form | `python3` |
+| Surface | Recorded runtime or target | Evidence status |
+|---|---|---|
+| GitHub Actions runner | `ubuntu-latest` | Configured and exercised by the submitted-head workflow. |
+| GitHub Actions Python | `3.11` | Explicitly pinned and exercised by CI. |
+| Python test command | `python -m pytest -q` | Configured in CI. |
+| Python cognitive smoke command | `python -m autonomous_vnext.cognitive_runtime ...` | Configured in CI. |
+| Documentation command form | `python3` | Generic documentation form; does not prove additional minor-version support. |
+| Node runtime | `>=20` | Declared by both npm package manifests; not yet exercised by the repository workflow. |
+| TypeScript compile target | `ES2022` with `NodeNext` | Declared by both package `tsconfig.json` files; build not yet verified in P0. |
 
-Python 3.11 is the only explicitly pinned and therefore currently evidenced supported Python version. The documentation's generic `python3` form does not establish compatibility with other minor versions.
+Python 3.11 is the only explicitly pinned and CI-exercised Python version. Node `>=20` is an explicit package requirement, but it remains declaration evidence rather than a tested support claim until the package builds run in a clean environment or CI.
 
 ## Evidence inventory
 
 | Source | Git blob SHA | What it establishes |
 |---|---|---|
-| `README.md` | `e7d19a0f707c8a748d987a9bdd6d78af32ae6263` | Repository purpose, implementation map, test command, optional ITensor boundary, and documented CLI usage. |
+| `README.md` | `e7d19a0f707c8a748d987a9bdd6d78af32ae6263` | Repository purpose, implementation map, Python test command, optional ITensor boundary, and documented CLI usage. |
 | `taskchain.md` | `50a8bed1aaa660e9df5756ab940c531590e4a205` | Active product directive, MVP scope, priority, success criteria, and non-goals. |
 | `.github/workflows/autonomous-vnext-ci.yml` | `8bff5231345c03e08aa620674b5c1bc740babc35` | Ubuntu runner, Python 3.11, pip/pytest installation, test command, and smoke/validation entry points. |
 | `autonomous_vnext/__init__.py` | `113c40b6a067952beadf95eff694dea7d96238c1` | Python package identity and implemented module surface. |
+| `packages/communication-fabric-mcp-template/package.json` | `c2d7e808b549ab2c31d9062bf3d16b793eebbbff` | npm package identity, dependency ranges, build/start/dev scripts, and Node `>=20`. |
+| `packages/lifetime-network-mcp-server/package.json` | `d899ecb57de6b8cddad8b5ba6f2cbd60aa57df1e` | npm package identity, dependency ranges, build/start/dev scripts, and Node `>=20`. |
+| Both package `tsconfig.json` files | `02b90f0bf6f21a6aabb1d68cb96f9cc0116befed` | Shared strict TypeScript configuration, `ES2022` target, `NodeNext`, `src/` input, and `dist/` output. |
+| `packages/communication-fabric-mcp-template/src/server.ts` | `5cb4bf6a5a5685ea53b59f465d57ef3cd19a2ba4` | Executable TypeScript MCP server implementation using Node, MCP SDK, and Zod. |
+| `packages/lifetime-network-mcp-server/src/server.ts` | `28fa3e25d235942ac6c6ef959d2f8d07f11502e8` | Second executable TypeScript MCP server implementation and its local data-loading path. |
 | `punchlist.md` | `e217f8d58a873d876c6a467461df851a51b2dce5` | P0 Phase 1 ordering and acceptance boundary. |
 
-Root-path probes for `pyproject.toml`, `requirements.txt`, and `setup.py` returned `404 Not Found` at the baseline ref.
+Root-path probes for `pyproject.toml`, `requirements.txt`, and `setup.py` returned `404 Not Found`. Package-path probes for both `package-lock.json` files also returned `404 Not Found` at the baseline ref.
+
+## Review correction
+
+The first submitted inventory omitted the existing Node/TypeScript/npm package surface. This revision incorporates the unresolved PR #7 review finding without broadening into package build, dependency, or security validation. The correction is documentation-only and preserves the original baseline commit so every statement remains reproducible against one immutable source state.
 
 ## Result and stop condition
 
-**Result: PASS for Phase 1 item 1 only** — repository purpose, default branch, primary implementation languages/formats, package-manager behavior, and evidenced runtime version are now recorded.
+**Result: PASS for Phase 1 item 1 only** — repository purpose, default branch, primary languages and formats, Python and npm package-manager behavior, and evidenced Python/Node runtime requirements are now recorded.
 
-Stop here. Do not treat this as completion of Phase 1 or P0. The next Builder item is the top-level directory and responsibility inventory, followed by manifest/build/workflow inventory in the order defined by `punchlist.md`.
+Stop here. Do not treat this as completion of Phase 1 or P0. After exact-head verification and review-thread resolution, the next Builder item is the top-level directory and responsibility inventory, followed by manifest/build/workflow inventory in the order defined by `punchlist.md`.
 
 ## Rollback
 
-Delete this document and revert the associated `punchlist.md` and `taskchain.md` entries. No runtime, schema, workflow, dependency, or production behavior is changed by this bounded documentation task.
+Revert this document and the associated `punchlist.md` and `taskchain.md` entries. No runtime, schema, workflow, dependency, package, credential, network, or production behavior is changed by this bounded documentation correction.
