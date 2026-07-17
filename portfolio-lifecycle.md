@@ -2,29 +2,30 @@
 
 > **Evidence-only coordination record.** This file does not approve a merge, release, deployment, token, schedule, issue writer, network path, or cross-repository mutation. Repository-local `taskchain.md`, `punchlist.md`, `release.md`, and `deploy.md` remain authoritative for implementation and acceptance details.
 
-Reviewed: **2026-07-17 15:03 PDT**  
+Reviewed: **2026-07-17 16:00 PDT**  
 Scope: **16 owned repositories**  
 Portfolio decision: **No repository is release-ready or deployment-ready.**  
-Current issue evidence: Bridge Issues #4–#9 and #14–#21 remain deferred proposals outside its first-release boundary. QuantumStateObjects now has one canonical exact-head candidate, PR #7, but three unresolved parser/schema-enforcement findings block acceptance. QSO-GENOMES PR #2 remains the highest cross-repository unblocker and is still non-mergeable and unaccepted.
+Current issue/change evidence: no owned-repository issue was newly updated during this review window. Bridge Issues #4–#9 and #14–#21 remain deferred. QuantumStateObjects PR #7 is now reconciled and exact-head verified for a 22-test runtime-primitives slice, but eight unresolved P2 findings block acceptance. QSO-GENOMES PR #2 remains the highest cross-repository unblocker and is still non-mergeable and unaccepted. Draft QSO-SEEKER PR #5, QSO-DIGITALIS PR #2, and Repository `0` PR #8 are separate expansion/governance proposals and do not change the active MVP priority.
 
 ## Portfolio priority and architecture handoff
 
 1. **QSO-GENOMES:** reconcile and freeze canonical PR #2 with exact-head, dependency, provenance, immutable-contract, Aequitas, manifest, negative-fixture, and downstream-consumer evidence; keep governance PR #3 and Experimenters PR #4 separate and excluded.
-2. **QuantumStateObjects:** repair PR #7 strict-UTF-8, complete-schema-field, and integer-version findings; rerun exact-head CI, resolve review threads, then complete merged-head and local runtime/message/ledger/freeze evidence. Keep Experimenters PR #3 deferred.
-3. **QSO-SEEKER:** obtain Architect disposition of the P0 baseline; keep action-orchestration PR #4 outside the hostile-input MVP unless separately chartered.
-4. **QSO-FABRIC:** reproduce and accept the existing four-QSO runtime before considering Experimenters runtime PR #2.
+2. **QuantumStateObjects:** repair all eight current PR #7 findings, rerun exact-head CI with retained artifacts, resolve review threads, and complete merged-head acceptance. The bounded runtime-primitives slice is in `REVIEW`, not release-ready capability.
+3. **QSO-SEEKER:** obtain Architect disposition of PR #2 P0, then complete versioned canonical-record/attribution, independent sanitizer isolation, digest handoff, and adversarial fixtures. Keep action-orchestration PR #4 and collection/private-overlay/field-publication PR #5 outside the hostile-input MVP.
+4. **QSO-FABRIC:** reproduce and accept the existing Atlas/Nova/Orion/Lyra harness before considering Experimenters runtime PR #2.
 5. **qso-field.github.io:** review PR #19's link baseline, then continue claim, accessibility, privacy/licensing, reproducibility, and upstream-contract gates.
-6. **Bridge:** lifecycle planning is structurally complete through `taskchain.md`, `punchlist.md`, `release.md`, and `deploy.md`; implementation remains blocked on current-head reproduction.
-7. All other repositories remain at their documented charter, provenance, incident, ownership, or evidence-baseline holds.
+6. **Bridge:** lifecycle planning is structurally complete; implementation remains blocked on current-head reproduction.
+7. **QSO-DIGITALIS:** review draft PR #2 only as a documentation/architecture charter candidate; no scaffold materialization, field runtime, transport, storage, or downstream contract activation is authorized.
+8. All other repositories remain at their documented charter, provenance, incident, ownership, or evidence-baseline holds.
 
 ## Shared lifecycle controls
 
-Every repository must preserve its product objective, user outcome, MVP boundary, priority, architecture handoff, acceptance criteria, non-goals, versioning/changelog intent, required artifacts, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. No repository may be marked ready until repository-specific tests, security, documentation, provenance, permissions, environment, rollback, and acceptance criteria pass at one immutable source head. Structural planning, local replay, merge-ref CI, exact-head focused tests, or retained candidate artifacts do not authorize release when independent review, merged-head verification, full runtime behavior, upstream contracts, privacy/licensing, or rollback remain incomplete.
+Every repository must preserve its product objective, user outcome, MVP boundary, priority, architecture handoff, acceptance criteria, non-goals, versioning/changelog intent, required artifacts, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. No repository may be marked ready until repository-specific tests, security, documentation, provenance, permissions, environment, rollback, privacy/license where applicable, and acceptance criteria pass at one immutable source head. Structural planning, scaffold materialization, local replay, merge-ref CI, exact-head focused tests, or retained candidate artifacts do not authorize release when independent review, merged-head verification, full behavior, upstream contracts, legal/privacy boundaries, or rollback remain incomplete.
 
 ## aevespers2/0
 
 - **Objective / outcome / MVP / priority:** establish a reproducible Autonomous vNext health baseline and prove one policy-gated, reversible local mission; repository inventory and health precede mission expansion, scientific engines, VTX/private publication, or portfolio governance.
-- **Handoff / acceptance / non-goals:** Architect dispositions PR #7 evidence; clean setup, full tests, policy denial, stop conditions, federation rejection, provenance, and rollback must pass. No credentials, silent remote writes, destructive operations, or owner-wide issue automation.
+- **Handoff / acceptance / non-goals:** Architect dispositions PR #7 evidence; clean setup, full tests, policy denial, stop conditions, federation rejection, provenance, and rollback must pass. Draft PR #8 is a non-mergeable portfolio control-plane proposal outside P0; no six-hour schedule, owner-wide token, central issue writer, or automated closure is authorized.
 - **Release / artifacts / deploy / recovery:** blocked `0.0.1-baseline`; require repository map, exact-head logs, security/static/test reports, mission evidence, source archive, checksums, provenance, review dispositions, bounded health/observability, and rollback. Restore candidate-touched files and rerun non-mutating validation after rollback.
 
 ## aevespers2/1
@@ -71,9 +72,9 @@ Every repository must preserve its product objective, user outcome, MVP boundary
 
 ## aevespers2/QSO-DIGITALIS
 
-- **Objective / outcome / MVP / priority:** approve a unique charter or retire/archive the repository; P0 is documentation-only purpose, users, contracts, trust/data/privacy/license boundaries, ecosystem role, verification, and retirement criteria.
-- **Handoff / acceptance / non-goals:** Architect/user decision precedes skeleton or schema work; require a non-overlapping stable contract or explicit retirement. Do not infer identity, twin, wallet, runtime, networking, execution, or settlement capability from the name.
-- **Release / artifacts / deploy / recovery:** no version; require charter, overlap analysis, verification plan, changelog, privacy/license decision, retirement record, provenance, health plan, and rollback. No implementation or deployment surface is approved.
+- **Objective / outcome / MVP / priority:** review draft PR #2 as a bounded Digital Consciousness Field charter candidate or retire/archive the repository; P0 remains documentation-only.
+- **Handoff / acceptance / non-goals:** Architect/user approve a non-overlapping evidence-envelope contract, capability separation, trust/data/privacy/license/retention boundaries, verification, migration, rollback, and retirement criteria. PR #2's roadmap and materializer are scaffold proposals, not implementation. No literal-consciousness claim, raw/executable transport, credentials, unrestricted shared memory, implicit trust, autonomous approval, or settlement authority.
+- **Release / artifacts / deploy / recovery:** possible `0.0.1-charter.1` remains blocked; require approved charter, overlap map, schemas/policies/fixtures only after approval, security/privacy/license review, exact-head evidence, checksums, provenance, downstream acceptance, health/observability, and rollback. No materialization or deployment is authorized.
 
 ## aevespers2/QSO-FABRIC
 
@@ -90,7 +91,7 @@ Every repository must preserve its product objective, user outcome, MVP boundary
 ## aevespers2/QSO-GENOMES
 
 - **Objective / outcome / MVP / priority:** reconcile, scope-contain, freeze, and independently accept one Atlas/Nova/Orion/Lyra compatibility-set head; this remains the highest portfolio unblocker.
-- **Handoff / acceptance / non-goals:** Architect controls provenance-preserving reconciliation and merge order; PR #2 is the sole compatibility path, while PR #3 and PR #4 are excluded. Require mergeable immutable head, exact-head suite, resolved P1/P2 findings, explicit digest scopes, immutable/Aequitas validation, negative fixtures, and downstream acceptance. No executable behavior, credentials, mutation, payments, or governance automation in alpha.
+- **Handoff / acceptance / non-goals:** Architect controls provenance-preserving reconciliation and merge order; PR #2 is the sole compatibility path, while PR #3 and PR #4 are excluded. Current PR #2 head remains non-mergeable. Require mergeable immutable head, exact-head suite, resolved findings, explicit digest scopes, immutable/Aequitas validation, negative fixtures, and downstream acceptance. No executable behavior, credentials, mutation, payments, or governance automation in alpha.
 - **Release / artifacts / deploy / recovery:** blocked `0.1.0-alpha.1`; require schemas/genomes/protocol/migration/Aequitas, compatibility manifest, fixtures, reconciliation records, review map, CI/clean-checkout/downstream reports, checksums, provenance, health validation, and rollback. Preserve all reviewed heads and reject digest/identity/immutability drift.
 
 ## aevespers2/QSO-PAYMENTS
@@ -101,9 +102,9 @@ Every repository must preserve its product objective, user outcome, MVP boundary
 
 ## aevespers2/QSO-SEEKER
 
-- **Objective / outcome / MVP / priority:** prove a read-only fail-closed path from untrusted public content to inert canonical and attribution records; P0 security/CLI baseline precedes retrieval expansion.
-- **Handoff / acceptance / non-goals:** Architect dispositions PR #2; PR #4 action-orchestration remains separate. Require clean immutable-head replay, deterministic outputs/hashes, credential-free/network-free sanitizer and digest handoff. No crawling, private-source access, executable processing, or runtime authority.
-- **Release / artifacts / deploy / recovery:** blocked `0.1.0-alpha.1`; require schemas/fixtures, CLI/PDF samples, split-job workflows, security/hidden-control reports, exact-head logs, retained artifacts, SBOM/checksums, provenance, health/observability, and rollback. Restore accepted P0 state and verify no network, credential, or content-execution authority.
+- **Objective / outcome / MVP / priority:** prove a read-only fail-closed path from untrusted public content to inert canonical and attribution records; PR #2 P0 and P1-P3 contracts/isolation precede retrieval expansion.
+- **Handoff / acceptance / non-goals:** PR #2 head `306dfa4104c12594b23dda8111e1c80edb0be397` is open/mergeable and exact-head run `29580240905` passed, but retained artifacts and Architect disposition remain absent. Draft PR #5 is a later public-collection/private-overlay/scheduled-workflow/license/field-publication proposal and is excluded. No crawling, private-source access, executable processing, scheduled live collection, or runtime authority.
+- **Release / artifacts / deploy / recovery:** blocked `0.1.0-alpha.1`; require schemas/fixtures, CLI/PDF samples, split-job workflows, security/hidden-control reports, exact-head retained artifacts, source/license/privacy review, SBOM/checksums, provenance, health/observability, rollback, and post-validation. Disable schedules/adapters and restore accepted P0 state on rollback.
 
 ## aevespers2/QSO-STUDIO
 
@@ -113,9 +114,9 @@ Every repository must preserve its product objective, user outcome, MVP boundary
 
 ## aevespers2/QuantumStateObjects
 
-- **Objective / outcome / MVP / priority:** accept one runnable package/configuration candidate, validate local runtime primitives, validate upstream contracts, then run four bounded QSOs. P0-A is final-head acceptance of canonical PR #7; P0-B is local instance/message/ledger/limits/freeze/rollback evidence.
-- **Handoff / acceptance / non-goals:** PR #7 head `80e0546a53c139b26e956bce8f20c41e907739a6` is the sole selected path. Run `29614395650` checked out and asserted the exact head; Python 3.11/3.13 passed 15 tests, default/configuration CLI smoke, wheel builds, and retained-artifact upload. The earlier hash-pin/source/name findings are repaired, but three unresolved P2 findings require strict UTF-8 decoding, enforcement of all schema-required runtime blocks, and integer-only schema versions. Require repaired final-head and merged-head checks, deterministic hashes, message/ledger/limits/freeze/rollback evidence, and no external code execution, network, credentials, or repository writes. No verified four-QSO claim before upstream acceptance.
-- **Release / artifacts / deploy / recovery:** metadata `0.1.0`, first eligible `0.1.0-alpha.1`; candidate artifact digests and wheel hashes are recorded, but repaired exact-head review, source/sdist, merged-head tests, full runtime/freeze/rollback/security reports, event/attribution samples, SBOM, provenance, privacy/license approval, and rollback remain required. `deploy.md` defines a disposable credential-free first target, strict configuration health checks, observability, rollback, and post-validation; deployment remains prohibited.
+- **Objective / outcome / MVP / priority:** accept one runnable package/configuration and bounded runtime-primitives candidate, validate accepted upstream contracts, then run four bounded QSOs. P0-A is final PR #7 acceptance; P0-B is atomic local lifecycle/message/ledger/limits/freeze/rollback evidence.
+- **Handoff / acceptance / non-goals:** PR #7 head `395915b60510e9a62c53ad128cf23d151e73eb1f` is open, unmerged, mergeable, and reconciled with current `main` without force rewriting. Run `29617877793` passed exact-head Python 3.11/3.13 installation, 22 tests, CLI/configuration smoke, wheels, and retained artifacts. Eight unresolved P2 findings require strict UTF-8, complete blocks, integer versions, canonical instance IDs, atomic delegated ingest, message-inclusive canonical freeze checkpoints, rollback at full event capacity, and strict persisted event shape/type validation. No Atlas/Nova/Orion/Lyra running claim without authorized append-only evidence.
+- **Release / artifacts / deploy / recovery:** blocked `0.1.0-alpha.1`; require repaired exact/merged heads, complete negative/adversarial/runtime/security reports, event/attribution/checkpoint samples, source/sdist/SBOM/checksums/provenance, accepted QSO-GENOMES/QSO-SEEKER contracts, privacy/license approval, health/observability, rollback drill, and approval. The first target remains disposable, credential-free, network-disabled, synthetic, bounded, and human-controlled.
 
 ## Portfolio release and deployment gates
 
@@ -124,8 +125,8 @@ Any future deployment must begin with bounded non-mutating/manual validation, re
 ## Review log
 
 - **2026-07-17:** established one evidence-only lifecycle view for all 16 repositories without approving release or deployment.
-- **2026-07-17:** recorded qso-field PR #19 as a successful documentation-link candidate while retaining all remaining publication gates.
-- **2026-07-17:** kept QSO-SEEKER PR #4, QSO-FABRIC PR #2, QSO-GENOMES PR #4, QSO-STUDIO PR #1, and QuantumStateObjects PR #3 as deferred candidates that cannot supersede active P0 objectives.
-- **2026-07-17:** corrected the issue review to reflect Bridge's open expansion backlog and completed Bridge's lifecycle planning structure; release and deployment remain blocked.
-- **2026-07-17:** advanced QuantumStateObjects through PR #4 and PR #6 exact-head candidates while preserving review provenance and rejecting superseded branches.
-- **2026-07-17:** advanced QuantumStateObjects to sole canonical PR #7. Exact-head run `29614395650` passed 15 tests and retained Python 3.11/3.13 artifacts, but three new parser/schema-enforcement findings block acceptance. Updated repository-local task, punch, release, changelog, and deployment plans; no release or deployment was authorized.
+- **2026-07-17:** completed Bridge lifecycle planning and preserved its expansion backlog outside the first release.
+- **2026-07-17:** advanced QuantumStateObjects through canonical PR #7 exact-head configuration evidence.
+- **2026-07-17:** reconciled QuantumStateObjects PR #7 with current `main`, recorded run `29617877793` and the 22-test runtime-primitives slice, then retained the release block after five additional runtime/evidence findings raised the unresolved total to eight.
+- **2026-07-17:** classified QSO-SEEKER draft PR #5 as a later collection/private-overlay/scheduled-field proposal outside P0-P3 and QSO-DIGITALIS draft PR #2 as a charter/scaffold candidate only.
+- **2026-07-17:** retained Repository `0` draft PR #8 as a non-mergeable governance/control-plane proposal outside the current Autonomous vNext baseline; no owner-wide schedule, token, or issue writer was authorized.
