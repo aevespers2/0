@@ -4,7 +4,7 @@
 
 Status: `BLOCKED — HEALTH, CONTRACT, AND END-TO-END EVIDENCE REQUIRED`
 
-Autonomous vNext has a substantial Phase-0 implementation and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence report. No release is eligible because P0 remains `READY`, every repository-health punch-list phase is unchecked, the evidence log is empty, and no current build, test, security, documentation, provenance, or rollback bundle is attached to default-branch head `fb3f284abfce5473eec3de442a435bd038f0146b`.
+Autonomous vNext has a substantial Phase-0 implementation and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence report. No release is eligible because P0 remains `READY`, every repository-health punch-list phase is unchecked, the evidence log is empty, and no current build, test, security, documentation, provenance, or rollback bundle is attached to reviewed implementation baseline `fb3f284abfce5473eec3de442a435bd038f0146b`.
 
 Draft PR #6 is not part of this candidate. Its proposed VTX envelope, Repository `0` proposal layer, private-authority publication design, and credential-gateway safeguards require a separately approved Repository `0` → Repository `1` contract. The current PR head `09038ac55c7945b2abb013d59cf9a1b270a9e717` has failing Autonomous vNext CI run `29546692277`: the test step failed and all smoke and federation validation steps were skipped.
 
@@ -70,7 +70,7 @@ Withdraw the candidate if verification is non-reproducible, policy or stop condi
 ## Unresolved Blockers
 
 - P0 and all repository-health phases remain incomplete; the evidence log is empty.
-- No current clean-environment CI/test/security/documentation/provenance bundle exists for the default-branch candidate.
+- No current clean-environment CI/test/security/documentation/provenance bundle exists for the reviewed implementation baseline.
 - One complete policy-gated mission and its rollback path have not been verified.
 - Draft PR #6 current head fails CI during tests; all later smoke and federation checks are skipped.
 - Repository `0` draft PR #6 and Repository `1` draft PR #1 disagree on whether the canonical route includes `0:proposal` before `1:quarantine`.
