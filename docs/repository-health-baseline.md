@@ -93,7 +93,7 @@ Root-path probes for `pyproject.toml`, `requirements.txt`, and `setup.py` return
 
 ## Review corrections
 
-The first submitted inventory omitted the existing Node/TypeScript/npm package surface. A later review found that the source-level inventory also omitted the executable Bash pre-push hook and its Python activation/configuration path. This revision records both findings without broadening into package builds, dependency analysis, hook execution, or security validation. The correction is documentation-only and preserves the original baseline commit so every statement remains reproducible against one immutable source state.
+The first submitted inventory omitted the existing Node/TypeScript/npm package surface. A later review found that the source-level inventory also omitted the executable Bash pre-push hook and its Python activation/configuration path. This revision records both findings without broadening into package builds, dependency analysis, hook execution, or security validation. The release gate now preserves every material review-thread blocker and requires the Bash hook/setup surface in the accepted health artifact. The correction is documentation-only and preserves the original baseline commit so every statement remains reproducible against one immutable source state.
 
 ## Result and stop condition
 
@@ -103,4 +103,4 @@ Stop here. Do not treat this as completion of Phase 1 or P0, and do not begin th
 
 ## Rollback
 
-Revert this document and the associated `punchlist.md` and `taskchain.md` entries. No runtime, schema, workflow, dependency, package, credential, network, or production behavior is changed by this bounded documentation correction.
+Revert this document and the associated `punchlist.md`, `taskchain.md`, `release.md`, and `changelog.md` entries. No runtime, schema, workflow, dependency, package, credential, network, or production behavior is changed by this bounded documentation correction.
