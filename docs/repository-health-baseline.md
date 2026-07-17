@@ -12,7 +12,7 @@ This document records the bounded Phase 1 identity, language, package-manager, a
 
 ## Purpose
 
-Repository `0` contains Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent. The active product directive prioritizes a reproducible health baseline followed by one bounded local mission that is policy-gated, reversible, and fully evidenced. Existing implementation surfaces include mission and action schemas, deny-by-default policy evaluation, append-only audit records, deterministic planning and cognitive-runtime components, federation proposal validation, local evidence generation, and two standalone TypeScript MCP server packages.
+Repository `0` contains Autonomous vNext Phase-0 scaffolding for a constrained, auditable builder-agent. The active product directive prioritizes a reproducible health baseline followed by one bounded local mission that is policy-gated, reversible, and fully evidenced. Existing implementation surfaces include mission and action schemas, deny-by-default policy evaluation, append-only audit records, deterministic planning and cognitive-runtime components, federation proposal validation, local evidence generation, two standalone TypeScript MCP server packages, and an operator-activated local pre-push federation gate.
 
 The current MVP explicitly excludes credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, and cross-repository publication authority.
 
@@ -20,8 +20,9 @@ The current MVP explicitly excludes credential discovery, silent pushes or deplo
 
 | Category | Evidence-backed role |
 |---|---|
-| Python | Primary Autonomous vNext implementation, scripts, CLI entry points, runtime smoke path, and tests. |
+| Python | Primary Autonomous vNext implementation, scripts, CLI entry points, runtime smoke path, tests, and the local Git-hook setup utility. |
 | TypeScript | Two standalone MCP server implementations under `packages/communication-fabric-mcp-template` and `packages/lifetime-network-mcp-server`. |
+| Bash | Executable `.githooks/pre-push` federation gate, enabled locally through `scripts/setup_federation_git_hooks.py`; it invokes two Python enforcement/pruning scripts before a push. |
 | JSON / JSON Schema | Mission and action contracts, mirror manifests, federation packets, package manifests, reports, state, and evidence artifacts. |
 | YAML | GitHub Actions workflow configuration. |
 | Markdown | Product, architecture, release, punch-list, task-chain, package, and operator documentation. |
@@ -46,7 +47,14 @@ This is a source-level inventory, not a GitHub language-statistics claim.
 - Both use semver ranges rather than exact versions, and no `package-lock.json` was found in either package at the baseline ref.
 - Both `tsconfig.json` files target `ES2022`, use `NodeNext` module and resolution semantics, enable strict checking, compile `src/**/*.ts`, and emit to `dist/`.
 
-These observations are inventory findings. Dependency consistency, advisories, reproducible installation, lockfile policy, package build verification, and package-manifest remediation remain Phase 2 and Phase 3 work.
+### Local Git-hook surface
+
+- `.githooks/pre-push` is an executable Bash hook with `set -euo pipefail`.
+- The hook derives the repository root and current `HEAD`, then invokes `scripts/enforce_federation_remote_write.py` and `scripts/prune_federation_runtime.py` with the authoritative head before a push.
+- `scripts/setup_federation_git_hooks.py` enables the hook for the current clone by setting local Git configuration `core.hooksPath` to `.githooks` by default; this activation is local and operator-initiated rather than automatic for every clone.
+- The hook adds a Bash runtime requirement to the local federation workflow and delegates substantive checks to the repository's Python scripts.
+
+These observations are inventory findings. Dependency consistency, advisories, reproducible installation, lockfile policy, package build verification, hook portability, and package-manifest remediation remain Phase 2 and Phase 3 work.
 
 ## Runtime baseline
 
@@ -57,19 +65,23 @@ These observations are inventory findings. Dependency consistency, advisories, r
 | Python test command | `python -m pytest -q` | Configured in CI. |
 | Python cognitive smoke command | `python -m autonomous_vnext.cognitive_runtime ...` | Configured in CI. |
 | Documentation command form | `python3` | Generic documentation form; does not prove additional minor-version support. |
+| Local hook setup | `python3 scripts/setup_federation_git_hooks.py` | Configures the current clone's local `core.hooksPath`; not automatically exercised by CI. |
+| Pre-push hook runtime | `/usr/bin/env bash` | Declared by the executable hook; runtime availability and portability are not yet tested as part of P0. |
 | Node runtime | `>=20` | Declared by both npm package manifests; not yet exercised by the repository workflow. |
 | TypeScript compile target | `ES2022` with `NodeNext` | Declared by both package `tsconfig.json` files; build not yet verified in P0. |
 
-Python 3.11 is the only explicitly pinned and CI-exercised Python version. Node `>=20` is an explicit package requirement, but it remains declaration evidence rather than a tested support claim until the package builds run in a clean environment or CI.
+Python 3.11 is the only explicitly pinned and CI-exercised Python version. Node `>=20` and Bash are explicit package/hook requirements, but they remain declaration and source evidence rather than tested support claims until the package builds and hook path run in a clean environment or CI.
 
 ## Evidence inventory
 
 | Source | Git blob SHA | What it establishes |
 |---|---|---|
-| `README.md` | `e7d19a0f707c8a748d987a9bdd6d78af32ae6263` | Repository purpose, implementation map, Python test command, optional ITensor boundary, and documented CLI usage. |
+| `README.md` | `e7d19a0f707c8a748d987a9bdd6d78af32ae6263` | Repository purpose, implementation map, Python test command, optional ITensor boundary, documented CLI usage, and local Git-hook activation path. |
 | `taskchain.md` | `50a8bed1aaa660e9df5756ab940c531590e4a205` | Active product directive, MVP scope, priority, success criteria, and non-goals. |
 | `.github/workflows/autonomous-vnext-ci.yml` | `8bff5231345c03e08aa620674b5c1bc740babc35` | Ubuntu runner, Python 3.11, pip/pytest installation, test command, and smoke/validation entry points. |
 | `autonomous_vnext/__init__.py` | `113c40b6a067952beadf95eff694dea7d96238c1` | Python package identity and implemented module surface. |
+| `.githooks/pre-push` | `cd20f3f00e70281097ef912ec505d7a241452126` | Executable Bash runtime, strict shell options, current-head derivation, and the two Python federation checks run before push. |
+| `scripts/setup_federation_git_hooks.py` | `e42dcbb6c3e27dfb4fc0140a280d73be3a8c9750` | Operator-invoked local activation through `git config --local core.hooksPath .githooks`. |
 | `packages/communication-fabric-mcp-template/package.json` | `c2d7e808b549ab2c31d9062bf3d16b793eebbbff` | npm package identity, dependency ranges, build/start/dev scripts, and Node `>=20`. |
 | `packages/lifetime-network-mcp-server/package.json` | `d899ecb57de6b8cddad8b5ba6f2cbd60aa57df1e` | npm package identity, dependency ranges, build/start/dev scripts, and Node `>=20`. |
 | Both package `tsconfig.json` files | `02b90f0bf6f21a6aabb1d68cb96f9cc0116befed` | Shared strict TypeScript configuration, `ES2022` target, `NodeNext`, `src/` input, and `dist/` output. |
@@ -79,15 +91,15 @@ Python 3.11 is the only explicitly pinned and CI-exercised Python version. Node 
 
 Root-path probes for `pyproject.toml`, `requirements.txt`, and `setup.py` returned `404 Not Found`. Package-path probes for both `package-lock.json` files also returned `404 Not Found` at the baseline ref.
 
-## Review correction
+## Review corrections
 
-The first submitted inventory omitted the existing Node/TypeScript/npm package surface. This revision incorporates the unresolved PR #7 review finding without broadening into package build, dependency, or security validation. The correction is documentation-only and preserves the original baseline commit so every statement remains reproducible against one immutable source state.
+The first submitted inventory omitted the existing Node/TypeScript/npm package surface. A later review found that the source-level inventory also omitted the executable Bash pre-push hook and its Python activation/configuration path. This revision records both findings without broadening into package builds, dependency analysis, hook execution, or security validation. The correction is documentation-only and preserves the original baseline commit so every statement remains reproducible against one immutable source state.
 
 ## Result and stop condition
 
-**Result: PASS for Phase 1 item 1 only** — repository purpose, default branch, primary languages and formats, Python and npm package-manager behavior, and evidenced Python/Node runtime requirements are now recorded.
+**Result: CONTENT COMPLETE, ACCEPTANCE PENDING for Phase 1 item 1** — the candidate records repository purpose, default branch, primary languages and formats, Python/npm package-manager behavior, the local Bash Git-hook surface, and evidenced Python/Node/Bash runtime requirements. The punch-list item remains unchecked until a successful workflow is attached to the final submitted head and every material review thread is resolved.
 
-Stop here. Do not treat this as completion of Phase 1 or P0. After exact-head verification and review-thread resolution, the next Builder item is the top-level directory and responsibility inventory, followed by manifest/build/workflow inventory in the order defined by `punchlist.md`.
+Stop here. Do not treat this as completion of Phase 1 or P0, and do not begin the top-level directory and responsibility inventory until the exact-head evidence and review gates pass.
 
 ## Rollback
 
