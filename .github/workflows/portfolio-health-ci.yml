@@ -1,0 +1,43 @@
+name: Portfolio Health Candidate CI
+
+on:
+  pull_request:
+    paths:
+      - "scripts/portfolio_health.py"
+      - "governance/portfolio-agents.json"
+      - ".github/workflows/portfolio-health*.yml"
+      - "docs/portfolio-health-control-plane.md"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out submitted head exactly
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Verify exact head
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Python and agent registry
+        run: |
+          python -m py_compile scripts/portfolio_health.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("governance/portfolio-agents.json").read_text())
+          ids = [agent["id"] for agent in data["agents"]]
+          assert len(ids) == len(set(ids))
+          assert {"sentinel", "ci_healer", "provenance_steward", "dependency_curator", "incident_custodian", "release_gatekeeper", "flow_orchestrator"} <= set(ids)
+          PY
