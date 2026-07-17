@@ -21,6 +21,16 @@
 | P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
 | P5 | Evaluate domain-specific roadmaps and remote publication adapters as separate product proposals | P4 | BLOCKED |
 
+## P0 health-baseline candidate — PR #7
+
+**Status:** `REVIEW — CORRECTION IMPLEMENTED, EXACT-HEAD VERIFICATION PENDING`
+
+PR #7 originally claimed only the first bounded Phase 1 inventory item. Submitted head `37f19f8c9560f2194bbdbf599e644d122324b994` completed Autonomous vNext CI run `29565948627` successfully, including the configured test, cognitive-runtime smoke, federation/status, guarded-patch, and relay checks. That exact-head evidence remains useful but does not verify later corrections or complete P0.
+
+The review finding that the inventory omitted the existing Node/TypeScript/npm surface has been corrected in the same PR. `docs/repository-health-baseline.md` now records `packages/communication-fabric-mcp-template` and `packages/lifetime-network-mcp-server`, both `package.json` manifests, shared strict `tsconfig.json` settings, TypeScript sources, build/start/dev scripts, npm dependency ranges, missing lockfile probes, and the declared Node `>=20` runtime. The report distinguishes CI-exercised Python 3.11 support from Node declaration evidence that has not yet been built in CI.
+
+**Directive:** obtain a successful workflow run attached to the corrected submitted head, resolve the Node/TypeScript review thread against that head, and only then continue with the top-level directory and responsibility inventory. Do not start P1 or treat the successful earlier workflow as release readiness. `release.md` remains blocked and must be reconciled with the accepted P0 evidence once this review item is resolved.
+
 ## Cross-repository scope gate — draft PR #6
 
 **Status:** `REVIEW — NOT PART OF THE ACTIVE MVP`
@@ -46,4 +56,5 @@ Builders execute only the highest-priority unblocked task. Each task must name f
 Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
 
 - 2026-07-16 — Synchronized draft PR #6 evidence to current head `09038ac55c7945b2abb013d59cf9a1b270a9e717`; CI run `29546692277` failed during tests and skipped all later smoke/federation checks. The draft remains outside the active MVP and portfolio priority is unchanged.
-- 2026-07-17 — Claimed P0 Phase 1 item 1 on `builder/repository-purpose-runtime-baseline-v1`. Added `docs/repository-health-baseline.md` against source commit `7333f441138bdc0d596232581c52e5e1134cd142`, recording the repository purpose, `main` default branch, Python/JSON/YAML/Markdown roles, pip-based dependency behavior, absent root Python manifests, Ubuntu/Python 3.11 CI runtime, exact source blob identities, stop condition, and rollback. Documentation-only change; no runtime, schema, workflow, or dependency behavior changed. Next item: inventory top-level directories and responsibility areas.
+- 2026-07-17 — Reviewed PR #7 at submitted head `37f19f8c9560f2194bbdbf599e644d122324b994`. Exact-head CI run `29565948627` passed, but the Phase 1 language/package/runtime inventory omitted the repository's Node/TypeScript/npm packages and Node `>=20` declaration. P0 remained `IN PROGRESS`; the same PR required correction and reverification before its first inventory item could be accepted.
+- 2026-07-17 — Corrected PR #7 without widening scope. Report commit `8f2d3c9693c39cbc48d6aa79e639b6439a7f80c2` adds both TypeScript MCP server packages, npm scripts and dependency ranges, shared `ES2022`/`NodeNext` configuration, Node `>=20`, missing lockfile probes, exact source blobs, limitations, stop condition, and rollback. Punch-list commit `491a3e4d3d60c6701bfb0264e51192ee92434d6d` records the correction. Documentation only; runtime, workflow, package, schema, credential, network, and deployment behavior are unchanged. Exact-head CI and review-thread resolution are the remaining gates before the directory inventory.
