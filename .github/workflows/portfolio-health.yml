@@ -1,0 +1,64 @@
+name: Portfolio Health Control Plane
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  PORTFOLIO_OWNER: aevespers2
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out trusted scanner
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run portfolio scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.PORTFOLIO_TOKEN || github.token }}
+        run: python scripts/portfolio_health.py
+
+      - name: Upload deterministic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-health-${{ github.run_id }}
+          path: |
+            portfolio-health.json
+            portfolio-health.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Synchronize central health issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="Portfolio health: attention required"
+          count="$(python -c 'import json; print(json.load(open("portfolio-health.json"))["finding_count"])')"
+          existing="$(gh issue list --state open --search "${title} in:title" --json number --jq '.[0].number // empty')"
+          if [[ "$count" -gt 0 ]]; then
+            if [[ -n "$existing" ]]; then
+              gh issue edit "$existing" --body-file portfolio-health.md
+            else
+              gh issue create --title "$title" --body-file portfolio-health.md --label portfolio-health || \
+                gh issue create --title "$title" --body-file portfolio-health.md
+            fi
+          elif [[ -n "$existing" ]]; then
+            gh issue close "$existing" --comment "Automated exact-state scan found no significant repository-health findings."
+          fi
