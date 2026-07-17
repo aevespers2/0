@@ -6,7 +6,7 @@
 **Goal:** Produce a verified, reproducible baseline of the repository's current health before MVP implementation proceeds.
 
 ## Phase 1 — Repository Inventory
-- [x] Record the repository purpose, default branch, primary languages, package managers, and runtime versions. Evidence: `docs/repository-health-baseline.md` on `builder/repository-purpose-runtime-baseline-v1`; baseline source commit `7333f441138bdc0d596232581c52e5e1134cd142`.
+- [x] Record the repository purpose, default branch, primary languages, package managers, and runtime versions. Evidence: corrected `docs/repository-health-baseline.md` on `builder/repository-purpose-runtime-baseline-v1`; baseline source commit `7333f441138bdc0d596232581c52e5e1134cd142`; includes Python/pip and both Node/TypeScript/npm package surfaces with Node `>=20` declaration.
 - [ ] Inventory top-level directories and identify application, library, script, test, documentation, configuration, and generated-output areas.
 - [ ] Inventory all manifests, lockfiles, build files, container files, and deployment descriptors.
 - [ ] Inventory all GitHub Actions workflows, reusable workflows, Dependabot configuration, issue templates, and security policy files.
@@ -104,3 +104,4 @@
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, and remediation tasks below.
 
 - 2026-07-17 — Completed bounded Phase 1 item 1 on `builder/repository-purpose-runtime-baseline-v1`. Recorded purpose, `main` default branch, Python/JSON/YAML/Markdown roles, pip behavior, absent root Python manifests, Ubuntu/Python 3.11 CI runtime, source blob identities, stop condition, and rollback in `docs/repository-health-baseline.md`. No runtime or workflow behavior changed.
+- 2026-07-17 — Corrected PR #7 review finding at commit `8f2d3c9693c39cbc48d6aa79e639b6439a7f80c2`: added both TypeScript MCP packages, npm manifests and scripts, shared `tsconfig.json` settings, Node `>=20`, missing lockfile probes, exact source blobs, and the distinction between declared Node support and CI-exercised Python support. Exact-head workflow verification and review-thread resolution remain required before advancing to the directory inventory.
