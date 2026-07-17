@@ -6,7 +6,7 @@
 **Goal:** Produce a verified, reproducible baseline of the repository's current health before MVP implementation proceeds.
 
 ## Phase 1 — Repository Inventory
-- [ ] Record the repository purpose, default branch, primary languages, package managers, and runtime versions.
+- [x] Record the repository purpose, default branch, primary languages, package managers, and runtime versions. Evidence: `docs/repository-health-baseline.md` on `builder/repository-purpose-runtime-baseline-v1`; baseline source commit `7333f441138bdc0d596232581c52e5e1134cd142`.
 - [ ] Inventory top-level directories and identify application, library, script, test, documentation, configuration, and generated-output areas.
 - [ ] Inventory all manifests, lockfiles, build files, container files, and deployment descriptors.
 - [ ] Inventory all GitHub Actions workflows, reusable workflows, Dependabot configuration, issue templates, and security policy files.
@@ -102,3 +102,5 @@
 
 ## Evidence Log
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, and remediation tasks below.
+
+- 2026-07-17 — Completed bounded Phase 1 item 1 on `builder/repository-purpose-runtime-baseline-v1`. Recorded purpose, `main` default branch, Python/JSON/YAML/Markdown roles, pip behavior, absent root Python manifests, Ubuntu/Python 3.11 CI runtime, source blob identities, stop condition, and rollback in `docs/repository-health-baseline.md`. No runtime or workflow behavior changed.
