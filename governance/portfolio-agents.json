@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "owner": "aevespers2",
+  "principles": [
+    "fail_closed_on_missing_evidence",
+    "exact_head_validation",
+    "trusted_base_validator",
+    "single_writer_per_state_path",
+    "small_reversible_changes",
+    "no_release_claim_without_artifacts"
+  ],
+  "agents": [
+    {
+      "id": "sentinel",
+      "purpose": "Detect failed or missing CI, new issues, divergence, stale provenance, and release metadata contradictions.",
+      "authority": "read_all_repositories; write_central_health_issue",
+      "schedule": "every_6_hours",
+      "outputs": ["portfolio-health.json", "portfolio-health.md"]
+    },
+    {
+      "id": "ci_healer",
+      "purpose": "Classify failing jobs, identify deterministic causes, and prepare bounded repair branches.",
+      "authority": "read_actions_logs; create_repair_branch; open_draft_pr",
+      "trigger": "sentinel.failed_ci",
+      "constraints": ["never_merge", "never_weaken_tests", "rerun_only_after_change_or_confirmed_flake"]
+    },
+    {
+      "id": "provenance_steward",
+      "purpose": "Prevent self-stale candidate SHAs and require evidence to name the reviewed baseline separately from the current candidate.",
+      "authority": "validate_release_metadata; prepare_docs_patch",
+      "trigger": "sentinel.stale_provenance"
+    },
+    {
+      "id": "dependency_curator",
+      "purpose": "Inventory runtimes, package managers, lockfiles, dependencies, and unsupported version ranges.",
+      "authority": "read_manifests; open_dependency_issue",
+      "schedule": "weekly"
+    },
+    {
+      "id": "incident_custodian",
+      "purpose": "Contain mutable-state writers, preserve evidence, enforce single-writer locking, and track incident closure criteria.",
+      "authority": "disable_portfolio_automation_via_pr; preserve_evidence; open_incident_issue",
+      "trigger": "sentinel.integrity_incident",
+      "constraints": ["no_root_cause_claim_without_evidence", "no_destructive_cleanup"]
+    },
+    {
+      "id": "release_gatekeeper",
+      "purpose": "Compute release eligibility only from exact-head CI, accepted review state, provenance, security, and rollback evidence.",
+      "authority": "read_evidence; publish_gate_report",
+      "trigger": "pull_request_or_release_change",
+      "constraints": ["cannot_approve_own_validator_change", "trusted_base_code_only"]
+    },
+    {
+      "id": "flow_orchestrator",
+      "purpose": "Route findings to the correct agent, deduplicate work, keep one canonical repair path, and close alerts after verified recovery.",
+      "authority": "triage; label; update_central_health_issue",
+      "schedule": "every_6_hours"
+    }
+  ]
+}
