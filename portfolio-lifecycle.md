@@ -1,35 +1,39 @@
 # Portfolio Lifecycle Plan
 
-> **Evidence-only coordination record.** This file authorizes no merge, release, deployment, credential use, schedule, network path, generated-code execution, or external repository write. Repository-local implementation evidence remains authoritative; this central plan records lifecycle status without altering reviewed candidate heads.
+> **Evidence-only coordination record.** This file authorizes no merge, release, deployment, credential use, schedule, network path, generated-code execution, or external repository write. Repository-local implementation evidence remains authoritative; this central plan records lifecycle status without altering implementation branches or reviewed candidate heads.
 
-Reviewed: **2026-07-18 13:01 PDT**  
+Reviewed: **2026-07-18 15:04 PDT**  
 Scope: **16 owned repositories**  
 Portfolio decision: **No repository is release-ready or deployment-ready.**
 
 ## Meaningful change since the prior review
 
-QuantumStateObjects PR #7 advanced by normal history to exact submitted head `291d7419bf29a3d979762c4655c05a2a672c6f82` against unchanged `main` head `3af0b2d57367631beb4d0eb5bdcd6a67aafa468b`. Exact-head CI run `29657511858` passed Python 3.11.15 and 3.13.14 with 150 tests and zero failures, errors, or skips; both jobs retained JUnit, wheel, checksum, checked-out-head, and artifact evidence. Wheel SHA-256 values are `df74cfbca5fc6c7744cbbbb897dec97f99c6f2eac19bcc97b49dc0ca38e1ad5d` and `e1c06a8d500b98c22722b463bda75e1b2d5f444365cd099e8b6fe411c1d0eb40`; artifact digests are `b0b302798c234922e9f75323d60da85dd810c957bd4af4922512f1a5aa714388` and `930f14ed7a411b5d6c36f901c0d80280db093cef2b367e406641e81289da6d49`. The interruption-reason atomicity finding is resolved, but eight P2 findings now block acceptance: repository-field shape, singleton-string message allowlists, inconsistent `max_records` default handling, structured configuration enum handling, structured message-kind handling, outgoing-recipient canonical validation before hashing, non-message receive inputs, and deterministic wrapping of configuration/genome file-read failures. PR #7 remains open, mergeable, unmerged, and not release- or deployment-ready. QuantumStateObjects `taskchain.md`, `punchlist.md`, `release.md`, `deploy.md`, and `changelog.md` on `main` were not changed.
+QSO-GENOMES `main` advanced from `f5e2bafe5696257465fdb7bda628f7d5f76c62f9` to `4cca48b53706dcc594b8214fd6299a452361add5` through merged PRs #5–#8. The new default-branch control surface includes scheduled/non-merge reconciliation, report-and-review-comment conversion into draft repair pull requests, and a trusted `/repair` command dispatcher. These changes are governance and repository-automation expansion, not compatibility-set acceptance evidence. They require an explicit security, permissions, event-trigger, provenance, failure-retention, disablement, and rollback disposition before operational trust or release relevance can be claimed.
 
-QSO-GENOMES PR #2 remains the sole canonical compatibility-set candidate at `688216ea60b9b2dc5bf3598048acf9ad2cf96033`, is non-mergeable, and retains unresolved exact-set, immutable-protocol, identity, digest-scope, dependency, exact-head, duplicate-entry, and provenance findings. New PR #5 is stacked on that candidate head, not on `main`; it adds governance/remediation and optional reconciliation-branch workflows and therefore remains a deferred expansion candidate rather than an accepted compatibility-set dependency. QSO-SEEKER merge commit `c0867fc9062ab8539eeb783b456911123d0a91b0` remains blocked from downstream authority by five unresolved post-merge canonical-contract findings. QSO-FABRIC remains blocked on accepted upstream versions/hashes, per-object evidence, and atomic rollback-qualified persistence. No canonical four-QSO run is authorized.
+Canonical QSO-GENOMES PR #2 remains open, unmerged, and non-mergeable at exact head `abda2ac987d39dd04ddc502cff8e0673a4f3de59`. Its own lifecycle files remain stale relative to current `main`: they still describe PR #3 as open/draft and governance workflows as inactive, while PRs #3 and #4 are closed unmerged and PRs #5–#8 have been merged. This contradiction is recorded here rather than adding further QSO-GENOMES default-branch drift during reconciliation. Candidate schemas, hashes, reports, or automation do not satisfy acceptance until one mergeable immutable head passes exact-head conformance, security/provenance review, review-thread disposition, and read-only downstream replay.
+
+QuantumStateObjects PR #7 remains open and unmerged at exact submitted head `291d7419bf29a3d979762c4655c05a2a672c6f82`; exact-head CI run `29657511858` passed Python 3.11/3.13 with 150 tests and retained JUnit, wheel, checksum, head-SHA, and artifact-digest evidence, but eight unresolved P2 findings and Issue #8 security adjudication still block acceptance. QuantumStateObjects `main` remains `3af0b2d57367631beb4d0eb5bdcd6a67aafa468b`; its `taskchain.md`, `punchlist.md`, `release.md`, `deploy.md`, and `changelog.md` were not changed.
+
+QSO-SEEKER merge commit `c0867fc9062ab8539eeb783b456911123d0a91b0` remains blocked from downstream authority by five unresolved post-merge canonical-contract findings. QSO-FABRIC remains blocked on accepted upstream versions and hashes, canonical adapters, per-object ledgers, checkpoint/freeze and rollback evidence, and atomic persistence. No canonical four-QSO run is authorized.
 
 ## Portfolio priority and handoff order
 
-1. **QSO-GENOMES:** reconcile, exact-head verify, and freeze canonical PR #2; keep PRs #3–#5 outside the compatibility-set acceptance path.
+1. **QSO-GENOMES:** obtain an explicit architecture/security disposition for the newly merged default-branch automation surface; then reconcile and freeze canonical PR #2 without treating those workflows as compatibility-set evidence.
 2. **QSO-SEEKER:** repair the five post-merge contract findings and obtain exact-head plus merged-head Security Envelope evidence before declaring v1 downstream-authoritative.
-3. **QuantumStateObjects:** remediate the eight PR #7 findings through separate bounded slices, preserve every reviewed head, complete Issue #8 security adjudication, obtain explicit merge approval, then verify the merged head against accepted upstream contracts.
+3. **QuantumStateObjects:** remediate PR #7 findings through separate bounded slices, preserve reviewed heads, complete Issue #8 adjudication, obtain explicit merge approval, and verify the merged head against accepted upstream contracts.
 4. **QSO-FABRIC:** reproduce only after exact accepted upstream schema/version/hash inputs exist; PRs #2–#4 and Issues #5–#12 remain deferred.
-5. **qso-field.github.io, Bridge, and QSO-DIGITALIS:** continue their documented evidence, baseline, and charter gates without displacing the canonical QSO path.
+5. **qso-field.github.io, Bridge, and QSO-DIGITALIS:** continue their evidence, baseline, and charter gates without displacing the canonical QSO path.
 6. **All remaining repositories:** retain charter, incident, ownership, provenance, or baseline holds.
 
 ## Shared lifecycle controls
 
-Every repository must retain a product objective, user outcome, bounded MVP, priority, architecture handoff, repository-specific acceptance criteria, explicit non-goals, release gates, versioning and changelog policy, artifact requirements, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. Readiness requires tests, security, documentation, provenance, permissions, environment validation, rollback evidence, privacy/licensing where applicable, and every repository-specific criterion at one immutable source head. Scaffolds, synthetic tests, merge-ref CI, generic harnesses, network rehearsals, manifests marked candidate or pending review, and retained but unaccepted artifacts do not authorize release or deployment.
+Every repository must retain a product objective, user outcome, bounded MVP, priority, architecture handoff, repository-specific acceptance criteria, explicit non-goals, release gates, versioning and changelog policy, artifact requirements, deployment environment and permissions, health checks, observability, rollback triggers/procedure, and post-deployment validation. Readiness requires tests, security, documentation, provenance, permissions, environment validation, rollback evidence, privacy/licensing where applicable, and every repository-specific criterion at one immutable source head. Scaffolds, synthetic tests, merge-ref CI, generic harnesses, network rehearsals, manifests marked candidate or pending review, automation presence, and retained but unaccepted artifacts do not authorize release or deployment.
 
 ## Current default-branch evidence
 
 | Repository | Reviewed default head | Lifecycle state |
 |---|---|---|
-| `aevespers2/0` | `3313ea25c271f00111b07e1fb1a804a525366c6a` before this plan update | Planning baseline in progress |
+| `aevespers2/0` | `b8853211a5f2c1ed41db9e0818215b22443baf40` before this plan update | Planning baseline in progress |
 | `aevespers2/1` | `6685872ceafdefa4961e261abb45202e664e3666` | Trust-core charter hold |
 | `aevespers2/AionUi` | `66b89879a0ef204a11cf0ea17fb58e5ad88dd930` | Fork-identity/reproduction hold |
 | `aevespers2/datarepo-temporal-invariants` | `5d549f1082d4bc0ee59a34d09f24b4fa44e6e9bb` | Integrity incident hold |
@@ -37,7 +41,7 @@ Every repository must retain a product objective, user outcome, bounded MVP, pri
 | `aevespers2/qso-field.github.io` | `67893241cc5809d4dae29502bd76809d0de37a9d` | Documentation candidate blocked |
 | `aevespers2/QuantumStateObjects` | `3af0b2d57367631beb4d0eb5bdcd6a67aafa468b` | Main intentionally unchanged; PR #7 under review |
 | `aevespers2/QSO-DIGITALIS` | `72debb75922484aa5b6b634de6a9723da9518f5d` | Documentation-charter hold |
-| `aevespers2/QSO-GENOMES` | `f5e2bafe5696257465fdb7bda628f7d5f76c62f9` | Canonical PR #2 blocked |
+| `aevespers2/QSO-GENOMES` | `4cca48b53706dcc594b8214fd6299a452361add5` | Automation-expanded main; canonical PR #2 blocked |
 | `aevespers2/QSO-SEEKER` | `c0867fc9062ab8539eeb783b456911123d0a91b0` | Merged contract acceptance-regressed |
 | `aevespers2/QSO-PAYMENTS` | `8ab3b97b44fc1a38cec9aa4e8b0aac3ac6bda161` | Documentation-only hold |
 | `aevespers2/QSO-FABRIC` | `380265fc50d5994d2233a521057427aca2885b95` | Upstream and atomicity blocked |
@@ -92,7 +96,7 @@ Every repository must retain a product objective, user outcome, bounded MVP, pri
 
 - **Objective / user outcome / MVP / priority:** accept one runnable package/configuration and bounded runtime-primitives candidate before any four-QSO experiment; PR #7 final acceptance is P0.
 - **Architecture / acceptance / non-goals:** current PR #7 head `291d7419bf29a3d979762c4655c05a2a672c6f82` passed run `29657511858`, but eight unresolved P2 findings and Issue #8 security adjudication block merge acceptance. No generated-code execution, credentials, network input, external write, upstream candidate consumption, or Atlas/Nova/Orion/Lyra running claim.
-- **Release / version / changelog / artifacts:** blocked `0.1.0-alpha.1`; require separate repair and exact-head evidence for all eight findings, immutable Issue #8 evidence/disposition, hostile-input threat model, explicit merge approval, merged-head verification, negative/runtime/security reports, event/attribution/checkpoint samples, wheel/sdist/SBOM/checksums/provenance, accepted upstream contracts, rollback drill, and changelog.
+- **Release / version / changelog / artifacts:** blocked `0.1.0-alpha.1`; require separate repair and exact-head evidence for all findings, immutable Issue #8 evidence/disposition, hostile-input threat model, explicit merge approval, merged-head verification, negative/runtime/security reports, event/attribution/checkpoint samples, wheel/sdist/SBOM/checksums/provenance, accepted upstream contracts, rollback drill, and changelog.
 - **Deploy / health / observability / rollback / validation:** no target approved; first target must be disposable, credential-free, network-disabled, bounded, and human-controlled. Observe lifecycle/hash/rejection/quarantine evidence; preserve failures, restore accepted checkpoint or clean environment, verify no external mutation, and repeat integrity/security/cleanup validation.
 
 ## aevespers2/QSO-DIGITALIS
@@ -105,9 +109,9 @@ Every repository must retain a product objective, user outcome, bounded MVP, pri
 ## aevespers2/QSO-GENOMES
 
 - **Objective / user outcome / MVP / priority:** reconcile, scope-contain, freeze, and independently accept exactly one Atlas/Nova/Orion/Lyra compatibility-set head; highest portfolio unblocker.
-- **Architecture / acceptance / non-goals:** PR #2 is canonical and currently non-mergeable; PRs #3–#5 are excluded/deferred. Require mergeable immutable head, exact-head suite, resolved findings, explicit digest scopes, immutable oversight validation, exact four-genome set, negative fixtures, provenance-preserving reconciliation, and downstream acceptance. No executable behavior, credentials, payments, or governance automation in the compatibility set.
-- **Release / version / changelog / artifacts:** blocked `0.1.0-alpha.1`; require schemas/genomes/protocol/migration/oversight artifacts, compatibility manifest, fixtures, reconciliation records, review map, CI/clean-checkout/downstream reports, checksums, changelog, and provenance.
-- **Deploy / health / observability / rollback / validation:** no runtime deployment; health validates schema, identity, immutability, and exact hashes, observes drift/consumer compatibility, preserves every reviewed head, and rolls back digest/identity/immutability regression.
+- **Architecture / acceptance / non-goals:** PR #2 is canonical, open, and non-mergeable at `abda2ac987d39dd04ddc502cff8e0673a4f3de59`. PRs #3 and #4 closed unmerged; PR #5 merged governance/remediation expansion; PRs #6–#8 merged reconciliation and report-repair automation into `main`. None is compatibility-set acceptance evidence. Require one mergeable immutable candidate head, exact-head suite, resolved/dispositioned findings, explicit digest scopes, immutable oversight validation, exact four-genome set, negative fixtures, provenance-preserving reconciliation, downstream acceptance, and an independent approval record for workflow actors, permissions, triggers, branch/PR creation, failure retention, disablement, and rollback. No executable QSO behavior, credentials, payments, autonomous policy change, or automation-derived acceptance.
+- **Release / version / changelog / artifacts:** blocked `0.1.0-alpha.1`; require schemas/genomes/protocol/migration/oversight artifacts, compatibility manifest, fixtures, reconciliation and automation-scope records, review map, exact-head/clean-checkout/downstream reports, checksums, changelog, SBOM/dependency record where applicable, and provenance.
+- **Deploy / health / observability / rollback / validation:** no compatibility-set publication or runtime deployment. Treat merged workflows as a separate repository-control plane: health must expose actor authorization, event source, exact source/base heads, branch and draft-PR effects, duplicate suppression, timeout/failure artifacts, and no execution of untrusted candidate code with write authority. Rollback disables the workflows and dispatcher, preserves all generated evidence/branches/comments, restores the last approved control configuration, and proves PR #2 history and artifacts were not rewritten.
 
 ## aevespers2/QSO-SEEKER
 
@@ -160,7 +164,8 @@ Every repository must retain a product objective, user outcome, bounded MVP, pri
 
 ## Review log
 
+- **2026-07-18 15:04 PDT:** reviewed all 16 default-branch heads, central lifecycle files, active pull requests, and current issue state; no repository became release-ready or deployment-ready.
+- **2026-07-18 15:04 PDT:** recorded QSO-GENOMES default-branch advance to `4cca48b53706dcc594b8214fd6299a452361add5` through merged PRs #5–#8 and classified the new reconciliation/report-repair/command-dispatch workflows as a separate unapproved repository-control surface rather than compatibility-set evidence.
+- **2026-07-18 15:04 PDT:** recorded that QSO-GENOMES PR #2 remains open and non-mergeable at `abda2ac987d39dd04ddc502cff8e0673a4f3de59`, while repository-local lifecycle documents now contradict merged PR and workflow state; used this central plan instead of adding more reconciliation drift.
+- **2026-07-18 15:04 PDT:** confirmed QuantumStateObjects `main` and its protected lifecycle files remain unchanged while PR #7 stays under exact-head review.
 - **2026-07-18 13:01 PDT:** recorded QuantumStateObjects PR #7 exact head `291d7419bf29a3d979762c4655c05a2a672c6f82`, successful exact-head run `29657511858`, 150 passing tests on Python 3.11/3.13, retained wheel/checksum/head-SHA/JUnit evidence, and artifact digests `b0b302…14388` and `930f14…a6d49`.
-- **2026-07-18 13:01 PDT:** recorded resolution of the interruption-reason thread and three newly filed findings, increasing unresolved PR #7 acceptance blockers from five to eight; left QuantumStateObjects default-branch lifecycle files unchanged.
-- **2026-07-18 13:01 PDT:** classified QSO-GENOMES PR #5 as a deferred expansion stacked on the canonical candidate rather than a compatibility-set acceptance dependency; portfolio priority did not change.
-- **2026-07-18 13:01 PDT:** reviewed all 16 default-branch heads, open issues, active pull requests, and central lifecycle files; no release, deployment, rollback, or approval transition was found.
