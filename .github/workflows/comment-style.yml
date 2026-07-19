@@ -1,0 +1,23 @@
+name: Comment Style Policy
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out submitted revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate source comment style
+        run: python scripts/check_comment_style.py
