@@ -1,0 +1,72 @@
+{
+  "schema_version": "2.0.0",
+  "owner": "aevespers2",
+  "principles": [
+    "fail_closed_on_missing_evidence",
+    "exact_head_requires_completed_success",
+    "trusted_default_branch_scanner",
+    "single_central_issue_writer",
+    "small_reversible_changes",
+    "no_release_claim_without_retained_artifacts",
+    "no_automatic_merge_or_publication"
+  ],
+  "agents": [
+    {
+      "id": "sentinel",
+      "purpose": "Detect current failed or missing exact-head CI, non-mergeable pull requests, blocking issues, stale provenance, and release metadata contradictions.",
+      "implemented": true,
+      "authority": ["read_owned_repositories", "write_central_health_issue"],
+      "schedule": "every_6_hours",
+      "outputs": ["portfolio-health.json", "portfolio-health.md", "SHA256SUMS"],
+      "constraints": ["latest_applicable_state_only", "bounded_pagination", "fail_closed_on_scan_error"]
+    },
+    {
+      "id": "ci_healer",
+      "purpose": "Classify failing jobs and prepare a bounded draft repair path after a deterministic cause is established.",
+      "implemented": false,
+      "authority": ["read_actions_logs", "propose_repair_branch", "propose_draft_pr"],
+      "trigger": "sentinel.failed_ci",
+      "constraints": ["never_merge", "never_weaken_tests", "never_rerun_without_change_or_confirmed_flake"]
+    },
+    {
+      "id": "provenance_steward",
+      "purpose": "Prevent stale candidate SHA claims and require evidence to name the exact reviewed source separately from historical evidence.",
+      "implemented": false,
+      "authority": ["read_release_metadata", "propose_documentation_patch"],
+      "trigger": "sentinel.stale_provenance",
+      "constraints": ["no_evidence_rewrite", "retain_historical_provenance"]
+    },
+    {
+      "id": "dependency_curator",
+      "purpose": "Inventory runtimes, package managers, lockfiles, dependencies, and unsupported version ranges.",
+      "implemented": false,
+      "authority": ["read_manifests", "propose_dependency_issue"],
+      "schedule": "weekly",
+      "constraints": ["no_runtime_install_authority", "pin_before_acceptance"]
+    },
+    {
+      "id": "incident_custodian",
+      "purpose": "Preserve evidence, identify mutable-state writers, and track containment and closure criteria.",
+      "implemented": false,
+      "authority": ["read_incident_evidence", "propose_containment_pr", "propose_incident_issue"],
+      "trigger": "sentinel.integrity_incident",
+      "constraints": ["no_root_cause_claim_without_evidence", "no_destructive_cleanup"]
+    },
+    {
+      "id": "release_gatekeeper",
+      "purpose": "Compute release eligibility only from exact-head successful CI, accepted review state, provenance, security, rollback, and human approval evidence.",
+      "implemented": false,
+      "authority": ["read_evidence", "publish_gate_report"],
+      "trigger": "pull_request_or_release_change",
+      "constraints": ["cannot_approve_own_validator_change", "trusted_base_code_only", "skipped_is_not_success"]
+    },
+    {
+      "id": "flow_orchestrator",
+      "purpose": "Deduplicate findings, maintain one canonical repair path, and close the central alert only after verified recovery.",
+      "implemented": true,
+      "authority": ["triage", "update_central_health_issue"],
+      "schedule": "every_6_hours",
+      "constraints": ["no_code_write", "no_merge", "no_release", "no_close_on_scan_error"]
+    }
+  ]
+}
