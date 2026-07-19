@@ -1,0 +1,68 @@
+name: Portfolio Health Candidate CI
+
+on:
+  pull_request:
+    paths:
+      - "scripts/portfolio_health.py"
+      - "tests/test_portfolio_health.py"
+      - "governance/portfolio-agents.json"
+      - ".github/workflows/portfolio-health*.yml"
+      - "docs/portfolio-health-control-plane.md"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact submitted head
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Verify exact head
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned test dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir 'pytest==8.4.2'
+
+      - name: Validate scanner, tests, and agent registry
+        run: |
+          mkdir -p reports/portfolio-health-ci
+          python -m py_compile scripts/portfolio_health.py
+          python -m pytest -q tests/test_portfolio_health.py --junitxml=reports/portfolio-health-ci/pytest.xml | tee reports/portfolio-health-ci/pytest.log
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("governance/portfolio-agents.json").read_text(encoding="utf-8"))
+          ids = [agent["id"] for agent in data["agents"]
+          assert len(ids) == len(set(ids))
+          required = {"sentinel", "ci_healer", "provenance_steward", "dependency_curator", "incident_custodian", "release_gatekeeper", "flow_orchestrator"}
+          assert required <= set(ids)
+          PY
+
+      - name: Record exact-head evidence
+        if: always()
+        run: |
+          mkdir -p reports/portfolio-health-ci
+          printf '%s\n' "${{ github.event.pull_request.head.sha }}" > reports/portfolio-health-ci/exact-head.txt
+          python --version > reports/portfolio-health-ci/python-version.txt 2>&1
+          python -m pytest --version > reports/portfolio-health-ci/pytest-version.txt 2>&1
+          sha256sum reports/portfolio-health-ci/* > reports/portfolio-health-ci/SHA256SUMS
+
+      - name: Upload candidate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: portfolio-health-ci-${{ github.event.pull_request.head.sha }}
+          path: reports/portfolio-health-ci
+          if-no-files-found: error
+          retention-days: 90
