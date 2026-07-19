@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "channel": "Clan",
+  "clan_flag": "ralbane",
+  "tooling": {
+    "terraform": {
+      "enabled": true,
+      "execution_mode": "plan_only_by_default",
+      "apply_requires_human_approval": true,
+      "exact_head_required": true,
+      "state_backend_required": true,
+      "state_locking_required": true,
+      "provider_lockfile_required": true,
+      "drift_detection_required": true
+    }
+  },
+  "safety": {
+    "automatic_apply": false,
+    "force_unlock": false,
+    "state_file_in_repository": false,
+    "secret_output_allowed": false,
+    "unreviewed_provider_upgrade": false
+  }
+}

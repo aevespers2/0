@@ -1,0 +1,102 @@
+name: Gods Jira and Prometheus Control Plane
+
+on:
+  pull_request:
+    paths:
+      - "integrations/gods/**"
+      - "scripts/gods_control.py"
+      - "tests/test_gods_control.py"
+      - ".github/workflows/gods-observability.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "37 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gods-observability-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out trusted or exact submitted head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          persist-credentials: false
+
+      - name: Assert exact submitted head
+        if: github.event_name == 'pull_request'
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test runner
+        run: python -m pip install pytest
+
+      - name: Run focused tests
+        run: pytest -q tests/test_gods_control.py
+
+      - name: Generate portfolio report
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PORTFOLIO_TOKEN || github.token }}
+          PORTFOLIO_OWNER: aevespers2
+        run: python scripts/portfolio_health.py
+
+      - name: Generate Prometheus exposition
+        if: github.event_name != 'pull_request'
+        run: python scripts/gods_control.py prometheus
+
+      - name: Jira dry-run
+        if: github.event_name == 'pull_request'
+        env:
+          JIRA_BASE_URL: https://example.atlassian.net
+          JIRA_PROJECT_KEY: QSO
+          JIRA_EMAIL: ci@example.invalid
+          JIRA_API_TOKEN: dry-run-only
+        run: |
+          cat > portfolio-health.json <<'JSON'
+          {"findings":[{"severity":"high","repo":"aevespers2/example","kind":"failed_ci","summary":"fixture"}],"errors":[]}
+          JSON
+          python scripts/gods_control.py jira --dry-run
+
+      - name: Synchronize Jira Pre-Review Tasks
+        if: github.event_name != 'pull_request' && env.JIRA_CONFIGURED == 'true'
+        env:
+          JIRA_CONFIGURED: ${{ secrets.JIRA_BASE_URL != '' && secrets.JIRA_EMAIL != '' && secrets.JIRA_API_TOKEN != '' && secrets.JIRA_PROJECT_KEY != '' }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+          JIRA_ISSUE_TYPE: ${{ vars.JIRA_ISSUE_TYPE || 'Task' }}
+        run: python scripts/gods_control.py jira
+
+      - name: Push metrics when configured
+        if: github.event_name != 'pull_request' && env.PUSHGATEWAY_CONFIGURED == 'true'
+        env:
+          PUSHGATEWAY_CONFIGURED: ${{ secrets.PROMETHEUS_PUSHGATEWAY_URL != '' }}
+          PROMETHEUS_PUSHGATEWAY_URL: ${{ secrets.PROMETHEUS_PUSHGATEWAY_URL }}
+        run: |
+          curl --fail --silent --show-error \
+            --data-binary @artifacts/gods/portfolio.prom \
+            "${PROMETHEUS_PUSHGATEWAY_URL%/}/metrics/job/qso_portfolio/channel/Gods"
+
+      - name: Upload Gods evidence
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gods-observability-${{ github.run_id }}
+          path: |
+            portfolio-health.json
+            portfolio-health.md
+            artifacts/gods/portfolio.prom
+          if-no-files-found: error
+          retention-days: 30

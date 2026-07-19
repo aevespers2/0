@@ -1,0 +1,6 @@
+{
+  "channel": "Gods",
+  "jira": {"deduplicate": true, "pre_review_tasks_only": true},
+  "prometheus": {"exclude_secrets": true, "exclude_commit_shas": true, "exclude_issue_numbers": true},
+  "automatic_merge": false
+}

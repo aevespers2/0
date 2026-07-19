@@ -1,0 +1,74 @@
+name: Clan Terraform Pre-Review Gate
+
+on:
+  pull_request:
+    paths:
+      - "**/*.tf"
+      - "**/*.tfvars"
+      - "**/.terraform.lock.hcl"
+      - "integrations/clan/**"
+      - "docs/clan-terraform.md"
+      - ".github/workflows/clan-terraform.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLAN_CHANNEL: Clan
+      CLAN_FLAG: ralbane
+    steps:
+      - name: Check out exact submitted head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Assert exact submitted head
+        if: github.event_name == 'pull_request'
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Validate Clan configuration
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('integrations/clan/config.json').read_text())
+          assert data['channel'] == 'Clan'
+          assert data['clan_flag'] == 'ralbane'
+          assert data['tooling']['terraform']['execution_mode'] == 'plan_only_by_default'
+          assert data['safety']['automatic_apply'] is False
+          PY
+
+      - name: Detect Terraform files
+        id: terraform
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name '*.tf' -o -name '*.tfvars' -o -name '.terraform.lock.hcl' \) -not -path './.git/*' | grep -q .; then
+            echo 'present=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'present=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Require provider lockfile when Terraform is present
+        if: steps.terraform.outputs.present == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .terraform.lock.hcl || {
+            echo 'Terraform is present but .terraform.lock.hcl is missing.' >&2
+            exit 1
+          }
+
+      - name: Record plan-only boundary
+        run: |
+          printf '%s\n' \
+            "channel=$CLAN_CHANNEL" \
+            "clan_flag=$CLAN_FLAG" \
+            "automatic_apply=false" \
+            "exact_head_required=true"
