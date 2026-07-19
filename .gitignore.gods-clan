@@ -1,0 +1,7 @@
+# Merge into the repository .gitignore after review.
+artifacts/gods/
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+crash.*.log
