@@ -80,11 +80,18 @@ def latest_workflow_states(runs: Iterable[dict[str, Any]]) -> list[dict[str, Any
     newest: dict[tuple[Any, Any, Any], dict[str, Any]] = {}
     ordered = sorted(
         runs,
-        key=lambda run: (run.get("created_at", ""), run.get("id", 0)),
+        key=lambda run: (
+            str(run.get("created_at") or ""),
+            int(run.get("id") or 0),
+        ),
         reverse=True,
     )
     for run in ordered:
-        key = (run.get("workflow_id") or run.get("name"), run.get("head_sha"), run.get("event"))
+        key = (
+            run.get("workflow_id") or run.get("name"),
+            run.get("head_sha"),
+            run.get("event"),
+        )
         newest.setdefault(key, run)
     return list(newest.values())
 
@@ -93,7 +100,10 @@ def latest_check_states(checks: Iterable[dict[str, Any]]) -> list[dict[str, Any]
     newest: dict[tuple[Any, Any], dict[str, Any]] = {}
     ordered = sorted(
         checks,
-        key=lambda check: (check.get("started_at", ""), check.get("id", 0)),
+        key=lambda check: (
+            str(check.get("started_at") or ""),
+            int(check.get("id") or 0),
+        ),
         reverse=True,
     )
     for check in ordered:
@@ -149,6 +159,18 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
     default = repo.get("default_branch") or "main"
     findings: list[Finding] = []
 
+    branch = request(f"/repos/{full}/branches/{urllib.parse.quote(default, safe='')}")
+    default_sha = branch["commit"]["sha"]
+    prs = paginated(f"/repos/{full}/pulls?state=open")
+    active_heads = {default_sha}
+    active_heads.update(
+        str(pr["head"]["sha"])
+        for pr in prs
+        if isinstance(pr, dict)
+        and isinstance(pr.get("head"), dict)
+        and pr["head"].get("sha")
+    )
+
     runs_payload = request(f"/repos/{full}/actions/runs?per_page=100")
     runs = runs_payload.get("workflow_runs", []) if isinstance(runs_payload, dict) else []
     if not isinstance(runs, list):
@@ -157,7 +179,9 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
     failed = [
         run
         for run in latest_runs
-        if run.get("status") == "completed" and run.get("conclusion") in BAD_RUN_CONCLUSIONS
+        if run.get("head_sha") in active_heads
+        and run.get("status") == "completed"
+        and run.get("conclusion") in BAD_RUN_CONCLUSIONS
     ]
     for run in failed:
         findings.append(
@@ -170,9 +194,9 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
             )
         )
 
-    branch = request(f"/repos/{full}/branches/{urllib.parse.quote(default, safe='')}")
-    default_sha = branch["commit"]["sha"]
-    default_checks_payload = request(f"/repos/{full}/commits/{default_sha}/check-runs?per_page=100")
+    default_checks_payload = request(
+        f"/repos/{full}/commits/{default_sha}/check-runs?per_page=100"
+    )
     default_checks = default_checks_payload.get("check_runs", [])
     default_problem = exact_head_check_problem(default_checks)
     if default_problem:
@@ -187,11 +211,12 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
             )
         )
 
-    prs = paginated(f"/repos/{full}/pulls?state=open")
     for pr in prs:
         number = int(pr["number"])
         sha = pr["head"]["sha"]
-        checks_payload = request(f"/repos/{full}/commits/{sha}/check-runs?per_page=100")
+        checks_payload = request(
+            f"/repos/{full}/commits/{sha}/check-runs?per_page=100"
+        )
         checks = checks_payload.get("check_runs", [])
         problem = exact_head_check_problem(checks)
         if problem:
@@ -209,16 +234,34 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
         mergeable = resolve_mergeable(full, number)
         if mergeable is False:
             findings.append(
-                Finding("high", full, "non_mergeable_pr", f"PR #{number} has merge conflicts", pr["html_url"])
+                Finding(
+                    "high",
+                    full,
+                    "non_mergeable_pr",
+                    f"PR #{number} has merge conflicts",
+                    pr["html_url"],
+                )
             )
         elif mergeable is None:
             findings.append(
-                Finding("medium", full, "unknown_mergeability", f"PR #{number} mergeability remained unknown after bounded retries", pr["html_url"])
+                Finding(
+                    "medium",
+                    full,
+                    "unknown_mergeability",
+                    f"PR #{number} mergeability remained unknown after bounded retries",
+                    pr["html_url"],
+                )
             )
 
         if not pr.get("draft", False) and problem:
             findings.append(
-                Finding("medium", full, "unverified_pr_not_draft", f"PR #{number} is not draft while exact-head validation is unresolved", pr["html_url"])
+                Finding(
+                    "medium",
+                    full,
+                    "unverified_pr_not_draft",
+                    f"PR #{number} is not draft while exact-head validation is unresolved",
+                    pr["html_url"],
+                )
             )
 
     issues = paginated(f"/repos/{full}/issues?state=open")
@@ -227,13 +270,20 @@ def scan_repo(repo: dict[str, Any]) -> list[Finding]:
         item
         for item in real_issues
         if any(
-            label.get("name", "").lower() in {"critical", "security", "incident", "p0", "blocker"}
+            label.get("name", "").lower()
+            in {"critical", "security", "incident", "p0", "blocker"}
             for label in item.get("labels", [])
         )
     ]
     for issue in severe:
         findings.append(
-            Finding("high", full, "blocking_issue", f"blocking issue #{issue['number']}: {issue['title']}", issue["html_url"])
+            Finding(
+                "high",
+                full,
+                "blocking_issue",
+                f"blocking issue #{issue['number']}: {issue['title']}",
+                issue["html_url"],
+            )
         )
 
     release = get_text(
@@ -297,7 +347,9 @@ def main() -> int:
         try:
             findings.extend(scan_repo(repo))
         except Exception as exc:  # fail closed but continue portfolio scan
-            errors.append(f"{repo.get('full_name', 'unknown')}: {type(exc).__name__}: {exc}")
+            errors.append(
+                f"{repo.get('full_name', 'unknown')}: {type(exc).__name__}: {exc}"
+            )
 
     findings.sort(
         key=lambda item: (
@@ -330,7 +382,8 @@ def main() -> int:
         for finding in findings:
             link = f" ([source]({finding.url}))" if finding.url else ""
             lines.append(
-                f"- **{finding.severity.upper()}** `{finding.repo}` / `{finding.kind}` — {finding.summary}{link}"
+                f"- **{finding.severity.upper()}** `{finding.repo}` / "
+                f"`{finding.kind}` — {finding.summary}{link}"
             )
     else:
         lines.append("No significant repository-health findings.")
