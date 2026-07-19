@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "channel": "Gods",
+  "jira": {
+    "enabled_by_secret": true,
+    "project_key_env": "JIRA_PROJECT_KEY",
+    "issue_type_env": "JIRA_ISSUE_TYPE",
+    "dedupe_label": "portfolio-health",
+    "channel_label": "gods"
+  },
+  "prometheus": {
+    "output_path": "artifacts/gods/portfolio.prom",
+    "metric_prefix": "qso_portfolio",
+    "allow_repository_names": true,
+    "allow_issue_numbers": false,
+    "allow_commit_shas": false
+  },
+  "release_gate": {
+    "require_exact_head_ci": true,
+    "require_zero_high_findings": true,
+    "require_zero_scan_errors": true,
+    "require_pre_review_tasks_closed": true,
+    "automatic_merge": false
+  }
+}
