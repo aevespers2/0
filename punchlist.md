@@ -100,5 +100,19 @@
 4. Complete Phase 7 and Phase 8.
 5. Complete Phase 9 and update `taskchain.md`.
 
+## Pre-Review Tasks — portfolio health control plane v2
+
+- [x] Rebuild the scanner candidate from current `main` instead of continuing the non-mergeable PR #8 branch.
+- [x] Use the authoritative per-PR endpoint with bounded retries for mergeability rather than the unreliable list response.
+- [x] Require completed successful exact-head checks; treat missing, pending, skipped, cancelled, neutral, and failed states as unresolved.
+- [x] Suppress an older failed run only when a newer applicable run for the same workflow, head, and event succeeds.
+- [x] Add bounded pagination for repositories, pull requests, and issues.
+- [x] Pin workflow actions, disable persisted credentials, and retain exact-head JUnit, logs, versions, scanner head, exit status, and SHA-256 evidence.
+- [x] Keep scheduled execution read-only outside the single central issue and close no alert while scan errors remain.
+- [ ] Pass candidate CI at the final submitted head and record its retained artifact digest.
+- [ ] Review the first trusted-main portfolio scan for false positives and false negatives before accepting issue auto-closure.
+- [ ] Configure and independently review the least-privilege `PORTFOLIO_TOKEN` for private owned repositories, or explicitly limit the accepted scope to public repositories.
+- [ ] Require human review before merging the scanner into `main`; no scanner result may itself authorize release.
+
 ## Evidence Log
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, and remediation tasks below.
