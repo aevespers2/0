@@ -1,0 +1,11 @@
+{
+  "channel": "Clan",
+  "clan_flag": "ralbane",
+  "terraform": {
+    "fmt_required": true,
+    "validate_required": true,
+    "plan_required": true,
+    "apply_requires_human_approval": true,
+    "automatic_apply": false
+  }
+}
