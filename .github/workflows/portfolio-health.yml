@@ -39,15 +39,40 @@ jobs:
         env:
           PORTFOLIO_TOKEN: ${{ secrets.PORTFOLIO_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
+          set +e
           python scripts/portfolio_health.py
           status=$?
+          set -e
           printf '%s\n' "$status" > reports/portfolio-health/scanner-exit-code.txt
           exit "$status"
 
       - name: Retain scanner evidence
         if: always()
+        shell: bash
         run: |
+          set -euo pipefail
+          mkdir -p reports/portfolio-health
+          if [[ ! -f portfolio-health.json || ! -f portfolio-health.md ]]; then
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          report = {
+              "schema_version": "2.0.0",
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "owner": "aevespers2",
+              "finding_count": 0,
+              "errors": ["portfolio scanner terminated before producing a complete report"],
+              "findings": [],
+          }
+          with open("portfolio-health.json", "w", encoding="utf-8") as handle:
+              json.dump(report, handle, indent=2, sort_keys=True)
+              handle.write("\n")
+          with open("portfolio-health.md", "w", encoding="utf-8") as handle:
+              handle.write("# Portfolio Health\n\nFindings: **0**\nScan errors: **1**\n\n## Scan errors\n- portfolio scanner terminated before producing a complete report\n")
+          PY
+          fi
           cp portfolio-health.json portfolio-health.md reports/portfolio-health/
           python --version > reports/portfolio-health/python-version.txt 2>&1
           sha256sum reports/portfolio-health/* > reports/portfolio-health/SHA256SUMS
