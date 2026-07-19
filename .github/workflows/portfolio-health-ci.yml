@@ -43,7 +43,7 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("governance/portfolio-agents.json").read_text(encoding="utf-8"))
-          ids = [agent["id"] for agent in data["agents"]
+          ids = [agent["id"] for agent in data["agents"]]
           assert len(ids) == len(set(ids))
           required = {"sentinel", "ci_healer", "provenance_steward", "dependency_curator", "incident_custodian", "release_gatekeeper", "flow_orchestrator"}
           assert required <= set(ids)
