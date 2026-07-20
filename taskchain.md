@@ -2,23 +2,34 @@
 
 ## Product directive
 
-- **Next objective:** Establish a reproducible health baseline for Autonomous vNext, then verify one end-to-end local mission that is policy-gated, reversible, and fully evidenced.
-- **User outcome:** An operator can submit an explicit mission contract and receive a bounded plan, policy decision, execution result, audit record, reflection result, and rollback path without hidden authority or silent remote action.
-- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk planning; local executor checks; append-only evidence; deterministic cognitive runtime; federation proposal validation; one read-only or local-check mission from intake through report.
-- **Priority:** Repository health and the bounded autonomous-builder contract remain ahead of new scientific engines, cross-repository publication, portfolio-wide authority, automatic infrastructure apply, release, or deployment.
-- **Success criteria:** clean setup is documented; complete applicable suites and smoke paths pass at one immutable commit; denial and stop conditions are tested; federation rejects stale or invalid proposals; evidence includes commands, versions, hashes, review state, and rollback.
-- **Non-goals:** credential discovery, silent pushes, unrestricted networking, destructive operations, production scientific claims, automatic Terraform apply, private publication authority, or owner-wide mutation before the core baseline and governance boundary are accepted.
+- **Next objective:** Establish a reproducible repository-health and portable device-security baseline for Autonomous vNext, then verify one end-to-end local bootstrap mission that is policy-gated, reversible, and fully evidenced.
+- **User outcome:** After a laptop, phone, workstation, or other owned environment is acquired, replaced, reset, recovered, or suspected of compromise, the operator can install Repository `0`, inventory the device before trusting ordinary tooling, compare it with an approved baseline, prepare bounded remediation, and submit evidence-backed proposals to Repository `1` without hidden authority or silent remote action.
+- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk planning; local executor checks; append-only evidence; deterministic cognitive runtime; federation proposal validation; one read-only portable-bootstrap mission covering platform identity, package-manager state, startup persistence, accounts, certificates, network interfaces, DNS/proxy/VPN/routes, firewall, hotspot/tethering, sharing, and Bluetooth where the platform permits observation.
+- **Priority:** Repository health and the portable first-install contract remain ahead of new scientific engines, cross-repository publication, portfolio-wide authority, automatic infrastructure apply, release, or deployment.
+- **Success criteria:** clean setup is documented; supported platforms and unsupported controls are explicit; complete applicable suites and smoke paths pass at one immutable commit; denial and stop conditions are tested; device observations are provenance-bound; Repository `1` rejects stale or invalid proposals; evidence includes commands, versions, hashes, review state, and rollback.
+- **Non-goals:** credential discovery, silent pushes, unrestricted networking, destructive operations, intrusive surveillance, traffic interception, counter-intrusion, control of unauthorized devices, production scientific claims, automatic Terraform apply, private publication authority, or owner-wide mutation before the core baseline and governance boundary are accepted.
+
+## Portable first-install security foundation
+
+Repository `0` is the candidate bootstrap, inspection, remediation-planning, bounded-execution, and continuous-maintenance layer installed before higher-level A.L.I.S.T.A.I.R.E. components are trusted. Repository `1` is the proposed independent trust core that owns accepted baselines, capability decisions, revocation, canonical receipts, and recovery checkpoints.
+
+The canonical documentation target is:
+
+`new/recovered/suspect device → Repository 0 read-only inventory → local proposal → Repository 1 quarantine/decision → bounded capability → Repository 0 reversible remediation → resulting-state receipt → Repository 1 reconciliation`
+
+A passing local check is not proof that a device is fully secure. Unsupported or unobservable platform state is recorded as `UNKNOWN`, and consequential remediation remains blocked until the applicable capability and approval exist.
 
 ## MVP roadmap
 
 | Priority | Task | Depends on | Status |
 |---|---|---|---|
 | P0 | Repository health baseline for the implemented Autonomous vNext surface | — | IN PROGRESS |
-| P1 | Verify one end-to-end bounded mission and evidence bundle | P0 | PROPOSED |
-| P2 | Establish architecture, package, contract, and ADR compatibility baseline | P1 | PROPOSED |
-| P3 | Harden configuration, secrets, command/path policy, federation, incident response, and rollback | P2 | PROPOSED |
-| P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
-| P5 | Evaluate portfolio governance, VTX/private authority, scientific engines, and infrastructure automation as separate products | P4 and separate approval | BLOCKED |
+| P0A | Approve the portable first-install product boundary and Repository `0`/`1` bootstrap contract | P0 evidence | REVIEW |
+| P1 | Verify one end-to-end read-only portable-bootstrap mission and evidence bundle | P0, P0A | PROPOSED |
+| P2 | Establish architecture, package, device-identity, baseline-policy, contract, and ADR compatibility | P1 | PROPOSED |
+| P3 | Harden configuration, secrets, command/path policy, package sources, startup state, networking, Bluetooth/sharing, incident response, and rollback | P2 | PROPOSED |
+| P4 | Package and document the verified Phase-0 runtime and per-platform baseline profiles | P3 | PROPOSED |
+| P5 | Evaluate remote adapters, portfolio governance, VTX/private authority, scientific engines, and infrastructure automation as separate products | P4 and separate approval | BLOCKED |
 
 ## P0 repository-health path — draft PR #7
 
@@ -34,7 +45,7 @@ PR #7 documents the Python, Node/TypeScript/npm, and Bash-hook surfaces at head 
 
 PR #6 remains open, draft, and mergeable at head `beb8dd2974aa936d1c0a23989b19c18e28e40e95`. It proposes Repository `0` as a myelination/proposal layer, VTX envelope primitives, and a credential-gateway policy while keeping Repository `1` authoritative.
 
-**Directive:** do not issue a token or merge the proposal into the bounded-mission release until Repository `1` authority, canonical route semantics, package/schema ownership, negative compatibility fixtures, credential custody, revocation, and rollback are approved.
+**Directive:** do not issue a token or merge the proposal into the bounded-mission release until Repository `1` authority, portable-bootstrap route semantics, device identity, baseline and evidence schema ownership, negative compatibility fixtures, credential custody, revocation, and rollback are approved.
 
 ## Portfolio-health control plane — draft PR #10
 
@@ -62,17 +73,17 @@ The repository now rejects double-slash source comments while preserving URL/URI
 
 **Status:** `REVIEW — DOCUMENTATION AND VALIDATION ONLY`
 
-The current documentation branch adds a Pages-ready MkDocs site covering the project overview, architecture, A.L.I.S.T.A.I.R.E. portfolio role, contracts, autonomous-development lifecycle, onboarding, security, operations, recovery, and release evidence. It also adds exact-head documentation validation. It does not modify runtime behavior or authorize Pages publication, credentials, merges, releases, deployments, Terraform apply, or owner-wide mutation.
+The current documentation branch adds a Pages-ready MkDocs site covering the project overview, architecture, A.L.I.S.T.A.I.R.E. portfolio role, portable first-install security, contracts, autonomous-development lifecycle, onboarding, security, operations, recovery, and release evidence. It also adds exact-head documentation validation. It does not modify runtime behavior or authorize Pages publication, credentials, merges, releases, deployments, Terraform apply, device administration, or owner-wide mutation.
 
-**Directive:** require strict site rendering, link validation, existing repository CI, and review of all claim/authority boundaries before merge. The documentation candidate does not complete P0.
+**Directive:** require strict site rendering, link validation, existing repository CI, and review of all claim/authority boundaries before merge. The documentation candidate does not complete P0 or P0A.
 
 ## Portfolio proposal rule
 
-Scientific-discovery, VTX/private-authority, portfolio-governance, Jira, Terraform, and other external-integration candidates remain bounded proposals or scaffolds until the core P0-P4 platform baseline and their own authority, security, evidence, incident, and rollback gates are accepted.
+Scientific-discovery, VTX/private-authority, portfolio-governance, Jira, Terraform, remote administration, and other external-integration candidates remain bounded proposals or scaffolds until the core P0-P4 platform baseline and their own authority, security, evidence, incident, and rollback gates are accepted.
 
 ## Builder rules
 
-Builders execute only the highest-priority unblocked task. Each task names files, tests, constraints, stop conditions, evidence, and rollback. Scope must not be widened to absorb an unrelated proposal or failure. A passing workflow validates only the exact tested head and cannot by itself authorize merge, release, deployment, credentials, or infrastructure change.
+Builders execute only the highest-priority unblocked task. Each task names files, tests, constraints, stop conditions, evidence, and rollback. Scope must not be widened to absorb an unrelated proposal or failure. A passing workflow validates only the exact tested head and cannot by itself authorize merge, release, deployment, credentials, device control, or infrastructure change.
 
 ## Builder log
 
@@ -83,3 +94,4 @@ Record commits, commands, workflow runs, artifact hashes, policy decisions, stop
 - 2026-07-19 — PR #11 merged Gods/Clan observability and Terraform scaffolds while preserving human approval for apply and releases and retaining a hardening punch list.
 - 2026-07-19 — PR #12 merged the source comment-style policy and repository gate.
 - 2026-07-20 — Added a documentation-only Pages, architecture, onboarding, security, operations, and release-evidence foundation without changing product priority or runtime scope.
+- 2026-07-20 — Clarified Repository `0` and Repository `1` as the portable first-install security and recovery pair; added P0A and a read-only device-bootstrap outcome without activating device-control authority.
