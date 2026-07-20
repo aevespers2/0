@@ -1,39 +1,46 @@
 # Autonomous vNext
 
-Repository `0` is the bounded autonomous-development and proposal layer for the A.L.I.S.T.A.I.R.E. ecosystem. Its present implementation turns an explicit mission into a low-risk plan, policy decision, bounded local action, evidence record, and reviewable result while preserving human control over credentials, remote writes, merging, release, deployment, and rollback.
+Repository `0` is the bounded autonomous-development, portable-bootstrap, inspection, remediation-planning, and proposal layer for the A.L.I.S.T.A.I.R.E. ecosystem. Its clarified first-install purpose is to help bring a newly acquired, replaced, recovered, reset, or suspect owned device under known control before higher-level services, package managers, network integrations, or user workloads are trusted.
+
+Its present implementation turns an explicit mission into a low-risk plan, policy decision, bounded local action, evidence record, and reviewable result while preserving human control over credentials, remote writes, device administration, merging, release, deployment, and rollback.
 
 !!! warning "Release status"
-    The repository is not release-ready. The active product objective remains one reproducible, policy-gated, reversible local mission verified at one immutable commit. Portfolio governance, VTX publication authority, remote credential gateways, scientific domain engines, and automatic infrastructure changes remain separate proposals or guarded capabilities.
+    The repository is not release-ready. The active product objective is a reproducible repository-health baseline plus an approved Repository `0`/`1` portable-bootstrap contract, followed by one read-only device-baseline mission verified at one immutable commit. Portfolio governance, VTX publication authority, remote credential gateways, scientific domain engines, automatic infrastructure changes, and privileged remediation remain separate proposals or guarded capabilities.
 
 ## Primary outcome
 
-An operator provides a mission contract with an objective, constraints, success criteria, repository boundary, and approval profile. Autonomous vNext then:
+An operator installs Repository `0` in a minimally exposed or trusted bootstrap state and provides a mission contract with an objective, constraints, success criteria, device/repository boundary, and approval profile. Autonomous vNext then:
 
-1. validates the mission;
-2. observes relevant local state;
-3. produces bounded candidate plans;
-4. scores risk and applies deny-by-default policy;
-5. executes only permitted local checks or reversible actions;
-6. records structured action and evidence artifacts;
-7. compares expected and observed results;
-8. stops, rolls back, or proposes follow-up work when the approved envelope is exceeded.
+1. validates the mission and device scope;
+2. observes relevant local state before ordinary tooling is trusted;
+3. inventories supported package-manager, startup, account, certificate, network, hotspot/tethering, sharing, and Bluetooth controls;
+4. records unavailable or unobservable controls as `UNKNOWN`;
+5. produces bounded candidate plans;
+6. scores risk and applies deny-by-default policy;
+7. executes only permitted read-only checks or reversible local actions;
+8. records structured action and evidence artifacts;
+9. submits a versioned proposal to Repository `1` when authority is required;
+10. compares expected and observed results;
+11. stops, rolls back, or proposes follow-up work when the approved envelope is exceeded.
+
+A successful check is evidence about the observed controls, not proof that the device is fully secure or attribution to a particular attacker.
 
 ## System position
 
 ```mermaid
 flowchart LR
-    O[Operator or approved orchestrator] --> M[Mission contract]
-    M --> R0[Repository 0: Autonomous vNext]
-    R0 --> P[Plan and policy decision]
-    P --> X[Bounded local execution]
-    X --> E[Evidence and reflection]
-    E --> Q[Reviewable proposal or result]
-    Q -. no direct authority .-> R1[Repository 1: trust and canonical-state boundary]
-    Q -. validated exchange .-> B[Bridge and subsystem repositories]
-    R1 --> H[Human approval for consequential state]
+    D[New, recovered, replaced, or suspect owned device] --> M[Portable bootstrap mission]
+    M --> R0[Repository 0: inspect, plan, verify]
+    R0 --> P[Local non-authoritative proposal]
+    P --> R1[Repository 1: quarantine and authority decision]
+    R1 -->|reject or review| H[Human review]
+    R1 -->|narrow expiring capability| X[Bounded reversible execution]
+    X --> E[Evidence and resulting-state receipt]
+    E --> R1
+    R1 --> C[Canonical baseline or recovery checkpoint]
 ```
 
-Repository `0` may prepare, validate, score, and evidence proposals. It does not silently acquire credentials, make itself authoritative over Repository `1`, merge arbitrary changes, publish releases, deploy infrastructure, or bypass repository-specific gates.
+Repository `0` may prepare, validate, score, and evidence proposals. It does not silently acquire credentials, make itself authoritative over Repository `1`, claim control of unsupported platform state, merge arbitrary changes, publish releases, deploy infrastructure, or bypass repository-specific gates.
 
 ## Implemented capability groups
 
@@ -48,10 +55,13 @@ Repository `0` may prepare, validate, score, and evidence proposals. It does not
 | Portfolio observability | Provide bounded health and evidence proposals; automated owner-wide authority remains separately gated |
 | Gods and Clan integration | Expose observability and Terraform planning scaffolds while preserving approval for apply, release, and deployment |
 
+The portable-bootstrap domain profile is documentation and planning scope until platform-specific inventory adapters, fixtures, and evidence pass their own acceptance gates.
+
 ## Documentation map
 
 - [System architecture](architecture.md) — components, trust zones, data flows, and failure containment.
 - [A.L.I.S.T.A.I.R.E. role](alistaire-role.md) — portfolio ownership and subsystem relationships.
+- [Portable first-install security](portable-first-install.md) — device bootstrap, security domains, Repository `0`/`1` boundary, and platform limitations.
 - [Contracts and state](contracts.md) — mission, action, proposal, evidence, and compatibility rules.
 - [Autonomous development](autonomous-development.md) — acceleration loop, authority ladder, and acceptance sequence.
 - [Developer onboarding](development.md) — setup, validation, repository map, and change discipline.
@@ -73,4 +83,4 @@ When these sources disagree, do not silently select the most permissive interpre
 
 ## Non-goals
 
-This documentation does not authorize unrestricted self-modification, autonomous credentials, silent pushes, destructive Git operations, production scientific claims, physical quantum-computing claims, automatic Terraform apply, automatic release, or deployment. Increasing development velocity is achieved through parallel proposal generation, deterministic validation, evidence reuse, and bounded automation—not by removing traceability or recovery paths.
+This documentation does not authorize unrestricted self-modification, autonomous credentials, silent pushes, destructive Git operations, intrusive monitoring, interception, counter-intrusion, control of unauthorized devices, production scientific claims, physical quantum-computing claims, automatic Terraform apply, automatic release, or deployment. Increasing development velocity is achieved through parallel proposal generation, deterministic validation, evidence reuse, and bounded automation—not by removing traceability or recovery paths.
