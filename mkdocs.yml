@@ -1,0 +1,46 @@
+site_name: Autonomous vNext
+site_description: Architecture, contracts, operations, and evidence guidance for Repository 0
+site_url: https://aevespers2.github.io/0/
+repo_url: https://github.com/aevespers2/0
+repo_name: aevespers2/0
+edit_uri: edit/main/docs/
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - System architecture: architecture.md
+      - A.L.I.S.T.A.I.R.E. role: alistaire-role.md
+      - Contracts and state: contracts.md
+      - Autonomous development: autonomous-development.md
+  - Engineering:
+      - Developer onboarding: development.md
+      - Operations and recovery: operations.md
+      - Security and authority: security.md
+      - Release evidence: release-evidence.md
+  - Existing references:
+      - Integration status: integration-status.md
+      - Clan Terraform: clan-terraform.md
