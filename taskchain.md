@@ -3,71 +3,83 @@
 ## Product directive
 
 - **Next objective:** Establish a reproducible health baseline for Autonomous vNext, then verify one end-to-end local mission that is policy-gated, reversible, and fully evidenced.
-- **User outcome:** An operator can submit an explicit mission contract and receive a bounded plan, policy decision, execution result, audit record, and rollback path without hidden authority or silent remote action.
-- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk plan selection; local executor checks; append-only audit/evidence; deterministic cognitive runtime; federation proposal validation; one read-only or local-check mission from intake through report.
-- **Priority:** Repository health and the core autonomous-builder contract remain ahead of new scientific domain engines, portfolio roadmaps, cross-repository publication infrastructure, or owner-wide governance automation.
-- **Success criteria:** clean setup is documented; the complete suite and smoke paths pass at one immutable commit; policy denial and stop conditions are tested; federation rejects stale or invalid proposals; evidence includes commands, versions, hashes, and rollback instructions.
-- **Non-goals:** credential discovery, silent pushes or deployment, destructive operations, unrestricted networking, production scientific claims, implementation of the ClimateSheafFM/composable-discovery proposals, private publication authority, or activation of a portfolio-wide scanner and issue writer before the core baseline and separate governance boundary are accepted.
-- **Release rationale:** The first release should prove trustworthy bounded execution rather than maximize feature breadth. A verified control loop is the reusable foundation for every later domain-specific agent, cross-repository adapter, or governance service.
+- **User outcome:** An operator can submit an explicit mission contract and receive a bounded plan, policy decision, execution result, audit record, reflection result, and rollback path without hidden authority or silent remote action.
+- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk planning; local executor checks; append-only evidence; deterministic cognitive runtime; federation proposal validation; one read-only or local-check mission from intake through report.
+- **Priority:** Repository health and the bounded autonomous-builder contract remain ahead of new scientific engines, cross-repository publication, portfolio-wide authority, automatic infrastructure apply, release, or deployment.
+- **Success criteria:** clean setup is documented; complete applicable suites and smoke paths pass at one immutable commit; denial and stop conditions are tested; federation rejects stale or invalid proposals; evidence includes commands, versions, hashes, review state, and rollback.
+- **Non-goals:** credential discovery, silent pushes, unrestricted networking, destructive operations, production scientific claims, automatic Terraform apply, private publication authority, or owner-wide mutation before the core baseline and governance boundary are accepted.
 
-## MVP Roadmap
+## MVP roadmap
 
 | Priority | Task | Depends on | Status |
 |---|---|---|---|
 | P0 | Repository health baseline for the implemented Autonomous vNext surface | — | IN PROGRESS |
 | P1 | Verify one end-to-end bounded mission and evidence bundle | P0 | PROPOSED |
-| P2 | Establish architecture/package/contract compatibility and ADR baseline | P1 | PROPOSED |
-| P3 | Harden configuration, secrets, command/path policy, federation, and rollback | P2 | PROPOSED |
+| P2 | Establish architecture, package, contract, and ADR compatibility baseline | P1 | PROPOSED |
+| P3 | Harden configuration, secrets, command/path policy, federation, incident response, and rollback | P2 | PROPOSED |
 | P4 | Package and document the verified Phase-0 runtime | P3 | PROPOSED |
-| P5 | Evaluate domain-specific roadmaps, remote publication adapters, and portfolio governance as separate product proposals | P4 and separate approval | BLOCKED |
+| P5 | Evaluate portfolio governance, VTX/private authority, scientific engines, and infrastructure automation as separate products | P4 and separate approval | BLOCKED |
 
-## P0 health-baseline candidate — PR #7
+## P0 repository-health path — draft PR #7
 
-**Status:** `REVIEW — CONTENT CORRECTED, EXACT-HEAD EVIDENCE AND FINAL THREAD DISPOSITION REQUIRED`
+**Status:** `STALE REVIEW PATH — CURRENT HEAD LACKS ATTACHED EXACT-HEAD CI AND IS NON-MERGEABLE`
 
-PR #7 remains the single bounded Phase 1 inventory path. Its current submitted head is `991216f8c9f72a3bcb23b745f148697659217322`, and the PR body now identifies that same head. Autonomous vNext CI run `29565948627` passed only on superseded head `37f19f8c9560f2194bbdbf599e644d122324b994`; no workflow run or commit status is attached to the current head, and GitHub reports the PR non-mergeable.
+PR #7 documents the Python, Node/TypeScript/npm, and Bash-hook surfaces at head `991216f8c9f72a3bcb23b745f148697659217322`. The passing Autonomous vNext run applies to an earlier head. Current content corrections remain useful candidate evidence, but P0 must not advance until the submitted head is verified, the remaining material review thread is resolved, and the candidate is reconciled with current `main`, including merged Gods/Clan and comment-policy changes.
 
-The candidate now records Python/pip, both Node/TypeScript/npm packages and Node `>=20`, and the executable `.githooks/pre-push` Bash gate with its `scripts/setup_federation_git_hooks.py` activation path. It also keeps Phase 1 item 1 pending, preserves every material review-thread blocker in the release gate, requires Bash hook/setup coverage in the accepted health artifact, and expands rollback to every candidate-touched file. These are documentation-only corrections and do not modify runtime, workflow, package, schema, credential, network, or deployment behavior.
+**Directive:** preserve PR #7 as historical P0 evidence or rebuild its inventory from current `main`. Do not mark the phase complete from superseded workflow results.
 
-One review thread remains unresolved: the original Node/TypeScript inventory thread, intentionally retained until exact-head evidence exists. The rollback-scope thread is resolved, and the current branch content includes every candidate-touched documentation file in rollback scope.
+## VTX and Repository 1 boundary — draft PR #6
 
-**Directive:** obtain a successful workflow run attached to the final submitted head, resolve the remaining material thread against that immutable content, and only then mark Phase 1 item 1 complete and continue to the top-level directory and responsibility inventory. Do not start P1 or treat any earlier workflow as release readiness. The product objective and portfolio priority are unchanged.
+**Status:** `DEFERRED ARCHITECTURE AND SECURITY PROPOSAL`
 
-## Cross-repository scope gate — draft PR #6
+PR #6 remains open, draft, and mergeable at head `beb8dd2974aa936d1c0a23989b19c18e28e40e95`. It proposes Repository `0` as a myelination/proposal layer, VTX envelope primitives, and a credential-gateway policy while keeping Repository `1` authoritative.
 
-**Status:** `REVIEW — NOT PART OF THE ACTIVE MVP`
+**Directive:** do not issue a token or merge the proposal into the bounded-mission release until Repository `1` authority, canonical route semantics, package/schema ownership, negative compatibility fixtures, credential custody, revocation, and rollback are approved.
 
-Draft PR #6 introduces a proposed Repository `0` myelination/proposal boundary, VTX envelope and serialization primitives, private-authority publication design, and a Muse credential-gateway policy. Its current head is `09038ac55c7945b2abb013d59cf9a1b270a9e717`. Autonomous vNext CI run `29546692277` failed during the test step, so the cognitive-runtime smoke and all federation validation steps were skipped.
+## Portfolio-health control plane — draft PR #10
 
-A contract mismatch remains: PR #6 documents `0:working -> 0:proposal -> 1:quarantine`, while Repository `1` draft PR #1 models a direct `0:working -> 1:quarantine` transition and has no `proposal` partition edge.
+**Status:** `REVIEWABLE CANDIDATE — GOVERNANCE AND TRUSTED-MAIN ACCEPTANCE REQUIRED`
 
-**Directive:** preserve PR #6 as a draft proposal without changing P0-P4 priority. Do not merge runtime/schema changes until the current head passes exact-head CI, Repository `1` authority is approved, package and schema ownership are assigned, route semantics are reconciled, negative compatibility fixtures exist, and the proposal is decomposed under a later architecture/security task.
+PR #10 supersedes PR #8 and is open, draft, and mergeable at head `7328cef2a6c9f033b3bee1720da51f567bad5b23`. Its exact-head candidate workflows passed and retained evidence. It improves enumeration, current-head semantics, failure handling, exact-source checkout, artifact retention, and fail-closed reporting.
 
-## Portfolio health control-plane scope gate — draft PR #8
+**Directive:** keep the control plane inert until the Architect approves the canonical owner, opt-in scope, private-repository treatment, least-privilege `PORTFOLIO_TOKEN`, issue lifecycle, finding semantics, trusted-main scan review, disable/revoke procedure, and the rule that scanner output cannot authorize release.
 
-**Status:** `REVIEW — DRAFT GOVERNANCE PROPOSAL; NOT PART OF THE ACTIVE MVP`
+## Merged integration scaffolds — PR #11
 
-Draft PR #8 proposes a six-hour owner-wide repository scanner, seven governance-agent roles, deterministic report artifacts, and automatic synchronization of a central health issue. Current head `f291db0446d84005a3764795ca880cafeec1ad4c` passed Portfolio Health Candidate CI run `29583289679` and Autonomous vNext CI run `29583289637`, but neither run retained artifacts. The checks establish compilation and registry structure only; the PR is draft and non-mergeable and does not establish complete repository enumeration, finding accuracy, safe issue lifecycle, private/organization coverage, disabled-Issues behavior, partial-failure recovery, least-privilege credentials, revocation, behavioral fixtures, or rollback.
+**Status:** `MERGED SCAFFOLD — PRE-REVIEW HARDENING REMAINS`
 
-The candidate overlaps the closed QSO-FABRIC bootstrap proposal and QSO-GENOMES draft PR #3 governance control plane. One canonical owner and authority boundary must be selected before any scheduled portfolio automation is adopted.
+The Gods observability/Jira and Clan Terraform scaffold is now present on `main`. It preserves human approval for Terraform apply and automatic release actions. `punchlists/gods-clan-pre-review.md` remains controlling evidence for workflow pinning, credential configuration, exact-head verification, and operational acceptance.
 
-**Directive:** keep PR #8 draft and inert without changing P0-P4 priority. Do not merge the scheduled workflow, configure a portfolio token, or activate issue-writing automation until the Architect approves the owning repository, explicit opt-in scope, least-privilege credential/revocation model, enumeration and pagination rules, exact-head and superseded-evidence semantics, failure/retry/checkpoint behavior, issue lifecycle, deterministic behavioral fixtures, retained provenance artifacts, and tested disable/revoke/revert rollback. Reconcile or retire the overlapping QSO-FABRIC and QSO-GENOMES proposals as part of that decision.
+**Directive:** treat monitoring and planning as distinct from Jira mutation, Terraform apply, release, or deployment. Do not infer authority from merged scaffolding.
+
+## Source comment policy — PR #12
+
+**Status:** `MERGED POLICY`
+
+The repository now rejects double-slash source comments while preserving URL/URI syntax, division operators, and quoted strings. All new source changes must satisfy `scripts/check_comment_style.py` and the associated workflow.
+
+## Documentation foundation candidate
+
+**Status:** `REVIEW — DOCUMENTATION AND VALIDATION ONLY`
+
+The current documentation branch adds a Pages-ready MkDocs site covering the project overview, architecture, A.L.I.S.T.A.I.R.E. portfolio role, contracts, autonomous-development lifecycle, onboarding, security, operations, recovery, and release evidence. It also adds exact-head documentation validation. It does not modify runtime behavior or authorize Pages publication, credentials, merges, releases, deployments, Terraform apply, or owner-wide mutation.
+
+**Directive:** require strict site rendering, link validation, existing repository CI, and review of all claim/authority boundaries before merge. The documentation candidate does not complete P0.
 
 ## Portfolio proposal rule
 
-Scientific-discovery, private publication, and portfolio-governance pull requests remain preserved as research or architecture proposals. They do not become active implementation priorities until P0-P4 produce a verified platform baseline and the Architect documents repository ownership, authority, contracts, evidence, migration, and rollback.
+Scientific-discovery, VTX/private-authority, portfolio-governance, Jira, Terraform, and other external-integration candidates remain bounded proposals or scaffolds until the core P0-P4 platform baseline and their own authority, security, evidence, incident, and rollback gates are accepted.
 
-## Builder Rules
+## Builder rules
 
-Builders execute only the highest-priority unblocked task. Each task must name files, tests, constraints, stop conditions, evidence, and rollback guidance. Scope must not be widened to absorb a roadmap proposal, cross-repository authority design, governance service, or unrelated test failure.
+Builders execute only the highest-priority unblocked task. Each task names files, tests, constraints, stop conditions, evidence, and rollback. Scope must not be widened to absorb an unrelated proposal or failure. A passing workflow validates only the exact tested head and cannot by itself authorize merge, release, deployment, credentials, or infrastructure change.
 
-## Builder Log
+## Builder log
 
-Record commits, exact commands/results, workflow links, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
+Record commits, commands, workflow runs, artifact hashes, policy decisions, stop conditions, residual risks, and follow-up work.
 
-- 2026-07-16 — Synchronized draft PR #6 evidence to current head `09038ac55c7945b2abb013d59cf9a1b270a9e717`; CI run `29546692277` failed during tests and skipped all later smoke/federation checks. The draft remains outside the active MVP and portfolio priority is unchanged.
-- 2026-07-17 — Reviewed PR #7 at submitted head `37f19f8c9560f2194bbdbf599e644d122324b994`. Exact-head CI run `29565948627` passed, but the Phase 1 language/package/runtime inventory omitted Node/TypeScript/npm and Node `>=20`. P0 advanced to `IN PROGRESS`; the same PR was required to be corrected and reverified.
-- 2026-07-17 — Re-reviewed PR #7 at head `71ba0563bbbedfa1554c3f0edce70962fc199dc8`. The Node correction was present, but the active Bash pre-push hook remained omitted and the punch list prematurely marked the item complete. No successful exact-head status was attached.
-- 2026-07-17 — PR #7 corrected the Bash hook/activation inventory, restored the punch-list item to pending, preserved every material release-thread blocker, added Bash to artifact requirements, and expanded rollback scope. Current head `991216f8c9f72a3bcb23b745f148697659217322` has no workflow or commit status, is non-mergeable, and retains one unresolved exact-head thread; the PR body and rollback disposition are now reconciled.
-- 2026-07-17 — Classified draft PR #8 as a deferred governance/control-plane proposal outside the active MVP. Its current structural CI passed without retained artifacts, while ownership, scope, credentials, issue lifecycle, failure handling, behavioral evidence, and rollback require a separate Architect decision.
-- 2026-07-17 — Reconciled live GitHub state: PR #7 has one unresolved review thread rather than two, and draft PR #8 is non-mergeable. No product priority or scope boundary changed.
+- 2026-07-17 — PR #7 corrected repository inventory content but remained non-mergeable without attached exact-head CI for its current head.
+- 2026-07-19 — PR #10 replaced the earlier portfolio-health proposal with a current-main, exact-head-validated, evidence-retaining candidate; governance and trusted-main acceptance remain open.
+- 2026-07-19 — PR #11 merged Gods/Clan observability and Terraform scaffolds while preserving human approval for apply and releases and retaining a hardening punch list.
+- 2026-07-19 — PR #12 merged the source comment-style policy and repository gate.
+- 2026-07-20 — Added a documentation-only Pages, architecture, onboarding, security, operations, and release-evidence foundation without changing product priority or runtime scope.
