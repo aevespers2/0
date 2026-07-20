@@ -1,5 +1,5 @@
 site_name: Autonomous vNext
-site_description: Architecture, contracts, operations, and evidence guidance for Repository 0
+site_description: Architecture, portable device bootstrap, contracts, operations, and evidence guidance for Repository 0
 site_url: https://aevespers2.github.io/0/
 repo_url: https://github.com/aevespers2/0
 repo_name: aevespers2/0
@@ -34,6 +34,7 @@ nav:
   - Architecture:
       - System architecture: architecture.md
       - A.L.I.S.T.A.I.R.E. role: alistaire-role.md
+      - Portable first-install security: portable-first-install.md
       - Contracts and state: contracts.md
       - Autonomous development: autonomous-development.md
   - Engineering:
