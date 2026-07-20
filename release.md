@@ -1,107 +1,96 @@
 # Release Plan
 
-## Current Decision
+## Current decision
 
-Status: `BLOCKED — HEALTH BASELINE, SECURITY, AND END-TO-END EVIDENCE REQUIRED`
+Status: `BLOCKED — HEALTH BASELINE, SECURITY, END-TO-END EVIDENCE, AND APPROVAL REQUIRED`
 
-Autonomous vNext has a substantial Phase-0 implementation and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence report. P0 is `IN PROGRESS`, but no release is eligible. PR #7 now contains a documentation-only repository-health candidate covering Python, Node/TypeScript/npm, and the active Bash pre-push hook and operator-invoked activation path; its Phase 1 punch-list item remains pending.
+Autonomous vNext has substantial Phase-0 source, tests, federation utilities, portfolio-observability scaffolding, and a defined first outcome: one reproducible, policy-gated, reversible local mission from contract intake through evidence and reflection. P0 remains `IN PROGRESS`; no application, package, Pages site, governance control plane, credential gateway, Terraform change, release, or deployment is approved by the presence of this implementation or documentation.
 
-The content corrections are not accepted release evidence. Autonomous vNext CI run `29565948627` passed only on earlier head `37f19f8c9560f2194bbdbf599e644d122324b994`. PR #7's current head is `991216f8c9f72a3bcb23b745f148697659217322`, and the PR body now identifies that same submitted head. The current head has no attached workflow run or commit status, and GitHub reports the PR non-mergeable. One review thread remains unresolved: the retained Node/TypeScript inventory thread pending exact-head verification. The corrected rollback-scope thread is resolved, and the current branch includes every candidate-touched documentation file in rollback scope.
+## Current candidate state
 
-Draft PR #6 remains outside this candidate. Its proposed VTX envelope, Repository `0` proposal layer, private-authority publication design, and credential-gateway safeguards require a separately approved Repository `0` → Repository `1` contract. Head `09038ac55c7945b2abb013d59cf9a1b270a9e717` has failing Autonomous vNext CI run `29546692277`: the test step failed and all smoke and federation validation steps were skipped.
-
-Draft PR #8 is also excluded. Current head `f291db0446d84005a3764795ca880cafeec1ad4c` passed Portfolio Health Candidate CI run `29583289679` and Autonomous vNext CI run `29583289637`, but GitHub currently reports the draft non-mergeable. Neither run retained artifacts, and the checks verify compilation and registry structure only. They do not establish complete repository enumeration and pagination, finding accuracy, safe issue lifecycle, private/organization coverage, disabled-Issues behavior, partial-failure recovery, token scope and revocation, behavioral fixtures, provenance, or rollback. The proposal overlaps governance candidates in QSO-GENOMES and the closed QSO-FABRIC bootstrap path.
+- **PR #7:** open draft, non-mergeable, head `991216f8c9f72a3bcb23b745f148697659217322`; useful repository-inventory corrections, but the passing workflow applies to an earlier head and current-main reconciliation remains required.
+- **PR #6:** open draft and mergeable, head `beb8dd2974aa936d1c0a23989b19c18e28e40e95`; VTX, Repository `0` proposal-layer, and credential-gateway candidate excluded from the first bounded-mission release.
+- **PR #10:** open draft and mergeable, head `7328cef2a6c9f033b3bee1720da51f567bad5b23`; exact-head candidate CI and retained evidence passed, but governance ownership, trusted-main behavior, token scope, issue lifecycle, and operational approval remain incomplete.
+- **PR #11:** merged Gods observability/Jira and Clan Terraform scaffolds; automatic apply, release, and deployment remain human-approved, and `punchlists/gods-clan-pre-review.md` remains controlling hardening work.
+- **PR #12:** merged the source comment-style policy and CI gate.
+- **Documentation foundation:** Pages-ready architecture, contracts, autonomous-development, onboarding, security, operations, recovery, and release-evidence material is proposed without changing runtime behavior or passing product release gates.
 
 ## Versioning
 
 - Scheme: Semantic Versioning.
-- First eligible candidate: `0.0.1-baseline`.
-- PR #7 may contribute repository-health documentation only after its current immutable submitted head passes verification and every remaining material review thread is explicitly resolved.
-- Draft VTX/private-authority work is excluded from `0.0.1-baseline` and requires a later separately versioned architecture/security decision.
-- Draft portfolio-control-plane work is excluded from `0.0.1-baseline` and requires a separately versioned governance product after ownership, scope, credentials, behavioral validation, provenance, and rollback are approved.
-- Domain-specific scientific engines remain separate proposals until the core P0-P4 platform baseline is accepted.
+- First eligible runtime candidate: `0.0.1-baseline`.
 - Tag only an immutable commit satisfying every included gate.
+- Documentation and governance candidates do not inherit runtime release eligibility.
+- VTX/private-authority, portfolio-governance, Jira mutation, Terraform apply, and scientific-domain work require separately versioned and approved products or capabilities.
 
-## Release Scope
+## First release scope
 
-- Verified repository inventory covering every implementation language, package manager, manifest, runtime, workflow, deployment surface, and active local hook, including Python, Node/TypeScript/npm, and Bash automation.
+- Complete repository-health inventory for Python, Node/TypeScript/npm, Bash hooks, workflows, documentation, integrations, generated outputs, and deployment surfaces.
 - Mission and action-record schemas.
 - Deny-by-default policy, low-risk planning, bounded local execution, append-only audit/evidence, deterministic cognitive runtime, and federation proposal validation.
-- One read-only or local-check mission from intake through plan, policy decision, execution result, evidence report, and rollback path.
-- Clean environment, complete tests and smoke checks, security review, documentation verification, checksums, provenance, and rollback evidence.
+- One read-only or local-check mission from intake through plan, policy decision, execution result, evidence report, reflection, and rollback.
+- Clean environment, complete applicable tests and smoke checks, security review, strict documentation build, provenance, checksums, and rollback evidence.
 
-## Explicit Exclusions
+## Explicit exclusions
 
-- Draft PR #6 and any Repository `0` myelination/proposal layer, VTX publication authority, credential gateway, remote adapter, webhook, or GitHub write path.
-- Draft PR #8 and any owner-wide scheduled scanner, portfolio token, central issue writer/closer, or autonomous recovery workflow.
-- Production secrets, keys, autonomous publication, silent remote mutation, destructive operations, and unrestricted networking.
-- Scientific-discovery roadmap implementations before the core baseline is accepted.
+- unrestricted credentials, silent remote writes, protected-branch mutation, autonomous merge, publication, release, deployment, payment, or destructive operations;
+- draft PR #6 and any VTX/private-authority or Repository `0` → Repository `1` transition without accepted ownership and compatibility contracts;
+- draft PR #10 or equivalent owner-wide scanner as a release-authorizing control plane;
+- automatic Jira mutation, Terraform apply, release, or deployment from merged PR #11 scaffolding;
+- scientific-discovery roadmap implementations before the core baseline is accepted;
+- claims that tensor-state abstractions are physical quantum computation.
 
-## Selected Completed Work
-
-None accepted for release. PR #7 contains corrected source-level inventory and rollback content for Python, Node/TypeScript/npm, Bash hook activation, and every documentation file touched by the candidate, but current head `991216f8c9f72a3bcb23b745f148697659217322` has no successful workflow or commit status, is non-mergeable, and retains one unresolved exact-head review thread. PR #8 has successful exact-head structural CI but no retained artifacts or behavioral/governance acceptance evidence, is non-mergeable, and remains draft and outside scope. Existing source, tests, workflows, hooks, federation utilities, documentation, and Apache-2.0 licensing remain candidate inputs rather than releasable completed work.
-
-## Planned Changelog Entries
-
-- `Documentation`: verified repository map, supported Python and Node runtimes, Bash hook/runtime activation, package managers, manifests, workflows, generated-output boundaries, setup, and recovery instructions.
-- `Added`: verified bounded mission control loop and evidence bundle.
-- `Security`: policy, command/path, secret, dependency, network, subprocess, workflow-permission, local-hook, patch-validation, and cross-runtime supply-chain findings.
-- `Release`: baseline reports, source archive, checksums, provenance, and approval decision.
-- `Excluded`: unapproved VTX/private-authority, cross-repository publication, and portfolio-governance control-plane work.
-
-## Acceptance Gates
+## Acceptance gates
 
 | Gate | Status | Requirement |
 |---|---|---|
-| Task completion | FAIL | P0 is completed with evidence; included P1-P4 work is `DONE`. |
-| Repository inventory | REVIEW | Python, Node/TypeScript/npm, Bash hook activation, and complete documentation rollback scope are recorded, but current-head CI and final review-thread disposition remain required. |
-| Environment/build | PARTIAL | Manifest and runtime evidence is recorded, but current PR #7 head `991216f8c9f72a3bcb23b745f148697659217322` has no attached workflow; clean setup, lockfile consistency, Node build paths, Bash-hook activation/configuration, schema/configuration checks, static validation, and supported platform matrix remain incomplete. |
-| Tests/smoke | STALE | Run `29565948627` passed configured tests and smoke checks on an earlier head only. The current submitted head, complete P0 baseline, Node builds, hook/configuration paths, policy-denial paths, one end-to-end bounded mission, and release-candidate replay remain unverified. Draft PR #6 still fails during tests. |
-| Security | NO EVIDENCE | Secrets, Python and npm dependencies, commands/paths, subprocesses, network, workflow permissions, local Git hooks, patch application, generated artifacts, and authority boundaries are reviewed at the final candidate. |
-| Federation/rollback | NO EVIDENCE | Stale proposals fail closed; retries are idempotent; one mission rollback restores the prior verified state; documentation-only rollback reverts every file touched by the candidate, including `release.md` and `changelog.md`. |
-| Cross-repository contract | BLOCKED | Repository `0`/`1` authority, route semantics, package/schema ownership, and negative compatibility fixtures are approved before any VTX work is included. |
-| Portfolio governance | BLOCKED | One canonical governance owner, explicit opt-in repository scope, least-privilege credential/revocation design, enumeration and pagination rules, exact-head success semantics, partial-failure recovery, safe issue lifecycle, deterministic behavioral fixtures, retained artifacts, and rollback are approved before PR #8 or an equivalent control plane is adopted. |
-| Documentation | REVIEW | Purpose and the initial full language/package/runtime inventory exist; setup, platform assumptions, generated-output policy, recovery, exact-head verification, and explicit final review-thread disposition remain incomplete. |
-| Provenance | PARTIAL | PR #7 records source/blob identities and earlier-head workflow evidence, but the current head lacks workflow logs, complete commands, versions, reports, artifact hashes, attestations, and final-candidate provenance. PR #8 has exact-head successful runs but no retained artifacts and no behavioral evidence bundle. |
-| Deployment | BLOCKED | `deploy.md` records the 2026-07-17 review; no deployment, portfolio schedule, token configuration, or issue-writing automation is authorized until an applicable release is explicitly ready and every deployment gate passes. |
-| Approval | PENDING | Explicit approval after all blocking gates pass. |
+| Task completion | FAIL | P0 is complete with evidence; included P1-P4 tasks are accepted. |
+| Repository inventory | REVIEW | Rebuild or reconcile the inventory against current `main`, including merged integrations and policy surfaces, then verify the exact candidate head. |
+| Environment/build | PARTIAL | Clean setup, supported runtimes, lockfile state, Node package checks, Bash-hook setup, documentation installation, and platform assumptions are reproduced. |
+| Tests/smoke | PARTIAL | Current-main exact-head tests, cognitive smoke, policy denial, federation negative cases, documentation build, and one bounded mission pass. |
+| Security | NO ACCEPTED BUNDLE | Secrets, dependencies, actions, commands/paths, network, subprocess, local hooks, patch application, credentials, artifacts, integrations, and authority boundaries are reviewed. |
+| Federation/rollback | NO ACCEPTED BUNDLE | Stale and invalid proposals fail closed; retries are idempotent; rollback restores the prior verified state. |
+| Cross-repository contract | BLOCKED | Repository `0`/`1` authority, route semantics, schema/package ownership, capability custody, and compatibility fixtures are approved. |
+| Portfolio governance | BLOCKED | Canonical owner, opt-in scope, least privilege, pagination/access semantics, current-head rules, issue lifecycle, partial-failure recovery, evidence, disablement, and rollback are approved. |
+| Gods/Clan integration | REVIEW | Pre-review punch list, credentials, workflow pinning, exact-head evidence, operational scope, and human-approval boundaries are accepted. |
+| Documentation | REVIEW | Strict MkDocs rendering, local-link checks, exact-head evidence, claim review, and publication decision pass. |
+| Provenance | PARTIAL | Complete commands, versions, reports, source/archive hashes, dependency records, SBOM where applicable, attestations, and artifact retention bind to one head. |
+| Deployment | BLOCKED | No package, Pages, scanner schedule, Jira writer, Terraform apply, release, or deployment is authorized until its own gates pass. |
+| Approval | PENDING | Authorized human explicitly approves the exact head, scope, residual risks, and rollback. |
 
-## Artifact Requirements
+## Artifact requirements
 
-- Accepted Markdown and machine-readable repository-health report covering Python, Node/TypeScript/npm, Bash hooks and activation, manifests, lockfiles, workflows, runtimes, deployment descriptors, and generated outputs.
-- Complete static, build, test, smoke, federation, security, documentation, and rollback reports at one immutable release-candidate commit.
-- Representative mission contract, action records, and evidence report containing no secrets.
-- Source archive, Python and npm dependency/SBOM records where applicable, SHA-256 checksums, and provenance manifest.
-- Review-thread disposition map and exact-head workflow logs for every included candidate change.
-- For any later VTX candidate: cross-repository contract fixture corpus, authority decision record, schema/package ownership record, compatibility results, credential-gateway threat model, and revocation evidence.
-- For any later portfolio-control-plane candidate: canonical-owner ADR, opt-in inventory, permission matrix, token issuance/revocation evidence, pagination and access-failure fixtures, zero/one/multiple-finding golden outputs, issue create/update/close/idempotency tests, partial-failure recovery evidence, retained JSON/Markdown artifacts, and disable/rollback procedure.
+- accepted machine-readable and Markdown repository-health report;
+- complete static, build, test, smoke, federation, security, documentation, and rollback reports at one immutable candidate;
+- representative mission, denial, action, evidence, reflection, stale proposal, malformed proposal, replay, and recovery fixtures containing no secrets;
+- source archive, dependency and SBOM records where applicable, SHA-256 manifest, and provenance statement;
+- review-thread and contradiction disposition map;
+- for portfolio governance: owner ADR, opt-in inventory, permission matrix, token issuance/revocation evidence, enumeration and failure fixtures, issue lifecycle/idempotency tests, retained artifacts, and disable/rollback procedure;
+- for VTX/Repository `1`: owner ADR, route and state model, schema/package versions, compatibility fixtures, key/capability custody, gateway threat model, revocation, and rollback;
+- for Gods/Clan: accepted punch-list evidence, Jira and Terraform authority matrix, plan/apply separation, credential controls, and incident recovery.
 
-## Rollback Criteria
+## Rollback criteria
 
-Withdraw the candidate if repository inventory omits an active language, package, runtime, hook, workflow, or deployment surface; task completion is recorded before acceptance; candidate identity is inconsistent across the PR body, release plan, workflow evidence, and artifacts; verification is non-reproducible; policy or stop conditions can be bypassed; stale proposals are accepted; retries duplicate actions; credentials or network authority exceed the mission; evidence is lost; documented commands fail; artifact hashes differ; cross-repository route semantics are inconsistent; or unapproved VTX/private-authority or portfolio-governance work enters the baseline. Restore the last reviewed commit or verified tag, revert every candidate-touched documentation file including `release.md` and `changelog.md`, disable any scheduled workflow or issue writer before credential revocation, and retain failed-candidate evidence, workflow logs, issue-state snapshots, and review dispositions.
+Withdraw or roll back when candidate identity is inconsistent; required source or runtime surfaces are omitted; exact-head verification is absent; commands are non-reproducible; policy or stop conditions can be bypassed; stale/replayed proposals are accepted; retries duplicate actions; credentials or network authority exceed scope; evidence is lost; artifact hashes differ; route or schema semantics conflict; or an unapproved external writer, release, deployment, Terraform apply, or governance action enters the candidate.
 
-## Unresolved Blockers
+Restore the last verified commit or tag, revert candidate-touched source and documentation, disable schedules and external writers before revoking credentials, restore or compensate external state, and retain failed-candidate logs, artifacts, issue snapshots, and review decisions.
 
-- PR #7 current head `991216f8c9f72a3bcb23b745f148697659217322` has no attached workflow run or commit status; the earlier passing run applies only to a superseded head, and GitHub reports the PR non-mergeable.
-- One PR #7 review thread remains unresolved: the Node/TypeScript inventory thread pending exact-head verification. The rollback thread is resolved and current rollback scope is complete.
-- Draft PR #8 current head `f291db0446d84005a3764795ca880cafeec1ad4c` passed exact-head structural workflows, but is non-mergeable, retained no artifacts, and lacks behavioral, credential, failure-recovery, issue-lifecycle, provenance, and rollback acceptance evidence.
-- Approval is required to select one canonical portfolio-governance owner—preferably a dedicated governance/control repository unless Repository `0` ownership is justified—and reconcile the overlapping Repository `0`, QSO-GENOMES, and closed QSO-FABRIC proposals before any owner-wide schedule, portfolio token, or issue writer is activated.
-- P0 and the remaining repository-health phases are incomplete.
-- No complete clean-environment build/static/security/documentation/provenance bundle exists across Python, Node, and local-hook surfaces.
-- One complete policy-gated mission and its rollback path have not been verified.
-- Draft PR #6 current head fails CI during tests; all later smoke and federation checks are skipped.
-- Repository `0` draft PR #6 and Repository `1` draft PR #1 disagree on whether the canonical route includes `0:proposal` before `1:quarantine`.
-- Repository `1` authority, schema/package ownership, key/capability custody, credential-gateway boundary, and remote-write policy require approval.
-- Platform-specific Safari/Desktop federation behavior lacks release evidence.
-- Scientific-discovery roadmap proposals remain intentionally outside the baseline release.
+## Unresolved blockers
 
-## Release Log
+- P0 has not been accepted against current `main`.
+- PR #7 is stale, non-mergeable, and lacks current-head attached CI.
+- PR #6 requires Repository `1`, route, schema, capability, credential, and revocation decisions.
+- PR #10 requires canonical governance ownership, trusted-main scan review, private-repository scope, token policy, issue lifecycle, and operational approval.
+- Gods/Clan pre-review tasks remain open; merged scaffolding is not production authority.
+- No complete current-main clean-environment, end-to-end mission, security, documentation, provenance, and rollback bundle exists.
+- Platform-specific Safari/Desktop federation behavior remains unverified for release.
+- Pages publication and support ownership remain unapproved.
 
-- 2026-07-16: Aligned the release scope with the approved bounded-mission MVP; candidate remained blocked pending repository health and end-to-end evidence.
-- 2026-07-16: Excluded draft PR #6 from `0.0.1-baseline`, recorded the Repository `0`/`1` route-contract decision gate, and marked its current failing CI run as an important release blocker.
-- 2026-07-17: Recorded PR #7 as a bounded P0 health candidate. The earlier submitted head passed CI but omitted Node/TypeScript/npm evidence.
-- 2026-07-17: Reconciled the package inventory correction, while retaining the exact-head CI and review-closure gates.
-- 2026-07-17: Deployment review found the Bash-hook omission and premature punch-list completion; both were corrected in the PR, but current-head verification remained absent.
-- 2026-07-17: Recorded three release-gate defects at PR #7 head `8ebfd345881eff3e2b308e31934afdee596483f3`: incomplete review-thread disposition wording, Bash omission from the artifact checklist, and incomplete documentation rollback scope.
-- 2026-07-17: Excluded draft PR #8 from `0.0.1-baseline`. Current head `f291db0446d84005a3764795ca880cafeec1ad4c` passed structural exact-head CI, but retained no artifacts and requires a canonical governance-owner and authority decision plus behavioral evidence before adoption.
-- 2026-07-17: Reconciled current live state: PR #7's body identifies head `991216f8c9f72a3bcb23b745f148697659217322`, the rollback thread is resolved, one exact-head review thread remains, and no current-head CI/status exists. Draft PR #8 is non-mergeable and remains excluded pending artifacts, behavioral validation, and governance approval.
+## Release log
+
+- 2026-07-16 — Defined the bounded-mission `0.0.1-baseline` outcome and excluded VTX/private-authority work.
+- 2026-07-17 — Recorded PR #7 as a repository-health candidate while retaining exact-head and review gates.
+- 2026-07-19 — PR #10 replaced the earlier portfolio-health proposal with an exact-head-validated, evidence-retaining candidate; governance acceptance remains open.
+- 2026-07-19 — PR #11 merged Gods/Clan scaffolding with human approval preserved for Terraform apply and releases.
+- 2026-07-19 — PR #12 merged the source comment-style policy and CI gate.
+- 2026-07-20 — Added a documentation-only Pages and developer-documentation foundation; runtime and release gates remain blocked.
