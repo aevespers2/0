@@ -35,6 +35,7 @@ nav:
       - System architecture: architecture.md
       - A.L.I.S.T.A.I.R.E. role: alistaire-role.md
       - Portable first-install security: portable-first-install.md
+      - Portable security contract v0: portable-security-contract-v0.md
       - Contracts and state: contracts.md
       - Autonomous development: autonomous-development.md
   - Engineering:
