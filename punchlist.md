@@ -1,23 +1,27 @@
 # Punch List
 
 ## Current Task
-**P0 / P0A — Repository health and portable first-install security baseline**
+**P0 / P0A / P0B — Repository health, portable first-install baseline, and shared contract**
 
 **Goal:** Produce a verified, reproducible baseline of the repository's current health and an approved portable-bootstrap contract before any device-remediation or higher-authority MVP implementation proceeds.
 
 ## Phase 0 — Portable Product Boundary and Repository `0`/`1` Contract
 - [ ] Approve Repository `0` as the bootstrap, inspection, remediation-planning, bounded-execution, evidence, and maintenance layer for owned or explicitly authorized devices.
 - [ ] Approve Repository `1` or an alternative as the independent baseline, capability, receipt, revocation, checkpoint, and recovery authority.
+- [x] Draft [Portable Security Contract v0](docs/portable-security-contract-v0.md) with a canonical local-staging-to-quarantine route and bounded authority model.
+- [ ] Approve or revise Portable Security Contract v0 and assign its canonical repository/package owner.
 - [ ] Define the canonical route from Repository `0` local proposal to Repository `1` quarantine and decision.
 - [ ] Define device identity, ownership scope, replacement/retirement state, baseline-policy identity, and supported platform profile identity.
-- [ ] Define inventory, proposal, capability, execution-receipt, resulting-state, revocation, freeze, and recovery-checkpoint envelopes.
+- [ ] Define inventory, proposal, capability, execution-receipt, resulting-state, revocation, freeze, correction, and recovery-checkpoint envelopes.
+- [ ] Define canonical serialization, digest, nonce, replay domain, expiry, expected-head, reason-code, and correction/supersession semantics.
 - [ ] Define exact human approvals for privileged remediation, credential changes, account changes, certificate/profile changes, network routing, firewall, hotspot/tethering, Bluetooth/sharing, package removal, and destructive recovery.
 - [ ] Define prohibited uses: unauthorized-device control, interception, counter-intrusion, covert monitoring, automatic deletion, evidence destruction, and unsupported claims of compromise or security.
 - [ ] Define privacy, redaction, retention, export, and deletion requirements for device inventories.
 - [ ] Record unsupported or unobservable controls as `UNKNOWN` rather than compliant.
-- [ ] Add shared positive, negative, stale, replay, unsupported-version, expected-head, wrong-device, partial-failure, revocation, freeze, and rollback fixtures with Repository `1`.
+- [ ] Add shared positive, negative, stale, replay, unsupported-version, expected-head, wrong-device, partial-failure, revocation, freeze, correction, and rollback fixtures with Repository `1`.
+- [ ] Verify both repositories contain semantically aligned contract documents and pass the same fixture bundle at immutable heads.
 
-**Acceptance criteria:** The portable first-install role, device scope, Repository `0`/`1` authority split, cross-repository route, schemas, platform support model, prohibited uses, privacy rules, stop conditions, and rollback are approved without activating credentials or device-control authority.
+**Acceptance criteria:** The portable first-install role, device scope, Repository `0`/`1` authority split, cross-repository route, schemas, platform support model, prohibited uses, privacy rules, stop conditions, correction, and rollback are approved without activating credentials or device-control authority.
 
 ## Phase 1 — Repository Inventory
 - [ ] Record the repository purpose, default branch, primary languages, package managers, and runtime versions.
@@ -90,7 +94,7 @@
 - [ ] Identify undocumented prerequisites, environment variables, services, and platform assumptions.
 - [ ] Verify license, contribution guidance, changelog, and release notes status.
 - [ ] Record the shortest reproducible path from clone to successful smoke test.
-- [ ] Verify the portable-first-install guide, platform matrix, device identity lifecycle, lost/replaced-device workflow, and Repository `1` contract remain aligned.
+- [ ] Verify the portable-first-install guide, Portable Security Contract v0, platform matrix, device identity lifecycle, lost/replaced-device workflow, and Repository `1` contract remain aligned.
 
 **Acceptance criteria:** A new contributor can follow the documented path without hidden steps, or every blocking documentation gap is listed.
 
@@ -109,8 +113,8 @@
 - [ ] Record exact tool and runtime versions.
 - [ ] Record the commit SHA used for the baseline.
 - [ ] Record supported, advisory, unavailable, and out-of-scope controls for each platform profile.
-- [ ] Mark P0 and P0A as PASS, CONDITIONAL PASS, or FAIL independently.
-- [ ] Unlock P1 only when no unclassified critical blocker remains and the portable product boundary is approved.
+- [ ] Mark P0, P0A, and P0B as PASS, CONDITIONAL PASS, or FAIL independently.
+- [ ] Unlock P1 only when no unclassified critical blocker remains and the portable product boundary and contract are approved.
 - [ ] Update `taskchain.md` with the result and Builder log evidence.
 
 **Acceptance criteria:** The baseline is reproducible from the recorded commit and provides a clear go/no-go decision for the first read-only portable-bootstrap mission.
@@ -127,3 +131,4 @@
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, platform limitations, privacy decisions, and remediation tasks below.
 
 - 2026-07-20 — Added the portable first-install product-boundary, platform, device-identity, Repository `0`/`1` gluing, privacy, and fail-closed evidence requirements. No implementation or privileged authority was enabled.
+- 2026-07-20 — Added Portable Security Contract v0 as a shared documentation candidate. Route, identifiers, result semantics, proposal/capability/receipt/revocation requirements, privacy, canonicalization, versioning, and 18 fixture classes are now explicit; approval, machine-readable schemas, fixtures, key custody, and operational authority remain open.
