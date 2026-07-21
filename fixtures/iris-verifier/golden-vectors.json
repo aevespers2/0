@@ -1,0 +1,25 @@
+{
+  "production_key_material_present": false,
+  "raw_biometric_material_present": false,
+  "schema": "qso.iris-synthetic-golden-vectors.v0",
+  "synthetic_only": true,
+  "vectors": [
+    {
+      "expected_protected_identifier": "f3cfb15cb20d60d8bb7afad7de5e14e0ab28c19e4221fe77e6baa750577b507a",
+      "fixture_id": "vector-001",
+      "profile": {
+        "domain": "qso.iris.local-verifier.v0",
+        "extractor_version": "synthetic-extractor-0",
+        "key_id": "synthetic-key-slot-0",
+        "max_helper_data_bytes": 4096,
+        "output_algorithm": "HMAC-SHA-256",
+        "profile_id": "iris-profile-synthetic-v0",
+        "raw_capture_retention": "memory-only",
+        "schema": "qso.iris-derivation-profile.v0",
+        "subject_scope": "single-eye",
+        "transform_id": "synthetic-transform-0"
+      },
+      "synthetic_input_derivation": "domain-separated-sha256-labels"
+    }
+  ]
+}
