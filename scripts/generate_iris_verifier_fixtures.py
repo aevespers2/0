@@ -6,7 +6,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from iris_verifier_contract import canonical_json_bytes, derive_protected_identifier
+from iris_verifier_contract import (
+    canonical_json_bytes,
+    derive_protected_identifier,
+    strict_json_loads,
+)
 
 
 _PROFILE = {
@@ -71,10 +75,8 @@ def main() -> int:
 
     rendered = render_manifest()
     if args.check:
-        current = args.check.read_text(encoding="utf-8")
-        if canonical_json_bytes(json.loads(current)) != canonical_json_bytes(
-            build_manifest()
-        ):
+        current = strict_json_loads(args.check.read_text(encoding="utf-8"))
+        if canonical_json_bytes(current) != canonical_json_bytes(build_manifest()):
             raise SystemExit(f"fixture drift: {args.check}")
         return 0
 
