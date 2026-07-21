@@ -9,6 +9,7 @@ on:
       - 'requirements-docs.txt'
       - 'README.md'
       - 'taskchain.md'
+      - 'punchlist.md'
       - 'release.md'
       - 'changelog.md'
       - '.github/workflows/documentation.yml'
@@ -20,6 +21,7 @@ on:
       - 'requirements-docs.txt'
       - 'README.md'
       - 'taskchain.md'
+      - 'punchlist.md'
       - 'release.md'
       - 'changelog.md'
       - '.github/workflows/documentation.yml'
@@ -73,6 +75,7 @@ jobs:
           required = [
               Path('README.md'),
               Path('taskchain.md'),
+              Path('punchlist.md'),
               Path('release.md'),
               Path('changelog.md'),
               Path('mkdocs.yml'),
@@ -83,6 +86,8 @@ jobs:
               Path('docs/autonomous-development.md'),
               Path('docs/development.md'),
               Path('docs/operations.md'),
+              Path('docs/portable-first-install.md'),
+              Path('docs/portable-security-contract-v0.md'),
               Path('docs/security.md'),
               Path('docs/release-evidence.md'),
           ]
