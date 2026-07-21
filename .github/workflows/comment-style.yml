@@ -9,15 +9,31 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: comment-style-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      SUBMITTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Check out submitted revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
+          ref: ${{ env.SUBMITTED_SHA }}
+          fetch-depth: 1
           persist-credentials: false
+          show-progress: false
+
+      - name: Assert exact clean source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SUBMITTED_SHA"
+          test -z "$(git status --porcelain)"
 
       - name: Validate source comment style
         run: python scripts/check_comment_style.py

@@ -14,23 +14,33 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: clan-terraform-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       CLAN_CHANNEL: Clan
       CLAN_FLAG: ralbane
+      SUBMITTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Check out exact submitted head
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ env.SUBMITTED_SHA }}
+          fetch-depth: 1
           persist-credentials: false
+          show-progress: false
 
-      - name: Assert exact submitted head
-        if: github.event_name == 'pull_request'
-        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+      - name: Assert exact clean source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SUBMITTED_SHA"
+          test -z "$(git status --porcelain)"
 
       - name: Validate Clan configuration
         run: |
@@ -66,9 +76,28 @@ jobs:
           }
 
       - name: Record plan-only boundary
+        shell: bash
         run: |
+          set -euo pipefail
+          mkdir -p reports/clan-terraform
           printf '%s\n' \
             "channel=$CLAN_CHANNEL" \
             "clan_flag=$CLAN_FLAG" \
             "automatic_apply=false" \
-            "exact_head_required=true"
+            "exact_head_required=true" \
+            "source_sha=$(git rev-parse HEAD)" \
+            "terraform_present=${{ steps.terraform.outputs.present }}" \
+            > reports/clan-terraform/boundary.txt
+          if [ -f .terraform.lock.hcl ]; then
+            sha256sum .terraform.lock.hcl > reports/clan-terraform/lockfile.sha256
+          fi
+          sha256sum integrations/clan/config.json .github/workflows/clan-terraform.yml > reports/clan-terraform/source.sha256
+
+      - name: Upload plan-only evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: clan-terraform-${{ env.SUBMITTED_SHA }}
+          path: reports/clan-terraform
+          if-no-files-found: error
+          retention-days: 30
