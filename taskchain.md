@@ -4,9 +4,9 @@
 
 - **Next objective:** Establish a reproducible repository-health and portable device-security baseline for Autonomous vNext, then verify one end-to-end local bootstrap mission that is policy-gated, reversible, and fully evidenced.
 - **User outcome:** After a laptop, phone, workstation, or other owned environment is acquired, replaced, reset, recovered, or suspected of compromise, the operator can install Repository `0`, inventory the device before trusting ordinary tooling, compare it with an approved baseline, prepare bounded remediation, and submit evidence-backed proposals to Repository `1` without hidden authority or silent remote action.
-- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk planning; local executor checks; append-only evidence; deterministic cognitive runtime; federation proposal validation; one read-only portable-bootstrap mission covering platform identity, package-manager state, startup persistence, accounts, certificates, network interfaces, DNS/proxy/VPN/routes, firewall, hotspot/tethering, sharing, and Bluetooth where the platform permits observation.
+- **MVP scope:** existing mission/action schemas; deny-by-default policy; low-risk planning; local executor checks; append-only evidence; deterministic cognitive runtime; federation proposal validation; one read-only portable-bootstrap mission covering platform identity, package-manager state, startup persistence, accounts, certificates, network interfaces, DNS/proxy/VPN/routes, firewall, hotspot/tethering, sharing, and Bluetooth where the platform permits observation; and the documentation-only [Portable Security Contract v0](docs/portable-security-contract-v0.md) defining the shared Repository `0`/`1` route, identifiers, result semantics, capability, receipt, revocation, privacy, and fixture requirements.
 - **Priority:** Repository health and the portable first-install contract remain ahead of new scientific engines, cross-repository publication, portfolio-wide authority, automatic infrastructure apply, release, or deployment.
-- **Success criteria:** clean setup is documented; supported platforms and unsupported controls are explicit; complete applicable suites and smoke paths pass at one immutable commit; denial and stop conditions are tested; device observations are provenance-bound; Repository `1` rejects stale or invalid proposals; evidence includes commands, versions, hashes, review state, and rollback.
+- **Success criteria:** clean setup is documented; supported platforms and unsupported controls are explicit; complete applicable suites and smoke paths pass at one immutable commit; denial and stop conditions are tested; device observations are provenance-bound; Repository `1` rejects stale or invalid proposals; evidence includes commands, versions, hashes, review state, and rollback; and both repositories pass one identical versioned contract fixture corpus.
 - **Non-goals:** credential discovery, silent pushes, unrestricted networking, destructive operations, intrusive surveillance, traffic interception, counter-intrusion, control of unauthorized devices, production scientific claims, automatic Terraform apply, private publication authority, or owner-wide mutation before the core baseline and governance boundary are accepted.
 
 ## Portable first-install security foundation
@@ -15,9 +15,15 @@ Repository `0` is the candidate bootstrap, inspection, remediation-planning, bou
 
 The canonical documentation target is:
 
-`new/recovered/suspect device → Repository 0 read-only inventory → local proposal → Repository 1 quarantine/decision → bounded capability → Repository 0 reversible remediation → resulting-state receipt → Repository 1 reconciliation`
+`new/recovered/suspect device → Repository 0 read-only inventory → non-authoritative local proposal → versioned proposal envelope → Repository 1 quarantine/decision → bounded capability → Repository 0 reversible remediation → resulting-state receipt → Repository 1 reconciliation`
 
 A passing local check is not proof that a device is fully secure. Unsupported or unobservable platform state is recorded as `UNKNOWN`, and consequential remediation remains blocked until the applicable capability and approval exist.
+
+## Shared contract candidate
+
+`docs/portable-security-contract-v0.md` now records a concrete pre-acceptance contract candidate. It defines required device, environment, ownership, platform-profile, baseline, policy, producer, time, nonce, expected-head, digest, and evidence identifiers; `PASS`/`FAIL`/`UNKNOWN`/`NOT_APPLICABLE` semantics; proposal, capability, receipt, revocation, correction, privacy, canonicalization, fixture, and versioning requirements.
+
+The document reduces ambiguity but does not select a production key store, device-identity derivation, signature standard, platform baseline owner, or human approval owner. It is not an accepted schema or operational authority until Repository `1` carries an aligned version, both repositories pass the same deterministic fixtures at immutable heads, and the Architect approves the version.
 
 ## MVP roadmap
 
@@ -25,7 +31,8 @@ A passing local check is not proof that a device is fully secure. Unsupported or
 |---|---|---|---|
 | P0 | Repository health baseline for the implemented Autonomous vNext surface | — | IN PROGRESS |
 | P0A | Approve the portable first-install product boundary and Repository `0`/`1` bootstrap contract | P0 evidence | REVIEW |
-| P1 | Verify one end-to-end read-only portable-bootstrap mission and evidence bundle | P0, P0A | PROPOSED |
+| P0B | Approve or revise Portable Security Contract v0 and assign contract ownership | P0A, Repository `1` alignment | REVIEW |
+| P1 | Verify one end-to-end read-only portable-bootstrap mission and evidence bundle | P0, P0A, P0B | PROPOSED |
 | P2 | Establish architecture, package, device-identity, baseline-policy, contract, and ADR compatibility | P1 | PROPOSED |
 | P3 | Harden configuration, secrets, command/path policy, package sources, startup state, networking, Bluetooth/sharing, incident response, and rollback | P2 | PROPOSED |
 | P4 | Package and document the verified Phase-0 runtime and per-platform baseline profiles | P3 | PROPOSED |
@@ -45,7 +52,7 @@ PR #7 documents the Python, Node/TypeScript/npm, and Bash-hook surfaces at head 
 
 PR #6 remains open, draft, and mergeable at head `beb8dd2974aa936d1c0a23989b19c18e28e40e95`. It proposes Repository `0` as a myelination/proposal layer, VTX envelope primitives, and a credential-gateway policy while keeping Repository `1` authoritative.
 
-**Directive:** do not issue a token or merge the proposal into the bounded-mission release until Repository `1` authority, portable-bootstrap route semantics, device identity, baseline and evidence schema ownership, negative compatibility fixtures, credential custody, revocation, and rollback are approved.
+**Directive:** do not issue a token or merge the proposal into the bounded-mission release until Repository `1` authority, portable-bootstrap route semantics, device identity, baseline and evidence schema ownership, negative compatibility fixtures, credential custody, revocation, and rollback are approved. Reconcile any VTX envelope with Portable Security Contract v0 rather than creating a competing route or identity vocabulary.
 
 ## Portfolio-health control plane — draft PR #10
 
@@ -73,9 +80,9 @@ The repository now rejects double-slash source comments while preserving URL/URI
 
 **Status:** `REVIEW — DOCUMENTATION AND VALIDATION ONLY`
 
-The current documentation branch adds a Pages-ready MkDocs site covering the project overview, architecture, A.L.I.S.T.A.I.R.E. portfolio role, portable first-install security, contracts, autonomous-development lifecycle, onboarding, security, operations, recovery, and release evidence. It also adds exact-head documentation validation. It does not modify runtime behavior or authorize Pages publication, credentials, merges, releases, deployments, Terraform apply, device administration, or owner-wide mutation.
+The current documentation branch adds a Pages-ready MkDocs site covering the project overview, architecture, A.L.I.S.T.A.I.R.E. portfolio role, portable first-install security, Portable Security Contract v0, contracts, autonomous-development lifecycle, onboarding, security, operations, recovery, and release evidence. It also adds exact-head documentation validation. It does not modify runtime behavior or authorize Pages publication, credentials, merges, releases, deployments, Terraform apply, device administration, or owner-wide mutation.
 
-**Directive:** require strict site rendering, link validation, existing repository CI, and review of all claim/authority boundaries before merge. The documentation candidate does not complete P0 or P0A.
+**Directive:** require strict site rendering, link validation, existing repository CI, comparison with the aligned Repository `1` contract, and review of all claim/authority boundaries before merge. The documentation candidate does not complete P0, P0A, or P0B.
 
 ## Portfolio proposal rule
 
@@ -95,3 +102,4 @@ Record commits, commands, workflow runs, artifact hashes, policy decisions, stop
 - 2026-07-19 — PR #12 merged the source comment-style policy and repository gate.
 - 2026-07-20 — Added a documentation-only Pages, architecture, onboarding, security, operations, and release-evidence foundation without changing product priority or runtime scope.
 - 2026-07-20 — Clarified Repository `0` and Repository `1` as the portable first-install security and recovery pair; added P0A and a read-only device-bootstrap outcome without activating device-control authority.
+- 2026-07-20 — Added Portable Security Contract v0 and P0B, aligning the proposed cross-repository route, identifiers, result states, capability/receipt/revocation boundaries, privacy controls, and shared fixture requirements without adding implementation or privileged authority.
