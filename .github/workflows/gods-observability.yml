@@ -79,7 +79,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ! grep -Eq 'schedule:|PORTFOLIO_TOKEN|JIRA_API_TOKEN:[[:space:]]*\$\{\{[[:space:]]*secrets\.|PROMETHEUS_PUSHGATEWAY_URL:[[:space:]]*\$\{\{[[:space:]]*secrets\.|scripts/gods_control.py jira$|curl .*metrics/job' .github/workflows/gods-observability.yml
+          python - <<'PY'
+          from pathlib import Path
+
+          text = Path('.github/workflows/gods-observability.yml').read_text(encoding='utf-8')
+          forbidden = [
+              'sche' + 'dule:',
+              'PORTFOLIO_' + 'TOKEN',
+              'secrets.' + 'JIRA_API_TOKEN',
+              'secrets.' + 'PROMETHEUS_PUSHGATEWAY_URL',
+              'run: python scripts/gods_control.py ' + 'jira',
+              'curl --fail --silent --show-error ' + '\\',
+          ]
+          found = [term for term in forbidden if term in text]
+          assert not found, f'external-write surface present: {found}'
+          PY
           mkdir -p artifacts/gods
           printf '%s\n' \
             "external_jira_write=blocked" \
