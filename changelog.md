@@ -14,6 +14,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-20 — Established Repository `0` in portfolio documentation as A.L.I.S.T.A.I.R.E.'s bounded autonomous-development and proposal layer, not the unilateral canonical-state or credential authority.
 - 2026-07-20 — Clarified the primary long-term product role: Repository `0` and Repository `1` are the portable first-install security and recovery pair for newly acquired, replaced, recovered, reset, or suspect owned devices.
 - 2026-07-20 — Reframed the first executable outcome as a read-only device-baseline mission before higher-level A.L.I.S.T.A.I.R.E. services or ordinary tooling are trusted.
+- 2026-07-20 — Added Portable Security Contract v0 as a shared pre-acceptance contract candidate and introduced P0B without activating runtime authority.
 
 ### Architecture
 
@@ -24,6 +25,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - Required portfolio health, Jira, Terraform, VTX, release, deployment, and self-modifying policy to remain distinct authority boundaries.
 - Added a portable-bootstrap lifecycle covering trusted/minimally exposed startup, read-only inventory, local proposal, Repository `1` quarantine and decision, bounded remediation, resulting-state receipt, canonical reconciliation, and continuous low-authority monitoring.
 - Added platform-control domains for package managers, startup persistence, accounts, certificates, network interfaces, DNS, proxy, VPN, routes, firewall, hotspot/tethering, sharing, Bluetooth, recovery, and unsupported-state handling.
+- Defined the candidate local-staging-to-quarantine route, required device/environment/owner/profile/baseline/policy identifiers, four-state result semantics, narrow capabilities, independent receipt reconciliation, revocation, correction, and no-auto-unlock behavior.
 
 ### Implementation
 
@@ -32,7 +34,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - PR #11 introduced merged observability and Terraform-governance scaffolds without automatic apply or release authority.
 - PR #12 introduced the source comment-style policy and CI gate while preserving URL/URI and quoted-string syntax.
 - The documentation candidate adds only MkDocs configuration, Pages content, exact-head documentation validation, and planning/release-document reconciliation; runtime behavior is unchanged.
-- No device inventory adapter, remediation command, credential, monitoring service, remote administration, or enforcement capability was added by the portable-bootstrap clarification.
+- No device inventory adapter, remediation command, credential, monitoring service, remote administration, contract parser, signature verifier, or enforcement capability was added by the portable-bootstrap or contract clarification.
 
 ### Documentation
 
@@ -42,12 +44,14 @@ All notable product, architecture, implementation, release, and deployment chang
 - Added pinned documentation dependencies and a strict exact-head documentation workflow with local-link checks, deterministic site archive, SHA-256 evidence, and retained artifacts.
 - Reconciled `taskchain.md` and `release.md` with current PR #6, #7, #10, merged PR #11 and #12, and the documentation-only candidate.
 - Added `docs/portable-first-install.md` and aligned Pages, task chain, release plan, and punch list with the clarified device-security mission.
+- Added `docs/portable-security-contract-v0.md` and aligned navigation, task chain, punch list, release plan, and changelog with its route, identity, privacy, integrity, versioning, and shared-fixture requirements.
 
 ### Evidence
 
 - PR #7 current head `991216f8c9f72a3bcb23b745f148697659217322` remains non-mergeable without attached exact-head CI; its earlier passing workflow does not validate the current head.
 - PR #10 head `7328cef2a6c9f033b3bee1720da51f567bad5b23` passed Portfolio Health Candidate CI run `29668233233` and Autonomous vNext CI run `29668233229`; its retained artifact digest is `sha256:e207daabfd46d788b687b614592a9b06182ca246642a85e35274b0ad4d25069e`.
-- Merged scaffolding and documentation do not constitute accepted runtime, security, release, device-control, or deployment evidence.
+- Merged scaffolding and documentation do not constitute accepted runtime, security, release, device-control, contract compatibility, or deployment evidence.
+- Portable Security Contract v0 requires a fresh exact-head documentation run and shared fixture evidence in both repositories before any compatibility claim.
 
 ### Security
 
@@ -55,14 +59,15 @@ All notable product, architecture, implementation, release, and deployment chang
 - Required exact-head identity, device identity, baseline-policy identity, schema validation, stale/replay checks, path and command controls, secret redaction, least privilege, revocation, independent verification, and rollback for consequential actions.
 - Preserved human approval for credentials, merges, releases, deployments, infrastructure apply, payments, sensitive publication, privileged device changes, emergency exceptions, and self-modification of authority controls.
 - Required unusual state to remain separate from attribution and unsupported controls to be reported as `UNKNOWN` rather than secure.
+- Required corrections and supersessions to preserve history and detached evidence to remain digest-bound to messages.
 
 ### Release
 
 - The first eligible candidate is now described as `0.0.1-portable-baseline`, subject to approval of the portable product boundary and without changing implementation eligibility.
-- The candidate remains blocked pending current-main repository health, clean environment, Repository `0`/`1` gluing contract, one end-to-end read-only bootstrap mission, complete applicable tests, platform profiles, security review, strict documentation validation, provenance, rollback, and explicit approval.
+- The candidate remains blocked pending current-main repository health, clean environment, Repository `0`/`1` gluing contract, accepted Portable Security Contract version, shared schemas and fixtures, one end-to-end read-only bootstrap mission, complete applicable tests, platform profiles, security review, strict documentation validation, provenance, rollback, and explicit approval.
 - Draft PR #6 and #10 remain excluded from release authority until their separate architecture, governance, credential, and operational gates pass.
 - Merged Gods/Clan scaffolding remains subject to `punchlists/gods-clan-pre-review.md` and does not authorize Jira mutation, Terraform apply, release, or deployment.
-- The documentation candidate does not complete P0 or P0A or authorize Pages publication.
+- The documentation candidate does not complete P0, P0A, or P0B or authorize Pages publication.
 
 ### Deployment
 
