@@ -5,6 +5,7 @@ from .contract import (
     assert_privacy_safe_record,
     canonical_json_bytes,
     derive_protected_identifier,
+    screen_synthetic_attempt_context,
     strict_json_loads,
     validate_profile,
 )
@@ -14,6 +15,7 @@ __all__ = [
     "assert_privacy_safe_record",
     "canonical_json_bytes",
     "derive_protected_identifier",
+    "screen_synthetic_attempt_context",
     "strict_json_loads",
     "validate_profile",
 ]
