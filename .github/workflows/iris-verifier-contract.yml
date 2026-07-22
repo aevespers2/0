@@ -26,6 +26,7 @@ jobs:
     env:
       SUBMITTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       ATOMIC_FIXTURE_SHA256: 5557b6eeec96a2655410a9a60bfddec9c981a10762f0f02eb6b91f07e0379fc5
+      JOURNAL_FIXTURE_SHA256: f255438eab406bba71ab23fad60d34b2a7d3a580e90583e1517d432d8e03b89a
 
     steps:
       - name: Check out exact submitted head
@@ -62,10 +63,13 @@ jobs:
             > reports/iris-verifier-contract/hostile-context.validated.json
           python -m json.tool fixtures/iris-verifier/atomic-consume-record-vectors.json \
             > reports/iris-verifier-contract/atomic-consume-record.validated.json
+          python -m json.tool fixtures/iris-verifier/crash-recovery-journal-vectors.json \
+            > reports/iris-verifier-contract/crash-recovery-journal.validated.json
           test "$(sha256sum fixtures/iris-verifier/atomic-consume-record-vectors.json | cut -d' ' -f1)" = "$ATOMIC_FIXTURE_SHA256"
+          test "$(sha256sum fixtures/iris-verifier/crash-recovery-journal-vectors.json | cut -d' ' -f1)" = "$JOURNAL_FIXTURE_SHA256"
           python scripts/generate_iris_verifier_fixtures.py \
             --check fixtures/iris-verifier/golden-vectors.json
-          printf 'fixture_check=passed\nhostile_context_check=passed\natomic_consume_record_check=passed\n' \
+          printf 'fixture_check=passed\nhostile_context_check=passed\natomic_consume_record_check=passed\njournal_recovery_check=passed\n' \
             > reports/iris-verifier-contract/fixture-check.txt
 
       - name: Run focused contract tests
@@ -75,6 +79,7 @@ jobs:
           python -m pytest -q \
             tests/test_iris_verifier_contract.py \
             tests/test_iris_atomic_contract.py \
+            tests/test_iris_journal_contract.py \
             | tee reports/iris-verifier-contract/pytest.log
 
       - name: Record exact-head evidence
@@ -95,8 +100,10 @@ jobs:
             printf 'production_key_material_allowed=false\n'
             printf 'operational_enrollment_authority=false\n'
             printf 'producer_authority_state_mutation=false\n'
+            printf 'durable_journal_authority=false\n'
             printf 'hostile_fixture_sha256=677a66f65bde813e122c6493b5421a06dadf867cfa029a05f3bc610564f50006\n'
             printf 'atomic_fixture_sha256=%s\n' "$ATOMIC_FIXTURE_SHA256"
+            printf 'journal_fixture_sha256=%s\n' "$JOURNAL_FIXTURE_SHA256"
             printf 'generated_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           } > reports/iris-verifier-contract/run-summary.txt
           git status --porcelain > reports/iris-verifier-contract/worktree.txt
@@ -106,12 +113,15 @@ jobs:
             fixtures/iris-verifier/golden-vectors.json \
             fixtures/iris-verifier/hostile-context-vectors.json \
             fixtures/iris-verifier/atomic-consume-record-vectors.json \
+            fixtures/iris-verifier/crash-recovery-journal-vectors.json \
             iris_verifier_contract/__init__.py \
             iris_verifier_contract/contract.py \
             iris_verifier_contract/atomicity.py \
+            iris_verifier_contract/journal.py \
             scripts/generate_iris_verifier_fixtures.py \
             tests/test_iris_verifier_contract.py \
             tests/test_iris_atomic_contract.py \
+            tests/test_iris_journal_contract.py \
             .github/workflows/iris-verifier-contract.yml \
             > reports/iris-verifier-contract/source.sha256
           find reports/iris-verifier-contract -maxdepth 1 -type f ! -name artifact.sha256 -print0 \
