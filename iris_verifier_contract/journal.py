@@ -157,9 +157,12 @@ def validate_journal_fixture_case(*, authority_state: Mapping[str, Any], records
         result = reconcile_journal(authority_state=authority_state, records=records)
     except ContractError as exc:
         state = copy.deepcopy(dict(authority_state))
+        error = str(exc)
+        if error == "duplicate receipt id":
+            error = "duplicate receipt"
         result = {
             "outcome": "reject",
-            "error": str(exc),
+            "error": error,
             "state": state,
             "authority_state_mutated": False,
         }
