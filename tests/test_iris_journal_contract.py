@@ -9,6 +9,7 @@ import pytest
 from iris_verifier_contract import (
     ContractError,
     assert_privacy_safe_record,
+    journal_record_sha256,
     reconcile_journal,
     strict_json_loads,
     validate_journal_fixture_case,
@@ -78,10 +79,14 @@ def test_malformed_phase_order_and_record_limit_fail_closed() -> None:
         item for item in manifest["cases"]
         if item["case_id"] == "acknowledged-journal-recovers-stale-state"
     )
+    malformed = copy.deepcopy(case["journal_records"][1:])
+    for sequence, record in enumerate(malformed, start=1):
+        record["journal_seq"] = sequence
+        record["record_sha256"] = journal_record_sha256(record)
     with pytest.raises(ContractError, match="journal-phase-order-invalid"):
         reconcile_journal(
             authority_state=case["authority_state"],
-            records=case["journal_records"][1:],
+            records=malformed,
         )
     with pytest.raises(ContractError, match="journal-record-limit-exceeded"):
         reconcile_journal(
