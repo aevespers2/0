@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -11,6 +12,7 @@ from iris_verifier_contract import (
     assert_privacy_safe_record,
     canonical_json_bytes,
     derive_protected_identifier,
+    screen_synthetic_attempt_context,
     strict_json_loads,
     validate_profile,
 )
@@ -19,6 +21,8 @@ from iris_verifier_contract import (
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "iris-verifier" / "golden-vectors.json"
 SCHEMA = ROOT / "contracts" / "iris-derived-verifier-v0.schema.json"
+HOSTILE_FIXTURE = ROOT / "fixtures" / "iris-verifier" / "hostile-context-vectors.json"
+HOSTILE_FIXTURE_SHA256 = "677a66f65bde813e122c6493b5421a06dadf867cfa029a05f3bc610564f50006"
 
 
 def _synthetic_bytes(domain: bytes, fixture_id: str) -> bytes:
@@ -144,3 +148,61 @@ def test_short_key_or_secret_is_rejected() -> None:
         derive_protected_identifier(
             profile=profile, reconstructed_secret=b"s" * 32, key=b"short"
         )
+
+
+def _hostile_manifest() -> dict:
+    payload = HOSTILE_FIXTURE.read_bytes()
+    assert hashlib.sha256(payload).hexdigest() == HOSTILE_FIXTURE_SHA256
+    return strict_json_loads(payload.decode("utf-8"))
+
+
+def test_hostile_context_fixture_corpus_fails_closed() -> None:
+    manifest = _hostile_manifest()
+    assert manifest["synthetic_only"] is True
+    assert manifest["production_key_material_present"] is False
+    assert manifest["raw_biometric_material_present"] is False
+    baseline = manifest["baseline"]
+    observed: dict[str, str] = {}
+
+    for case in manifest["cases"]:
+        attempt = copy.deepcopy(baseline["attempt"])
+        context = copy.deepcopy(baseline["context"])
+        attempt.update(case["attempt_overrides"])
+        context.update(case["context_overrides"])
+        case_id = case["case_id"]
+
+        if case["expected"] == "accept":
+            result = screen_synthetic_attempt_context(
+                attempt=attempt,
+                context=context,
+            )
+            assert result == attempt
+            observed[case_id] = "accept"
+        else:
+            with pytest.raises(ContractError, match=case["error"]):
+                screen_synthetic_attempt_context(
+                    attempt=attempt,
+                    context=context,
+                )
+            observed[case_id] = case["error"]
+
+    assert observed == {
+        "valid-baseline": "accept",
+        "wrong-eye": "eye-side-mismatch",
+        "wrong-device": "device-mismatch",
+        "stale-generation": "stale-generation",
+        "replayed-attempt": "attempt-replay",
+        "corrupted-helper-data-digest": "helper-data-digest-mismatch",
+        "revoked-profile": "profile-revoked",
+        "profile-replaced": "profile-replaced",
+        "recovery-required": "recovery-not-complete",
+        "recovery-completed-replacement": "accept",
+    }
+
+
+def test_hostile_fixture_is_privacy_safe_and_has_unique_cases() -> None:
+    manifest = _hostile_manifest()
+    assert_privacy_safe_record(manifest)
+    case_ids = [case["case_id"] for case in manifest["cases"]]
+    assert len(case_ids) == len(set(case_ids))
+    assert all(case["expected"] in {"accept", "reject"} for case in manifest["cases"])
