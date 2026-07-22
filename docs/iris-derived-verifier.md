@@ -68,7 +68,7 @@ A future implementation must reject at least:
 - non-canonical records, duplicate JSON keys, and non-finite values;
 - missing evidence, missing authority, or ambiguous disposition.
 
-The current code validates derivation profiles, deterministic keyed derivation, strict JSON, privacy-safe record shape, schema shape, synthetic golden vectors, and a bounded synthetic attempt-context screen. It does not claim coverage of capture, liveness, matching, biometric-performance, or operational state-management failures.
+The current code validates derivation profiles, deterministic keyed derivation, strict JSON, privacy-safe record shape, schema shape, synthetic golden vectors, a bounded synthetic attempt-context screen, and a pure atomic consume-and-record projection. It does not claim coverage of capture, liveness, matching, biometric-performance, durable storage, or operational state-management failures.
 
 ## Synthetic hostile-context corpus
 
@@ -110,6 +110,20 @@ Repository `0` may emit a non-authoritative proposal containing only normalized 
 
 Repository `1` must independently validate identity namespaces, profile generation, revocation state, replay state, device/workspace binding, evidence completeness, and policy before recording any disposition. No Repository `0` match result can directly create enrollment, authentication, capability, or canonical identity state.
 
+## Atomic consume-and-record contract
+
+`fixtures/iris-verifier/atomic-consume-record-vectors.json` is a public synthetic corpus with byte SHA-256 `5557b6eeec96a2655410a9a60bfddec9c981a10762f0f02eb6b91f07e0379fc5`. Repository `0` uses it only to project the authority-side result without persisting or mutating authority state. Repository `1` validates the same bytes through an independently implemented state machine.
+
+The corpus requires all-or-nothing behavior for replay consumption and receipt recording:
+
+- interruption before commit or after preparation leaves the state byte-identical;
+- a successful commit records the attempt and receipt in the same version increment;
+- interruption after commit but before acknowledgment leaves a complete commit that an exact retry recognizes as already committed;
+- replay, revocation, and stale-version failures leave state unchanged;
+- a consumed attempt without a receipt, or a receipt without the consumed attempt, is invalid state and fails closed.
+
+This is conformance evidence for a transaction boundary, not a durable transaction implementation. Repository `0` never writes the candidate authority state, and the fixture does not select a database, consensus mechanism, lock strategy, journal, signer, or recovery owner.
+
 ## Rotation, rollback, and recovery
 
 Rotation creates a new profile generation with a new transform and/or key. Old profile generations and helper-data references must be explicitly revoked; they are never silently reactivated. Recovery references bind prior and replacement profiles to an independently owned checkpoint digest without copying biometric material.
@@ -121,12 +135,13 @@ Rollback of this candidate means closing the pull request or reverting its files
 This candidate provides:
 
 - `contracts/iris-derived-verifier-v0.schema.json`;
-- `iris_verifier_contract` strict parsing, profile validation, privacy guard, canonicalization, keyed derivation, and synthetic attempt-context screening primitives;
+- `iris_verifier_contract` strict parsing, profile validation, privacy guard, canonicalization, keyed derivation, synthetic attempt-context screening, and pure atomic projection primitives;
 - a synthetic fixture generator and committed golden vector;
 - the hostile-context corpus for wrong-eye, wrong-device, stale, replayed, corrupted, revoked, replaced, and recovery cases;
+- the shared atomic consume-and-record corpus for interruption, retry, replay, revocation, stale-version, and partial-state cases;
 - focused regression tests;
 - a read-only exact-head workflow with retained checksummed evidence.
 
 ## Remaining blockers
 
-Operational work remains blocked on approved capture hardware and profiles, liveness and quality algorithms, fuzzy-extractor design and leakage analysis, protected helper-data construction, independent implementations, performance evaluation, device identity, key custody, signer policy, durable revocation/replay state, atomic consume-and-record semantics, privacy and legal approval, incident ownership, recovery drills, and explicit human authorization.
+Operational work remains blocked on approved capture hardware and profiles, liveness and quality algorithms, fuzzy-extractor design and leakage analysis, protected helper-data construction, independent implementations, performance evaluation, device identity, key custody, signer policy, durable transactional storage, replay/revocation ownership, crash recovery, atomic commit evidence, privacy and legal approval, incident ownership, recovery drills, and explicit human authorization.
