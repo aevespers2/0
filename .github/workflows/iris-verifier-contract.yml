@@ -50,16 +50,18 @@ jobs:
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
 
-      - name: Validate schema and synthetic fixture
+      - name: Validate schema and synthetic fixtures
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p reports/iris-verifier-contract
           python -m json.tool contracts/iris-derived-verifier-v0.schema.json \
             > reports/iris-verifier-contract/schema.validated.json
+          python -m json.tool fixtures/iris-verifier/hostile-context-vectors.json \
+            > reports/iris-verifier-contract/hostile-context.validated.json
           python scripts/generate_iris_verifier_fixtures.py \
             --check fixtures/iris-verifier/golden-vectors.json
-          printf 'fixture_check=passed\n' \
+          printf 'fixture_check=passed\nhostile_context_check=passed\n' \
             > reports/iris-verifier-contract/fixture-check.txt
 
       - name: Run focused contract tests
@@ -86,6 +88,7 @@ jobs:
             printf 'raw_biometric_material_allowed=false\n'
             printf 'production_key_material_allowed=false\n'
             printf 'operational_enrollment_authority=false\n'
+            printf 'hostile_fixture_sha256=677a66f65bde813e122c6493b5421a06dadf867cfa029a05f3bc610564f50006\n'
             printf 'generated_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           } > reports/iris-verifier-contract/run-summary.txt
           git status --porcelain > reports/iris-verifier-contract/worktree.txt
@@ -93,6 +96,7 @@ jobs:
             contracts/iris-derived-verifier-v0.schema.json \
             docs/iris-derived-verifier.md \
             fixtures/iris-verifier/golden-vectors.json \
+            fixtures/iris-verifier/hostile-context-vectors.json \
             iris_verifier_contract/__init__.py \
             iris_verifier_contract/contract.py \
             scripts/generate_iris_verifier_fixtures.py \
