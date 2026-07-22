@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import re
+from datetime import datetime, timezone
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -25,6 +26,33 @@ _PROFILE_KEYS = {
     "max_helper_data_bytes",
     "raw_capture_retention",
     "output_algorithm",
+}
+_ATTEMPT_KEYS = {
+    "schema",
+    "attempt_id",
+    "profile_id",
+    "generation",
+    "subject_ref",
+    "eye_side",
+    "device_ref",
+    "capture_digest",
+    "helper_data_digest",
+    "created_at",
+    "status",
+}
+_CONTEXT_KEYS = {
+    "expected_profile_id",
+    "current_generation",
+    "expected_subject_ref",
+    "expected_eye_side",
+    "expected_device_ref",
+    "expected_helper_data_digest",
+    "now",
+    "max_age_seconds",
+    "seen_attempt_ids",
+    "revoked_profile_ids",
+    "replacement_profile_id",
+    "recovery_state",
 }
 _FORBIDDEN_RECORD_KEYS = {
     "raw_image",
@@ -168,7 +196,9 @@ def assert_privacy_safe_record(record: Any, *, path: str = "$") -> None:
         for index, value in enumerate(record):
             assert_privacy_safe_record(value, path=f"{path}[{index}]")
         return
-    if isinstance(record, float) and (record != record or record in (float("inf"), float("-inf"))):
+    if isinstance(record, float) and (
+        record != record or record in (float("inf"), float("-inf"))
+    ):
         raise ContractError(f"non-finite value at {path}")
 
 
@@ -178,3 +208,145 @@ def require_sha256(name: str, value: Any) -> str:
     if not isinstance(value, str) or not _HEX_64.fullmatch(value):
         raise ContractError(f"{name} must be a lowercase SHA-256 digest")
     return value
+
+
+def _require_exact_keys(
+    name: str, value: Mapping[str, Any], expected: set[str]
+) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ContractError(f"{name} must be an object")
+    keys = set(value)
+    missing = expected - keys
+    unknown = keys - expected
+    if missing:
+        raise ContractError(f"missing {name} fields: {sorted(missing)}")
+    if unknown:
+        raise ContractError(f"unknown {name} fields: {sorted(unknown)}")
+    return dict(value)
+
+
+def _parse_utc_timestamp(name: str, value: Any) -> datetime:
+    if not isinstance(value, str):
+        raise ContractError(f"{name} must be an RFC 3339 timestamp")
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ContractError(f"{name} must be an RFC 3339 timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ContractError(f"{name} must include a UTC offset")
+    return parsed.astimezone(timezone.utc)
+
+
+def screen_synthetic_attempt_context(
+    *,
+    attempt: Mapping[str, Any],
+    context: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fail closed on synthetic attempt/context mismatches before proposal use.
+
+    This is a deterministic contract screen for synthetic fixtures. It does not
+    perform biometric comparison, enrollment, authentication, capability
+    issuance, device control, or canonical identity disposition.
+    """
+
+    normalized_attempt = _require_exact_keys("attempt", attempt, _ATTEMPT_KEYS)
+    normalized_context = _require_exact_keys("context", context, _CONTEXT_KEYS)
+
+    if normalized_attempt["schema"] != "qso.iris-verification-attempt.v0":
+        raise ContractError("unsupported attempt schema")
+    for field in ("attempt_id", "profile_id", "subject_ref", "device_ref"):
+        _require_identifier(field, normalized_attempt[field])
+    generation = normalized_attempt["generation"]
+    if type(generation) is not int or generation < 1:
+        raise ContractError("generation must be a positive integer")
+    if normalized_attempt["eye_side"] not in {"left", "right"}:
+        raise ContractError("eye_side must be left or right")
+    require_sha256("capture_digest", normalized_attempt["capture_digest"])
+    require_sha256("helper_data_digest", normalized_attempt["helper_data_digest"])
+    created_at = _parse_utc_timestamp("created_at", normalized_attempt["created_at"])
+    if normalized_attempt["status"] != "proposal-created":
+        raise ContractError("attempt status is not proposal-created")
+
+    for field in (
+        "expected_profile_id",
+        "expected_subject_ref",
+        "expected_device_ref",
+    ):
+        _require_identifier(field, normalized_context[field])
+    if normalized_context["expected_eye_side"] not in {"left", "right"}:
+        raise ContractError("expected_eye_side must be left or right")
+    require_sha256(
+        "expected_helper_data_digest",
+        normalized_context["expected_helper_data_digest"],
+    )
+    current_generation = normalized_context["current_generation"]
+    if type(current_generation) is not int or current_generation < 1:
+        raise ContractError("current_generation must be a positive integer")
+    max_age_seconds = normalized_context["max_age_seconds"]
+    if type(max_age_seconds) is not int or not 1 <= max_age_seconds <= 86_400:
+        raise ContractError("max_age_seconds must be an integer in [1, 86400]")
+    now = _parse_utc_timestamp("now", normalized_context["now"])
+
+    seen_attempt_ids = normalized_context["seen_attempt_ids"]
+    revoked_profile_ids = normalized_context["revoked_profile_ids"]
+    if not isinstance(seen_attempt_ids, list) or not all(
+        isinstance(value, str) and _IDENTIFIER.fullmatch(value)
+        for value in seen_attempt_ids
+    ):
+        raise ContractError("seen_attempt_ids must be normalized identifiers")
+    if len(seen_attempt_ids) != len(set(seen_attempt_ids)):
+        raise ContractError("seen_attempt_ids must not contain duplicates")
+    if not isinstance(revoked_profile_ids, list) or not all(
+        isinstance(value, str) and _IDENTIFIER.fullmatch(value)
+        for value in revoked_profile_ids
+    ):
+        raise ContractError("revoked_profile_ids must be normalized identifiers")
+    if len(revoked_profile_ids) != len(set(revoked_profile_ids)):
+        raise ContractError("revoked_profile_ids must not contain duplicates")
+
+    replacement_profile_id = normalized_context["replacement_profile_id"]
+    if replacement_profile_id is not None:
+        _require_identifier("replacement_profile_id", replacement_profile_id)
+    recovery_state = normalized_context["recovery_state"]
+    if recovery_state not in {"normal", "recovery-required", "recovery-completed"}:
+        raise ContractError("unsupported recovery_state")
+    if recovery_state == "recovery-completed" and replacement_profile_id is None:
+        raise ContractError("recovery-completed requires a replacement profile")
+
+    profile_id = normalized_attempt["profile_id"]
+    if profile_id in revoked_profile_ids:
+        raise ContractError("profile-revoked")
+    if replacement_profile_id is not None and profile_id != replacement_profile_id:
+        raise ContractError("profile-replaced")
+    if recovery_state == "recovery-required":
+        raise ContractError("recovery-not-complete")
+    if profile_id != normalized_context["expected_profile_id"]:
+        raise ContractError("profile-mismatch")
+    if generation < current_generation:
+        raise ContractError("stale-generation")
+    if generation > current_generation:
+        raise ContractError("future-generation")
+    if normalized_attempt["subject_ref"] != normalized_context["expected_subject_ref"]:
+        raise ContractError("subject-mismatch")
+    if normalized_attempt["eye_side"] != normalized_context["expected_eye_side"]:
+        raise ContractError("eye-side-mismatch")
+    if normalized_attempt["device_ref"] != normalized_context["expected_device_ref"]:
+        raise ContractError("device-mismatch")
+    if (
+        normalized_attempt["helper_data_digest"]
+        != normalized_context["expected_helper_data_digest"]
+    ):
+        raise ContractError("helper-data-digest-mismatch")
+    if normalized_attempt["attempt_id"] in seen_attempt_ids:
+        raise ContractError("attempt-replay")
+
+    age_seconds = (now - created_at).total_seconds()
+    if age_seconds < 0:
+        raise ContractError("future-attempt")
+    if age_seconds > max_age_seconds:
+        raise ContractError("stale-attempt")
+
+    assert_privacy_safe_record(normalized_attempt)
+    assert_privacy_safe_record(normalized_context)
+    return normalized_attempt
