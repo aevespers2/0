@@ -38,7 +38,7 @@ The schema separates:
 - revocation records;
 - recovery references.
 
-Capture records, liveness/quality assessments, normalized features, helper data, enrollment dispositions, corrections, and recovery checkpoints require independent identities and ownership even when later schemas are added.
+Capture records, liveness/quality assessments, normalized features, helper data, enrollment dispositions, corrections, and recovery checkpoints require independent identities and ownership even when later schemas are added. Verification attempts carry an explicit positive profile generation so stale or future generations cannot be inferred from a mutable profile name.
 
 ## Privacy invariants
 
@@ -68,7 +68,25 @@ A future implementation must reject at least:
 - non-canonical records, duplicate JSON keys, and non-finite values;
 - missing evidence, missing authority, or ambiguous disposition.
 
-The current code validates only the derivation profile, deterministic keyed derivation, strict JSON, privacy-safe record shape, schema shape, and synthetic golden vectors. It does not claim coverage of capture or biometric-performance failures.
+The current code validates derivation profiles, deterministic keyed derivation, strict JSON, privacy-safe record shape, schema shape, synthetic golden vectors, and a bounded synthetic attempt-context screen. It does not claim coverage of capture, liveness, matching, biometric-performance, or operational state-management failures.
+
+## Synthetic hostile-context corpus
+
+`fixtures/iris-verifier/hostile-context-vectors.json` is a public synthetic corpus with byte SHA-256 `677a66f65bde813e122c6493b5421a06dadf867cfa029a05f3bc610564f50006`. It contains no capture, biometric template, reconstructed secret, helper-data bytes, production key, or live identity material.
+
+The corpus fixes one baseline attempt and context, then requires deterministic outcomes for:
+
+- a valid baseline;
+- wrong-eye and wrong-device attempts;
+- a stale profile generation;
+- an already-seen attempt identifier;
+- a changed helper-data digest;
+- a revoked profile;
+- an attempt against a replaced profile;
+- an incomplete recovery state;
+- a completed recovery using the explicit replacement profile and generation.
+
+The screen validates exact record fields, normalized identifiers, lowercase SHA-256 digests, bounded age, profile generation, subject, eye, device, helper-data reference, replay state, revocation state, replacement state, and recovery state before a synthetic proposal may be considered. Acceptance remains evidence only and creates no enrollment, authentication, capability, device-control, or canonical-state authority.
 
 ## Evaluation requirements
 
@@ -103,8 +121,9 @@ Rollback of this candidate means closing the pull request or reverting its files
 This candidate provides:
 
 - `contracts/iris-derived-verifier-v0.schema.json`;
-- `iris_verifier_contract` strict parsing, profile validation, privacy guard, canonicalization, and keyed derivation primitives;
+- `iris_verifier_contract` strict parsing, profile validation, privacy guard, canonicalization, keyed derivation, and synthetic attempt-context screening primitives;
 - a synthetic fixture generator and committed golden vector;
+- the hostile-context corpus for wrong-eye, wrong-device, stale, replayed, corrupted, revoked, replaced, and recovery cases;
 - focused regression tests;
 - a read-only exact-head workflow with retained checksummed evidence.
 
