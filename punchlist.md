@@ -100,5 +100,24 @@
 4. Complete Phase 7 and Phase 8.
 5. Complete Phase 9 and update `taskchain.md`.
 
+## Portfolio Health Control Plane v3
+
+- [x] Rebuild the scanner from current `main` rather than rewriting the diverged PR #10 branch.
+- [x] Separate a dedicated cross-repository `PORTFOLIO_TOKEN` from the repository-scoped `GITHUB_TOKEN` and use public owner enumeration when portfolio credentials are absent.
+- [x] Restrict current workflow findings to default and open-PR heads and supersede older workflow failures with newer states for the same workflow, head, and event.
+- [x] Add exact-head checks, bounded mergeability retries, workflow-permission auditing, immutable-Action checks, expected-artifact checks, documentation-link checks, release provenance checks, and blocking-issue detection.
+- [x] Add stable finding identities and a semantic SHA-256 fingerprint that excludes timestamps.
+- [x] Route changed findings only to canonical issue #9 and suppress duplicate comments for unchanged fingerprints.
+- [x] Keep generated reports outside the checkout and retain exact-head, runtime, test, report, and checksum evidence for 90 days.
+- [x] Add 16 focused scanner regressions and a read-only exact-head candidate workflow.
+- [ ] Obtain successful GitHub Actions evidence at the final replacement-PR head.
+- [ ] Verify the replacement is mergeable and has no unresolved high-risk review thread.
+- [ ] Close PR #10 unmerged as superseded while preserving its historical evidence.
+- [ ] Merge only the validated replacement into `main`, then inspect the first trusted resulting-state scan.
+- [ ] Confirm a second unchanged scan creates no duplicate issue comment.
+- [ ] Classify and repair the highest-priority live findings without enabling production, credential, destructive-history, release, publication, deployment, or infrastructure authority.
+
+**Control-plane acceptance criteria:** exact-head CI passes; the first trusted scan covers all accessible owned repositories without silent access loss; issue #9 receives at most one comment per changed semantic fingerprint; artifacts remain available; scan errors fail closed; and all privileged actions remain separately authorized.
+
 ## Evidence Log
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, and remediation tasks below.
