@@ -1,0 +1,140 @@
+name: Portfolio Health Control Plane
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/portfolio_health.py"
+      - "tests/test_portfolio_health.py"
+      - "governance/portfolio-agents.json"
+      - ".github/workflows/portfolio-health*.yml"
+      - "docs/portfolio-health-control-plane.md"
+      - "punchlist.md"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: portfolio-health-control-plane
+  cancel-in-progress: false
+
+env:
+  PORTFOLIO_OWNER: aevespers2
+  TRUSTED_SHA: ${{ github.sha }}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out trusted exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.TRUSTED_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+          show-progress: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+          cache: ""
+
+      - name: Assert trusted clean scanner source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$TRUSTED_SHA"
+          test -z "$(git status --porcelain)"
+          test -f scripts/portfolio_health.py
+          evidence="$RUNNER_TEMP/portfolio-health"
+          mkdir -p "$evidence"
+          printf '%s\n' "$TRUSTED_SHA" > "$evidence/scanner-head.txt"
+          printf '%s\n' "$GITHUB_RUN_ID" > "$evidence/workflow-run.txt"
+
+      - name: Run exact-state portfolio scan
+        id: scan
+        continue-on-error: true
+        env:
+          PORTFOLIO_TOKEN: ${{ secrets.PORTFOLIO_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/portfolio-health"
+          cd "$evidence"
+          python "$GITHUB_WORKSPACE/scripts/portfolio_health.py"
+          status=$?
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$status" > "$evidence/scanner-exit-code.txt"
+          exit 0
+
+      - name: Retain scan evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/portfolio-health"
+          test -f "$evidence/portfolio-health.json"
+          test -f "$evidence/portfolio-health.md"
+          {
+            printf '\nExact scanner head: `%s`\n' "$TRUSTED_SHA"
+            printf 'Evidence run: `%s`\n' "$GITHUB_RUN_ID"
+          } >> "$evidence/portfolio-health.md"
+          python --version > "$evidence/python-version.txt" 2>&1
+          sha256sum \
+            scripts/portfolio_health.py \
+            .github/workflows/portfolio-health.yml \
+            "$evidence/portfolio-health.json" \
+            "$evidence/portfolio-health.md" \
+            > "$evidence/SHA256SUMS"
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git status --porcelain)"
+
+      - name: Upload deterministic evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: portfolio-health-${{ github.run_id }}-${{ env.TRUSTED_SHA }}
+          path: ${{ runner.temp }}/portfolio-health
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Comment only when the semantic fingerprint changes
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/portfolio-health"
+          current="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["portfolio_fingerprint"])' "$evidence/portfolio-health.json")"
+          previous="$(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/9/comments" --jq '.[].body' \
+              | grep -oE 'portfolio_fingerprint=sha256:[0-9a-f]{64}' \
+              | tail -1 \
+              | cut -d= -f2 \
+              || true
+          )"
+          if [[ "$current" != "$previous" ]]; then
+            gh issue comment 9 --body-file "$evidence/portfolio-health.md"
+          else
+            echo "unchanged portfolio fingerprint; no duplicate comment created"
+          fi
+
+      - name: Fail closed on incomplete scan coverage
+        if: always()
+        env:
+          SCAN_STATUS: ${{ steps.scan.outputs.status }}
+        run: |
+          set -euo pipefail
+          test "$SCAN_STATUS" = "0"

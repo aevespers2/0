@@ -1,0 +1,107 @@
+{
+  "schema_version": "3.0.0",
+  "owner": "aevespers2",
+  "canonical_health_issue": 9,
+  "principles": [
+    "fail_closed_on_missing_or_incomplete_evidence",
+    "exact_head_requires_completed_success",
+    "trusted_default_branch_scanner",
+    "semantic_fingerprint_deduplication",
+    "single_central_issue_comment_route",
+    "small_reversible_repairs",
+    "historical_evidence_is_not_current_state",
+    "no_automatic_merge_release_publication_or_deployment"
+  ],
+  "authority_boundary": {
+    "repository_reads": true,
+    "actions_log_reads": true,
+    "central_issue_comments": true,
+    "repair_branch_and_draft_pr_preparation": true,
+    "automatic_merge": false,
+    "production_deployment": false,
+    "credential_changes": false,
+    "destructive_history_rewrite": false,
+    "infrastructure_apply": false
+  },
+  "deduplication_key": [
+    "repository",
+    "issue_or_pull_request",
+    "exact_head",
+    "workflow_run",
+    "failure_signature",
+    "resolution_state"
+  ],
+  "skill_tree_mapping": {
+    "CAT-012": ["012-D link checking and documentation testing", "012-E docs-as-code and changelog synchronization"],
+    "CAT-017": ["017-C provenance modeling", "017-D version-substitution detection", "017-E audit-package generation and correction propagation"],
+    "CAT-022": ["022-A dependency pinning", "022-C deterministic execution", "022-D checksum validation", "022-E artifact packaging"],
+    "CAT-031": ["031-A threat-aware acceptance criteria", "031-D integration and regression testing", "031-E verified builds and vulnerability remediation"],
+    "CAT-040": ["040-A system archaeology", "040-B migration dependency mapping", "040-E rollback planning and post-migration monitoring"],
+    "CAT-052": ["052-B least privilege", "052-E audit evidence and continuous assurance"],
+    "CAT-054": ["054-B supply-chain hardening", "054-E control validation and continuous assurance"]
+  },
+  "proposed_skill_gap": {
+    "id": "031-L",
+    "name": "portfolio exact-state repair orchestration",
+    "scope": [
+      "cross-repository active-head enumeration",
+      "workflow-failure signature normalization",
+      "semantic finding deduplication",
+      "artifact-presence verification",
+      "stale-provenance reconciliation",
+      "bounded reversible repair resumption"
+    ],
+    "authority_effect": "none"
+  },
+  "agents": [
+    {
+      "id": "sentinel",
+      "implemented": true,
+      "purpose": "Detect current failed or missing exact-head CI, conflicts, blocking issues, unsafe workflow permissions, mutable Actions, missing artifacts, broken documentation links, stale provenance, and release contradictions.",
+      "authority": ["read_owned_repositories", "read_actions_and_artifacts"],
+      "constraints": ["active_heads_only", "bounded_pagination", "fail_closed_on_scan_error"]
+    },
+    {
+      "id": "flow_orchestrator",
+      "implemented": true,
+      "purpose": "Compute a stable semantic fingerprint and comment on canonical issue 9 only when portfolio state changes.",
+      "authority": ["read_issue_comments", "comment_on_issue_9"],
+      "constraints": ["no_duplicate_comments", "no_issue_overwrite", "no_automatic_close"]
+    },
+    {
+      "id": "ci_healer",
+      "implemented": false,
+      "purpose": "Diagnose exact failing jobs and prepare focused reversible repair branches after deterministic root cause is established.",
+      "authority": ["read_actions_logs", "propose_repair_branch", "propose_draft_pr"],
+      "constraints": ["never_weaken_tests", "never_claim_flake_without_evidence", "never_merge_on_own_output"]
+    },
+    {
+      "id": "provenance_steward",
+      "implemented": false,
+      "purpose": "Reconcile stale candidate heads, workflow runs, artifacts, and release-document claims while preserving history.",
+      "authority": ["read_release_metadata", "propose_documentation_patch"],
+      "constraints": ["no_evidence_rewrite", "retain_superseded_generations"]
+    },
+    {
+      "id": "dependency_curator",
+      "implemented": false,
+      "purpose": "Inventory runtimes, lockfiles, unsupported dependencies, mutable Actions, and supply-chain gaps.",
+      "authority": ["read_manifests", "propose_dependency_issue_or_patch"],
+      "constraints": ["no_runtime_install_authority", "pin_before_acceptance"]
+    },
+    {
+      "id": "incident_custodian",
+      "implemented": false,
+      "purpose": "Preserve failure evidence and prepare non-destructive containment and recovery proposals.",
+      "authority": ["read_incident_evidence", "propose_containment_pr"],
+      "constraints": ["no_destructive_cleanup", "no_root_cause_claim_without_evidence"]
+    },
+    {
+      "id": "release_gatekeeper",
+      "implemented": false,
+      "purpose": "Report release eligibility from exact-head CI, review, provenance, security, artifact, and rollback evidence.",
+      "authority": ["read_evidence", "publish_non_authorizing_gate_report"],
+      "constraints": ["cannot_approve_own_validator_change", "skipped_is_not_success", "human_release_authority_required"]
+    }
+  ]
+}
