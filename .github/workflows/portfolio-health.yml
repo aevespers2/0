@@ -68,11 +68,13 @@ jobs:
         shell: bash
         run: |
           set +e
-          python scripts/portfolio_health.py
+          evidence="$RUNNER_TEMP/portfolio-health"
+          cd "$evidence"
+          python "$GITHUB_WORKSPACE/scripts/portfolio_health.py"
           status=$?
           set -e
           echo "status=$status" >> "$GITHUB_OUTPUT"
-          printf '%s\n' "$status" > "$RUNNER_TEMP/portfolio-health/scanner-exit-code.txt"
+          printf '%s\n' "$status" > "$evidence/scanner-exit-code.txt"
           exit 0
 
       - name: Retain scan evidence
@@ -81,20 +83,19 @@ jobs:
         run: |
           set -euo pipefail
           evidence="$RUNNER_TEMP/portfolio-health"
-          test -f portfolio-health.json
-          test -f portfolio-health.md
-          cp portfolio-health.json portfolio-health.md "$evidence/"
+          test -f "$evidence/portfolio-health.json"
+          test -f "$evidence/portfolio-health.md"
+          {
+            printf '\nExact scanner head: `%s`\n' "$TRUSTED_SHA"
+            printf 'Evidence run: `%s`\n' "$GITHUB_RUN_ID"
+          } >> "$evidence/portfolio-health.md"
           python --version > "$evidence/python-version.txt" 2>&1
           sha256sum \
             scripts/portfolio_health.py \
             .github/workflows/portfolio-health.yml \
-            portfolio-health.json \
-            portfolio-health.md \
+            "$evidence/portfolio-health.json" \
+            "$evidence/portfolio-health.md" \
             > "$evidence/SHA256SUMS"
-          {
-            printf '\nExact scanner head: `%s`\n' "$TRUSTED_SHA"
-            printf 'Evidence run: `%s`\n' "$GITHUB_RUN_ID"
-          } >> portfolio-health.md
           git diff --exit-code
           git diff --cached --exit-code
           test -z "$(git status --porcelain)"
@@ -115,7 +116,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          current="$(python -c 'import json; print(json.load(open("portfolio-health.json"))["portfolio_fingerprint"])')"
+          evidence="$RUNNER_TEMP/portfolio-health"
+          current="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["portfolio_fingerprint"])' "$evidence/portfolio-health.json")"
           previous="$(
             gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/9/comments" --jq '.[].body' \
               | grep -oE 'portfolio_fingerprint=sha256:[0-9a-f]{64}' \
@@ -124,7 +126,7 @@ jobs:
               || true
           )"
           if [[ "$current" != "$previous" ]]; then
-            gh issue comment 9 --body-file portfolio-health.md
+            gh issue comment 9 --body-file "$evidence/portfolio-health.md"
           else
             echo "unchanged portfolio fingerprint; no duplicate comment created"
           fi
