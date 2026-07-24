@@ -9,7 +9,10 @@ on:
       - main
     paths:
       - "scripts/portfolio_health.py"
+      - "scripts/github_content.py"
+      - "scripts/portfolio_health_entry.py"
       - "tests/test_portfolio_health.py"
+      - "tests/test_portfolio_health_entry.py"
       - "governance/portfolio-agents.json"
       - ".github/workflows/portfolio-health*.yml"
       - "docs/portfolio-health-control-plane.md"
@@ -54,6 +57,8 @@ jobs:
           test "$(git rev-parse HEAD)" = "$TRUSTED_SHA"
           test -z "$(git status --porcelain)"
           test -f scripts/portfolio_health.py
+          test -f scripts/github_content.py
+          test -f scripts/portfolio_health_entry.py
           evidence="$RUNNER_TEMP/portfolio-health"
           mkdir -p "$evidence"
           printf '%s\n' "$TRUSTED_SHA" > "$evidence/scanner-head.txt"
@@ -70,7 +75,7 @@ jobs:
           set +e
           evidence="$RUNNER_TEMP/portfolio-health"
           cd "$evidence"
-          python "$GITHUB_WORKSPACE/scripts/portfolio_health.py"
+          python "$GITHUB_WORKSPACE/scripts/portfolio_health_entry.py"
           status=$?
           set -e
           echo "status=$status" >> "$GITHUB_OUTPUT"
@@ -92,6 +97,8 @@ jobs:
           python --version > "$evidence/python-version.txt" 2>&1
           sha256sum \
             scripts/portfolio_health.py \
+            scripts/github_content.py \
+            scripts/portfolio_health_entry.py \
             .github/workflows/portfolio-health.yml \
             "$evidence/portfolio-health.json" \
             "$evidence/portfolio-health.md" \

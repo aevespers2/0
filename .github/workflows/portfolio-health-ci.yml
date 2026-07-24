@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - "scripts/portfolio_health.py"
+      - "scripts/github_content.py"
+      - "scripts/portfolio_health_entry.py"
       - "tests/test_portfolio_health.py"
+      - "tests/test_portfolio_health_entry.py"
       - "governance/portfolio-agents.json"
       - ".github/workflows/portfolio-health*.yml"
       - "docs/portfolio-health-control-plane.md"
@@ -47,7 +50,10 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SUBMITTED_SHA"
           test -z "$(git status --porcelain)"
           test -f scripts/portfolio_health.py
+          test -f scripts/github_content.py
+          test -f scripts/portfolio_health_entry.py
           test -f tests/test_portfolio_health.py
+          test -f tests/test_portfolio_health_entry.py
           test -f governance/portfolio-agents.json
 
       - name: Install pinned test dependency
@@ -59,8 +65,13 @@ jobs:
           set -euo pipefail
           evidence="$RUNNER_TEMP/portfolio-health-ci"
           mkdir -p "$evidence"
-          python -m py_compile scripts/portfolio_health.py
-          python -m pytest -q tests/test_portfolio_health.py \
+          python -m py_compile \
+            scripts/portfolio_health.py \
+            scripts/github_content.py \
+            scripts/portfolio_health_entry.py
+          python -m pytest -q \
+            tests/test_portfolio_health.py \
+            tests/test_portfolio_health_entry.py \
             --junitxml="$evidence/pytest.xml" \
             | tee "$evidence/pytest.log"
 
@@ -93,7 +104,10 @@ jobs:
           python -m pytest --version > "$evidence/pytest-version.txt" 2>&1
           sha256sum \
             scripts/portfolio_health.py \
+            scripts/github_content.py \
+            scripts/portfolio_health_entry.py \
             tests/test_portfolio_health.py \
+            tests/test_portfolio_health_entry.py \
             governance/portfolio-agents.json \
             .github/workflows/portfolio-health-ci.yml \
             .github/workflows/portfolio-health.yml \

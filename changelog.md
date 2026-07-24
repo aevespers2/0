@@ -19,6 +19,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-16 — Required the Architect to choose a canonical route model, assign schema/package ownership, and approve Repository `1` authority before VTX runtime/schema work can merge.
 - 2026-07-17 — Recorded that PR #8 overlaps the closed QSO-FABRIC bootstrap proposal and QSO-GENOMES draft governance control plane. One canonical governance owner, opt-in scope, credential boundary, evidence model, and rollback path must be approved before adoption.
 - 2026-07-23 — Corrected the portfolio-health source model so workflow security and artifact expectations are evaluated from each immutable default or open-PR head rather than inferred from the default workflow tree.
+- 2026-07-24 — Added a narrow GitHub Contents API decoding boundary so line-wrapped base64 responses are normalized before strict alphabet, padding, and UTF-8 validation; malformed payloads still fail closed.
 
 ### Implementation
 - No released implementation capability is claimed; existing source and tests remain candidate inputs pending current verification.
@@ -27,6 +28,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-17 — PR #7 now inventories Python/pip, both Node/TypeScript/npm packages, Node `>=20`, and the executable Bash pre-push hook plus operator-invoked activation path; it also restores the Phase 1 item to pending and corrects release-artifact and rollback wording.
 - 2026-07-17 — Observed PR #8 adding a portfolio scanner, scheduled and candidate workflows, a seven-role registry, and control-plane documentation. These are implemented candidate artifacts, not an accepted or activated portfolio-governance capability.
 - 2026-07-23 — Added exact-PR-head workflow scanning, inheritance deduplication, exact-run artifact-source resolution, and hostile regressions without adding merge, release, publication, deployment, credential, or infrastructure authority.
+- 2026-07-24 — Routed scheduled scans through a hardened entry point and added focused wrapped-base64, malformed-alphabet, invalid-UTF-8, and unexpected-encoding regressions without expanding scanner authority.
 
 ### Evidence
 - 2026-07-16 — Earlier draft head `dbd8186caa2017f4dcc2f53e2ae25ce5ec244be8` completed Autonomous vNext CI run `29544823133` successfully, but that result is superseded for submission review because the branch advanced.
@@ -37,6 +39,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-17 — PR #7 current head `991216f8c9f72a3bcb23b745f148697659217322` contains the bounded content corrections and is consistently identified in the PR body, but has no attached workflow run or commit status, is non-mergeable, and retains one unresolved Node/TypeScript review thread pending exact-head verification. The corrected rollback-scope thread is resolved.
 - 2026-07-17 — PR #8 current head `f291db0446d84005a3764795ca880cafeec1ad4c` completed Portfolio Health Candidate CI run `29583289679` and Autonomous vNext CI run `29583289637` successfully, but neither run retained artifacts. The checks validate compilation and registry structure rather than enumeration, finding semantics, issue lifecycle, credential scope, failure recovery, or behavioral fixtures; GitHub currently reports the draft non-mergeable.
 - 2026-07-23 — Added two focused regressions proving changed unsafe PR workflows are detected, inherited safe workflow copies are deduplicated, and missing artifacts are evaluated against the workflow declaration at the run's exact head.
+- 2026-07-24 — Diagnosed the portfolio-wide `Only base64 data is allowed` scan failure as strict decoding of GitHub's valid line-wrapped Contents API payloads and added retained exact-head regression evidence for the corrected boundary.
 
 ### Release
 - The `0.0.1-baseline` candidate remains blocked until clean-environment tests, security checks, documentation verification, provenance, and rollback evidence pass.
@@ -44,6 +47,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-17 — A passing workflow on PR #7's earlier head does not make the repository release-ready. The final submitted head must pass attached exact-head CI and the remaining material review thread must be resolved before additional P0 inventory begins.
 - 2026-07-17 — Draft PR #8 is excluded from the Autonomous vNext release. Its scanner, registry, scheduled workflow, token boundary, and issue lifecycle require a separately approved governance product and retained behavioral evidence.
 - 2026-07-23 — Portfolio-health v3.1 remains a reversible scanner repair candidate until its final exact head passes retained validation; success does not authorize release or operational action.
+- 2026-07-24 — The content-decoder repair is not release evidence until the focused PR head and resulting `main` scan both complete with retained artifacts and zero repository-decoding errors.
 
 ### Deployment
 - No remote publishing or deployment is authorized by the MVP directive.
@@ -51,6 +55,7 @@ All notable product, architecture, implementation, release, and deployment chang
 - 2026-07-17 — No deployment was attempted for PR #7; current-head verification and final review closure remain blocking.
 - 2026-07-17 — No portfolio-wide token, six-hour schedule, central issue mutation, or automated recovery closure from PR #8 is authorized. The draft remains inert until ownership, least privilege, opt-in scope, tests, failure recovery, retained evidence, and rollback are approved.
 - 2026-07-23 — The exact-head scanner repair changes no production deployment, credential, release, Pages, payment, destructive-history, or infrastructure state.
+- 2026-07-24 — The decoder repair changes no token scope, repository visibility, issue-writing policy, merge authority, deployment, credential, release, Pages, payment, destructive-history, or infrastructure state.
 
 ## Entry Format
 - Date
