@@ -164,3 +164,94 @@ def test_render_markdown_contains_machine_readable_fingerprint():
 def test_pagination_rejects_non_list_payload():
     with pytest.raises(ValueError, match="did not return a list"):
         health.paginated("/items", requester=lambda path: {"items": []})
+
+
+def test_pr_head_workflow_scan_reports_only_changed_unsafe_sources(monkeypatch):
+    path = ".github/workflows/ci.yml"
+    baseline = """on:
+  pull_request:
+permissions:
+  contents: read
+jobs: {}
+"""
+    changed = """on:
+  pull_request_target:
+permissions: write-all
+jobs:
+  x:
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+"""
+    monkeypatch.setattr(
+        health,
+        "content",
+        lambda request_path: [{"path": path}]
+        if "/contents/.github/workflows?" in request_path
+        else None,
+    )
+    monkeypatch.setattr(health, "text", lambda request_path: changed)
+    findings, sources = health.scan_workflows(
+        "aevespers2/example",
+        "a" * 40,
+        "PR #7@aaaaaaaaaaaa",
+        baseline_sources={path: baseline},
+    )
+    assert sources == {path: changed}
+    assert {finding.kind for finding in findings} == {
+        "unsafe_workflow_permissions",
+        "unsafe_pull_request_target_permissions",
+        "mutable_action_reference",
+    }
+    assert all("a" * 40 in finding.identity for finding in findings)
+
+    monkeypatch.setattr(health, "text", lambda request_path: baseline)
+    inherited, sources = health.scan_workflows(
+        "aevespers2/example",
+        "b" * 40,
+        "PR #8@bbbbbbbbbbbb",
+        baseline_sources={path: baseline},
+    )
+    assert inherited == []
+    assert sources == {path: baseline}
+
+
+def test_artifact_check_uses_workflow_source_from_run_exact_head():
+    path = ".github/workflows/pr-only.yml"
+    run = {
+        "id": 44,
+        "workflow_id": 9,
+        "head_sha": "p" * 40,
+        "status": "completed",
+        "conclusion": "success",
+        "name": "PR-only validation",
+        "html_url": "https://example.invalid/run/44",
+    }
+    calls = []
+    def requester(request_path):
+        calls.append(request_path)
+        if request_path.endswith("/actions/workflows/9"):
+            return {"path": path}
+        if request_path.endswith("/actions/runs/44/artifacts?per_page=1"):
+            return {"total_count": 0}
+        raise AssertionError(request_path)
+
+    findings = health.scan_artifacts(
+        "aevespers2/example",
+        {"p" * 40},
+        [run],
+        {
+            "d" * 40: {},
+            "p" * 40: {
+                path: "steps:\n  - uses: actions/upload-artifact@" + "a" * 40
+            },
+        },
+        requester=requester,
+    )
+    assert len(findings) == 1
+    assert findings[0].kind == "missing_expected_artifact"
+    assert calls == [
+        "/repos/aevespers2/example/actions/workflows/9",
+        "/repos/aevespers2/example/actions/runs/44/artifacts?per_page=1",
+    ]
