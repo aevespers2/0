@@ -184,19 +184,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 """
+    content_requests = []
+    text_requests = []
     monkeypatch.setattr(
         health,
         "content",
-        lambda request_path: [{"path": path}]
+        lambda request_path: content_requests.append(request_path) or ([{"path": path}]
         if "/contents/.github/workflows?" in request_path
-        else None,
+        else None),
     )
-    monkeypatch.setattr(health, "text", lambda request_path: changed)
+    monkeypatch.setattr(
+        health,
+        "text",
+        lambda request_path: text_requests.append(request_path) or changed,
+    )
     findings, sources = health.scan_workflows(
         "aevespers2/example",
         "a" * 40,
         "PR #7@aaaaaaaaaaaa",
         baseline_sources={path: baseline},
+        source_repo="contributor/example",
     )
     assert sources == {path: changed}
     assert {finding.kind for finding in findings} == {
@@ -205,6 +212,14 @@ jobs:
         "mutable_action_reference",
     }
     assert all("a" * 40 in finding.identity for finding in findings)
+    assert all("contributor/example" in finding.identity for finding in findings)
+    assert all("github.com/contributor/example/blob/" in finding.url for finding in findings)
+    assert content_requests == [
+        "/repos/contributor/example/contents/.github/workflows?ref=" + "a" * 40
+    ]
+    assert text_requests == [
+        "/repos/contributor/example/contents/.github/workflows/ci.yml?ref=" + "a" * 40
+    ]
 
     monkeypatch.setattr(health, "text", lambda request_path: baseline)
     inherited, sources = health.scan_workflows(
@@ -212,6 +227,7 @@ jobs:
         "b" * 40,
         "PR #8@bbbbbbbbbbbb",
         baseline_sources={path: baseline},
+        source_repo="contributor/example",
     )
     assert inherited == []
     assert sources == {path: baseline}
