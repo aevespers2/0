@@ -156,13 +156,15 @@ def scan_workflows(
     ref_name: str,
     label: str | None = None,
     baseline_sources: dict[str, str] | None = None,
+    source_repo: str | None = None,
 ) -> tuple[list[Finding], dict[str, str]]:
-    """Scan workflow files at one exact head, suppressing unchanged PR inheritance."""
+    """Scan workflow files at one exact source head, including forked PR heads."""
     findings: list[Finding] = []
     sources: dict[str, str] = {}
     label = label or ref_name
+    source_repo = source_repo or repo
     ref = urllib.parse.quote(ref_name, safe="")
-    listing = content(f"/repos/{repo}/contents/.github/workflows?ref={ref}")
+    listing = content(f"/repos/{source_repo}/contents/.github/workflows?ref={ref}")
     if listing is None:
         return findings, sources
     if not isinstance(listing, list):
@@ -171,19 +173,20 @@ def scan_workflows(
         path = item.get("path") if isinstance(item, dict) else None
         if not isinstance(path, str) or not path.endswith((".yml", ".yaml")):
             continue
-        source = text(f"/repos/{repo}/contents/{urllib.parse.quote(path, safe='/')}?ref={ref}")
+        source = text(f"/repos/{source_repo}/contents/{urllib.parse.quote(path, safe='/')}?ref={ref}")
         if source is None:
             continue
         sources[path] = source
         if baseline_sources is not None and baseline_sources.get(path) == source:
             continue
-        url = f"https://github.com/{repo}/blob/{ref_name}/{path}"
+        url = f"https://github.com/{source_repo}/blob/{ref_name}/{path}"
         prefix = f"{label}: {path}"
+        source_identity = f"{source_repo}|{ref_name}|{path}"
         for kind, summary in permission_problems(source):
-            findings.append(Finding("high" if kind != "missing_workflow_permissions" else "medium", repo, kind, f"{prefix}: {summary}", url, f"{repo}|workflow|{ref_name}|{path}|{kind}"))
+            findings.append(Finding("high" if kind != "missing_workflow_permissions" else "medium", repo, kind, f"{prefix}: {summary}", url, f"{repo}|workflow-source|{source_identity}|{kind}"))
         mutable = mutable_actions(source)
         if mutable:
-            findings.append(Finding("medium", repo, "mutable_action_reference", f"{prefix}: {', '.join(mutable)}", url, f"{repo}|workflow|{ref_name}|{path}|mutable|{'|'.join(mutable)}"))
+            findings.append(Finding("medium", repo, "mutable_action_reference", f"{prefix}: {', '.join(mutable)}", url, f"{repo}|workflow-source|{source_identity}|mutable|{'|'.join(mutable)}"))
     return findings, sources
 
 
@@ -276,13 +279,25 @@ def scan_repo(repository: dict[str, Any]) -> list[Finding]:
     workflow_sources_by_head[default_sha] = default_sources
     findings.extend(workflow_findings)
 
-    scanned_pr_heads: set[str] = set()
+    scanned_pr_heads: set[tuple[str, str]] = set()
     for pr in prs:
         number, sha = int(pr["number"]), str(pr["head"]["sha"])
-        if sha in scanned_pr_heads:
+        head_repo = (pr.get("head") or {}).get("repo") or {}
+        source_repo = head_repo.get("full_name") if isinstance(head_repo, dict) else None
+        if not isinstance(source_repo, str) or not source_repo:
+            findings.append(Finding("high", repo, "unavailable_pr_head_source", f"PR #{number} at {sha[:12]} has no readable source repository identity", pr["html_url"], f"{repo}|pr|{number}|{sha}|workflow-source-unavailable"))
             continue
-        scanned_pr_heads.add(sha)
-        pr_findings, pr_sources = scan_workflows(repo, sha, f"PR #{number}@{sha[:12]}", baseline_sources=default_sources)
+        source_key = (source_repo, sha)
+        if source_key in scanned_pr_heads:
+            continue
+        scanned_pr_heads.add(source_key)
+        pr_findings, pr_sources = scan_workflows(
+            repo,
+            sha,
+            f"PR #{number}@{sha[:12]}",
+            baseline_sources=default_sources,
+            source_repo=source_repo,
+        )
         workflow_sources_by_head[sha] = pr_sources
         findings.extend(pr_findings)
 
@@ -351,7 +366,7 @@ def main() -> int:
             errors.append(f"{repository.get('full_name', 'unknown')}: {type(exc).__name__}: {exc}")
     findings.sort(key=lambda item: ({"high": 0, "medium": 1, "low": 2}.get(item.severity, 9), item.repo, item.kind, item.identity, item.summary))
     report = {
-        "schema_version": "3.1.0",
+        "schema_version": "3.1.1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "owner": OWNER,
         "coverage_mode": "owner_all_visibility" if PORTFOLIO_TOKEN else "public_owner_repositories",
