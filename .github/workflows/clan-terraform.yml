@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: clan-terraform-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: clan-terraform-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -76,6 +76,7 @@ jobs:
           }
 
       - name: Record plan-only boundary
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
@@ -86,6 +87,9 @@ jobs:
             "automatic_apply=false" \
             "exact_head_required=true" \
             "source_sha=$(git rev-parse HEAD)" \
+            "submitted_sha=$SUBMITTED_SHA" \
+            "workflow_run=$GITHUB_RUN_ID" \
+            "workflow_attempt=$GITHUB_RUN_ATTEMPT" \
             "terraform_present=${{ steps.terraform.outputs.present }}" \
             > reports/clan-terraform/boundary.txt
           if [ -f .terraform.lock.hcl ]; then
