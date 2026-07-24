@@ -151,11 +151,20 @@ def local_links(source: str, source_path: str) -> list[str]:
     return sorted(targets)
 
 
-def scan_workflows(repo: str, branch: str) -> tuple[list[Finding], dict[str, str]]:
+def scan_workflows(
+    repo: str,
+    ref_name: str,
+    label: str | None = None,
+    baseline_sources: dict[str, str] | None = None,
+    source_repo: str | None = None,
+) -> tuple[list[Finding], dict[str, str]]:
+    """Scan workflow files at one exact source head, including forked PR heads."""
     findings: list[Finding] = []
     sources: dict[str, str] = {}
-    ref = urllib.parse.quote(branch, safe="")
-    listing = content(f"/repos/{repo}/contents/.github/workflows?ref={ref}")
+    label = label or ref_name
+    source_repo = source_repo or repo
+    ref = urllib.parse.quote(ref_name, safe="")
+    listing = content(f"/repos/{source_repo}/contents/.github/workflows?ref={ref}")
     if listing is None:
         return findings, sources
     if not isinstance(listing, list):
@@ -164,16 +173,20 @@ def scan_workflows(repo: str, branch: str) -> tuple[list[Finding], dict[str, str
         path = item.get("path") if isinstance(item, dict) else None
         if not isinstance(path, str) or not path.endswith((".yml", ".yaml")):
             continue
-        source = text(f"/repos/{repo}/contents/{urllib.parse.quote(path, safe='/')}?ref={ref}")
+        source = text(f"/repos/{source_repo}/contents/{urllib.parse.quote(path, safe='/')}?ref={ref}")
         if source is None:
             continue
         sources[path] = source
-        url = f"https://github.com/{repo}/blob/{branch}/{path}"
+        if baseline_sources is not None and baseline_sources.get(path) == source:
+            continue
+        url = f"https://github.com/{source_repo}/blob/{ref_name}/{path}"
+        prefix = f"{label}: {path}"
+        source_identity = f"{source_repo}|{ref_name}|{path}"
         for kind, summary in permission_problems(source):
-            findings.append(Finding("high" if kind != "missing_workflow_permissions" else "medium", repo, kind, f"{path}: {summary}", url, f"{repo}|workflow|{path}|{kind}"))
+            findings.append(Finding("high" if kind != "missing_workflow_permissions" else "medium", repo, kind, f"{prefix}: {summary}", url, f"{repo}|workflow-source|{source_identity}|{kind}"))
         mutable = mutable_actions(source)
         if mutable:
-            findings.append(Finding("medium", repo, "mutable_action_reference", f"{path}: {', '.join(mutable)}", url, f"{repo}|workflow|{path}|mutable|{'|'.join(mutable)}"))
+            findings.append(Finding("medium", repo, "mutable_action_reference", f"{prefix}: {', '.join(mutable)}", url, f"{repo}|workflow-source|{source_identity}|mutable|{'|'.join(mutable)}"))
     return findings, sources
 
 
@@ -193,21 +206,30 @@ def scan_links(repo: str, branch: str) -> list[Finding]:
     return findings
 
 
-def scan_artifacts(repo: str, heads: set[str], runs: Iterable[dict[str, Any]], workflow_sources: dict[str, str]) -> list[Finding]:
+def scan_artifacts(
+    repo: str,
+    heads: set[str],
+    runs: Iterable[dict[str, Any]],
+    workflow_sources_by_head: dict[str, dict[str, str]],
+    requester: Callable[[str], Any] = api,
+) -> list[Finding]:
+    """Check declarations from the workflow source at each run's exact head."""
     findings: list[Finding] = []
     paths: dict[int, str] = {}
     for run in runs:
-        if run.get("head_sha") not in heads or run.get("status") != "completed" or run.get("conclusion") != "success":
+        head_sha = str(run.get("head_sha") or "")
+        if head_sha not in heads or run.get("status") != "completed" or run.get("conclusion") != "success":
             continue
         workflow_id, run_id = run.get("workflow_id"), run.get("id")
         if not isinstance(workflow_id, int) or not isinstance(run_id, int):
             continue
         if workflow_id not in paths:
-            meta = api(f"/repos/{repo}/actions/workflows/{workflow_id}")
+            meta = requester(f"/repos/{repo}/actions/workflows/{workflow_id}")
             paths[workflow_id] = str(meta.get("path") or "") if isinstance(meta, dict) else ""
-        if "actions/upload-artifact@" not in workflow_sources.get(paths[workflow_id], ""):
+        source = workflow_sources_by_head.get(head_sha, {}).get(paths[workflow_id], "")
+        if "actions/upload-artifact@" not in source:
             continue
-        artifacts = api(f"/repos/{repo}/actions/runs/{run_id}/artifacts?per_page=1")
+        artifacts = requester(f"/repos/{repo}/actions/runs/{run_id}/artifacts?per_page=1")
         if isinstance(artifacts, dict) and artifacts.get("total_count") == 0:
             findings.append(Finding("high", repo, "missing_expected_artifact", f"successful run {run.get('name')} ({run_id}) retained no declared artifact", str(run.get("html_url") or ""), f"{repo}|run|{run_id}|missing-artifact"))
     return findings
@@ -252,9 +274,34 @@ def scan_repo(repository: dict[str, Any]) -> list[Finding]:
         if labels & {"critical", "security", "incident", "p0", "blocker"}:
             findings.append(Finding("high", repo, "blocking_issue", f"issue #{issue['number']}: {issue['title']}", issue["html_url"], f"{repo}|issue|{issue['number']}|blocking"))
 
-    workflow_findings, workflow_sources = scan_workflows(repo, branch)
+    workflow_sources_by_head: dict[str, dict[str, str]] = {}
+    workflow_findings, default_sources = scan_workflows(repo, default_sha, f"{branch}@{default_sha[:12]}")
+    workflow_sources_by_head[default_sha] = default_sources
     findings.extend(workflow_findings)
-    findings.extend(scan_artifacts(repo, heads, runs, workflow_sources))
+
+    scanned_pr_heads: set[tuple[str, str]] = set()
+    for pr in prs:
+        number, sha = int(pr["number"]), str(pr["head"]["sha"])
+        head_repo = (pr.get("head") or {}).get("repo") or {}
+        source_repo = head_repo.get("full_name") if isinstance(head_repo, dict) else None
+        if not isinstance(source_repo, str) or not source_repo:
+            findings.append(Finding("high", repo, "unavailable_pr_head_source", f"PR #{number} at {sha[:12]} has no readable source repository identity", pr["html_url"], f"{repo}|pr|{number}|{sha}|workflow-source-unavailable"))
+            continue
+        source_key = (source_repo, sha)
+        if source_key in scanned_pr_heads:
+            continue
+        scanned_pr_heads.add(source_key)
+        pr_findings, pr_sources = scan_workflows(
+            repo,
+            sha,
+            f"PR #{number}@{sha[:12]}",
+            baseline_sources=default_sources,
+            source_repo=source_repo,
+        )
+        workflow_sources_by_head[sha] = pr_sources
+        findings.extend(pr_findings)
+
+    findings.extend(scan_artifacts(repo, heads, runs, workflow_sources_by_head))
     findings.extend(scan_links(repo, branch))
 
     release = text(f"/repos/{repo}/contents/release.md?ref={urllib.parse.quote(branch, safe='')}")
@@ -319,7 +366,7 @@ def main() -> int:
             errors.append(f"{repository.get('full_name', 'unknown')}: {type(exc).__name__}: {exc}")
     findings.sort(key=lambda item: ({"high": 0, "medium": 1, "low": 2}.get(item.severity, 9), item.repo, item.kind, item.identity, item.summary))
     report = {
-        "schema_version": "3.0.0",
+        "schema_version": "3.1.1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "owner": OWNER,
         "coverage_mode": "owner_all_visibility" if PORTFOLIO_TOKEN else "public_owner_repositories",

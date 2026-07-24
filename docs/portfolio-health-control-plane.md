@@ -1,4 +1,4 @@
-# Portfolio Health Control Plane v3
+# Portfolio Health Control Plane v3.1
 
 ## Purpose
 
@@ -8,17 +8,17 @@ It is a bounded observation and repair-routing system. It does not merge pull re
 
 ## Current repair
 
-The prior candidate in PR #10 was built from a stale base and had diverged from current `main`. Its scheduled workflow would have created a second portfolio-health issue and rewritten the report on every run because timestamps changed even when the underlying findings did not. It also selected authenticated portfolio enumeration whenever any token existed, although the repository-scoped `GITHUB_TOKEN` does not establish portfolio-wide visibility.
+Version 3 established dedicated portfolio credentials, public-only fallback coverage, stable finding identities, semantic deduplication, one canonical issue route, exact-head validation, and retained evidence. Review of the trusted scanner then found a remaining exact-head coverage defect: workflow security and artifact expectations were read only from the default branch. A workflow introduced or modified solely on an open pull-request head could therefore evade permission and mutable-Action checks, and a PR-only workflow that declared artifact upload could finish successfully without retained artifacts while the scanner consulted an unrelated default-branch workflow tree.
 
-Version 3 is rebuilt from current `main` and corrects those defects:
+Version 3.1 closes that bounded defect:
 
-1. a dedicated `PORTFOLIO_TOKEN` selects all-visibility owner enumeration;
-2. the ordinary repository token falls back to the public owner endpoint rather than claiming private coverage;
-3. findings receive stable identities and a semantic SHA-256 fingerprint that excludes volatile timestamps;
-4. canonical issue #9 receives a new comment only when that fingerprint changes;
-5. old comments, workflow runs, heads, and artifacts remain preserved as historical evidence;
-6. generated reports are written outside the checked-out source tree;
-7. every scanner change receives exact submitted-head tests and retained evidence before integration.
+1. the default workflow tree is read from the immutable default commit rather than a mutable branch name;
+2. every unique open-PR head receives its own workflow-source inspection;
+3. PR findings are bound to repository, PR, exact head, workflow path, and normalized failure kind;
+4. workflow files byte-identical to the trusted default copy are not reported again for each PR;
+5. artifact expectations are resolved from the workflow source at the exact run head;
+6. new regressions exercise changed unsafe workflows, inherited safe workflows, mutable Action references, and missing artifacts from PR-only workflows;
+7. no merge, release, publication, deployment, credential, or infrastructure authority is added.
 
 ## Inspection surface
 
@@ -29,9 +29,9 @@ For every accessible, non-archived owned repository, the scanner evaluates:
 - missing, incomplete, skipped, cancelled, stale, timed-out, action-required, and failed exact-head checks;
 - authoritative PR mergeability with bounded retries;
 - security, incident, P0, critical, and blocker issues;
-- top-level workflow permissions and privileged automatic triggers;
-- mutable third-party Action references;
-- successful workflows that declare artifact upload but retain no artifact;
+- top-level workflow permissions and privileged automatic triggers at the exact default and open-PR heads;
+- mutable third-party Action references introduced or changed on open PRs;
+- successful workflows that declare artifact upload at the run's exact head but retain no artifact;
 - local Markdown links from `README.md`, `taskchain.md`, `punchlist.md`, `release.md`, and `changelog.md`;
 - stale exact-head statements and observable workflow contradictions in `release.md`.
 
@@ -85,21 +85,22 @@ Equivalent prose: the scanner observes and records current evidence first. Repai
 - **CAT-012:** `012-D` link checking and documentation testing; `012-E` docs-as-code and lifecycle synchronization.
 - **CAT-017:** `017-C` derivation-chain recording; `017-D` version-substitution detection; `017-E` hashing, audit packaging, and correction propagation.
 - **CAT-022:** `022-A` dependency pinning; `022-C` deterministic execution; `022-D` checksum validation; `022-E` artifact packaging.
-- **CAT-031:** `031-A` threat-aware acceptance criteria; `031-D` integration and regression testing; `031-E` verified builds and remediation.
+- **CAT-031:** `031-A` threat-aware acceptance criteria; `031-D` integration and regression testing; `031-E` verified builds, change-impact analysis, and remediation.
 - **CAT-040:** `040-A` system archaeology; `040-B` dependency mapping; `040-E` rollback planning and post-repair monitoring.
 - **CAT-052:** `052-B` least privilege; `052-E` audit evidence and continuous assurance.
 - **CAT-054:** `054-B` supply-chain hardening; `054-E` control validation.
 
-Proposed non-authoritative gap **`031-L — portfolio exact-state repair orchestration`** covers active-head enumeration, failure-signature normalization, semantic deduplication, artifact-presence verification, stale-provenance reconciliation, and bounded repair resumption. It does not expand authorization.
+The existing non-authoritative gap **`031-L — portfolio exact-state repair orchestration`** includes active-head enumeration, exact-head workflow-source inspection, failure-signature normalization, semantic deduplication, artifact-presence verification, stale-provenance reconciliation, and bounded repair resumption. It does not expand authorization.
 
 ## Acceptance criteria
 
 The control plane is acceptable for `main` only when:
 
 - all focused scanner regressions pass on the exact submitted head;
+- workflow-security and artifact checks demonstrably use each default or PR run's immutable source head;
 - all Actions are immutable and permissions remain least privilege;
 - generated evidence remains outside the checkout and is retained;
-- the replacement PR is based on current `main`, mergeable, and free of unresolved high-risk review findings;
+- the repair PR is based on current `main`, mergeable, and free of unresolved high-risk review findings;
 - issue #9 is the only automated notification route;
 - an unchanged fingerprint demonstrably produces no duplicate comment;
 - production, credentials, destructive history, release, publication, deployment, and infrastructure changes remain blocked.

@@ -119,5 +119,19 @@
 
 **Control-plane acceptance criteria:** exact-head CI passes; the first trusted scan covers all accessible owned repositories without silent access loss; issue #9 receives at most one comment per changed semantic fingerprint; artifacts remain available; scan errors fail closed; and all privileged actions remain separately authorized.
 
+## Portfolio Health Control Plane v3.1 exact-head coverage repair
+
+- [x] Confirm the trusted scanner previously inspected workflow source only on the default branch.
+- [x] Inspect workflow permissions and immutable Action references at every unique open-PR exact head.
+- [x] Suppress inherited PR workflow findings when the exact file is byte-identical to the trusted default copy.
+- [x] Resolve artifact-upload expectations from the workflow source at the successful run's exact head.
+- [x] Add hostile regressions for changed unsafe PR workflows, inherited safe workflows, mutable Action references, and missing PR-only artifacts.
+- [x] Document the repaired scope and preserve all release, deployment, credential, publication, and infrastructure denials.
+- [ ] Obtain successful exact-head GitHub Actions evidence and a retained artifact for the focused repair.
+- [ ] Merge only if the repair remains current, reversible, mergeable, and free of unresolved high-risk review findings.
+- [ ] Inspect the resulting trusted scan and confirm the changed semantic fingerprint is reported once through issue #9.
+
+**v3.1 acceptance criteria:** the scanner cannot use a default-branch workflow file as evidence for a different PR head; PR-only unsafe workflow changes and missing declared artifacts fail visibly; unchanged inherited workflows do not create duplicate findings; validation evidence is bound to the exact submitted head.
+
 ## Evidence Log
 Record commit links, commands, outputs, workflow URLs, issue references, blockers, and remediation tasks below.
