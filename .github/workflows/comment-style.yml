@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: comment-style-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: comment-style-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -19,8 +19,9 @@ jobs:
     timeout-minutes: 10
     env:
       SUBMITTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
-      - name: Check out submitted revision
+      - name: Check out exact submitted revision
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           ref: ${{ env.SUBMITTED_SHA }}
@@ -28,12 +29,65 @@ jobs:
           persist-credentials: false
           show-progress: false
 
-      - name: Assert exact clean source
+      - name: Initialize evidence and assert exact clean source
         shell: bash
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SUBMITTED_SHA"
           test -z "$(git status --porcelain)"
+          evidence="$RUNNER_TEMP/comment-style"
+          mkdir -p "$evidence"
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'source_sha=%s\n' "$SUBMITTED_SHA"
+            printf 'workflow_run=%s\n' "$GITHUB_RUN_ID"
+            printf 'workflow_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+          } > "$evidence/source-identity.txt"
 
       - name: Validate source comment style
-        run: python scripts/check_comment_style.py
+        id: validation
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/comment-style"
+          python scripts/check_comment_style.py \
+            > "$evidence/comment-style.log" 2>&1
+          status=$?
+          cat "$evidence/comment-style.log"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Record deterministic evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/comment-style"
+          mkdir -p "$evidence"
+          python --version > "$evidence/python-version.txt" 2>&1
+          sha256sum \
+            scripts/check_comment_style.py \
+            .github/workflows/comment-style.yml \
+            > "$evidence/input-sha256.txt"
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git status --porcelain)"
+
+      - name: Upload exact-head evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: comment-style-${{ env.SUBMITTED_SHA }}
+          path: ${{ runner.temp }}/comment-style
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Fail closed on validation failure
+        if: always()
+        env:
+          VALIDATION_STATUS: ${{ steps.validation.outputs.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$VALIDATION_STATUS" = "0"
