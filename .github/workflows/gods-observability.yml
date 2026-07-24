@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: gods-observability-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: gods-observability-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -44,8 +44,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install test runner
-        run: python -m pip install --disable-pip-version-check pytest
+      - name: Install pinned test runner
+        run: python -m pip install --disable-pip-version-check --no-cache-dir 'pytest==8.4.2'
 
       - name: Run focused tests
         run: pytest -q tests/test_gods_control.py
@@ -111,9 +111,11 @@ jobs:
           {
             printf 'repository=%s\n' "$GITHUB_REPOSITORY"
             printf 'source_sha=%s\n' "$(git rev-parse HEAD)"
+            printf 'submitted_sha=%s\n' "$SUBMITTED_SHA"
             printf 'workflow_run=%s\n' "$GITHUB_RUN_ID"
             printf 'workflow_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
             printf 'python=%s\n' "$(python --version 2>&1)"
+            printf 'pytest=%s\n' "$(python -m pytest --version 2>&1)"
             printf 'generated_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           } > artifacts/gods/run-summary.txt
           find artifacts/gods -maxdepth 1 -type f ! -name sha256.txt -print0 \
