@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aevespers2/0/contracts/iris-derived-verifier-v0.schema.json",
+  "title": "Iris-derived local verifier contract v0",
+  "description": "Non-operational record schemas for synthetic conformance testing. Matching is evidence only and never enrollment, authentication, capability issuance, or canonical disposition.",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._:-]{2,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "derivationProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "profile_id",
+        "extractor_version",
+        "transform_id",
+        "domain",
+        "key_id",
+        "subject_scope",
+        "max_helper_data_bytes",
+        "raw_capture_retention",
+        "output_algorithm"
+      ],
+      "properties": {
+        "schema": {"const": "qso.iris-derivation-profile.v0"},
+        "profile_id": {"$ref": "#/$defs/identifier"},
+        "extractor_version": {"$ref": "#/$defs/identifier"},
+        "transform_id": {"$ref": "#/$defs/identifier"},
+        "domain": {"const": "qso.iris.local-verifier.v0"},
+        "key_id": {"$ref": "#/$defs/identifier"},
+        "subject_scope": {"const": "single-eye"},
+        "max_helper_data_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "raw_capture_retention": {"const": "memory-only"},
+        "output_algorithm": {"const": "HMAC-SHA-256"}
+      }
+    },
+    "verificationAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "attempt_id",
+        "profile_id",
+        "generation",
+        "subject_ref",
+        "eye_side",
+        "device_ref",
+        "capture_digest",
+        "helper_data_digest",
+        "created_at",
+        "status"
+      ],
+      "properties": {
+        "schema": {"const": "qso.iris-verification-attempt.v0"},
+        "attempt_id": {"$ref": "#/$defs/identifier"},
+        "profile_id": {"$ref": "#/$defs/identifier"},
+        "generation": {"type": "integer", "minimum": 1},
+        "subject_ref": {"$ref": "#/$defs/identifier"},
+        "eye_side": {"enum": ["left", "right"]},
+        "device_ref": {"$ref": "#/$defs/identifier"},
+        "capture_digest": {"$ref": "#/$defs/sha256"},
+        "helper_data_digest": {"$ref": "#/$defs/sha256"},
+        "created_at": {"$ref": "#/$defs/timestamp"},
+        "status": {
+          "enum": [
+            "quality-rejected",
+            "liveness-rejected",
+            "replay-suspected",
+            "reconstruction-failed",
+            "proposal-created"
+          ]
+        }
+      }
+    },
+    "matchProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "proposal_id",
+        "attempt_id",
+        "protected_identifier_digest",
+        "disposition",
+        "created_at"
+      ],
+      "properties": {
+        "schema": {"const": "qso.iris-match-proposal.v0"},
+        "proposal_id": {"$ref": "#/$defs/identifier"},
+        "attempt_id": {"$ref": "#/$defs/identifier"},
+        "protected_identifier_digest": {"$ref": "#/$defs/sha256"},
+        "disposition": {"const": "non-authoritative-match-proposal"},
+        "created_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "revocationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "revocation_id",
+        "profile_id",
+        "generation",
+        "effective_at",
+        "reason_code"
+      ],
+      "properties": {
+        "schema": {"const": "qso.iris-revocation.v0"},
+        "revocation_id": {"$ref": "#/$defs/identifier"},
+        "profile_id": {"$ref": "#/$defs/identifier"},
+        "generation": {"type": "integer", "minimum": 1},
+        "effective_at": {"$ref": "#/$defs/timestamp"},
+        "reason_code": {
+          "enum": [
+            "key-rotation",
+            "profile-replacement",
+            "device-loss",
+            "suspected-compromise",
+            "subject-request",
+            "policy-withdrawal"
+          ]
+        }
+      }
+    },
+    "recoveryReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "recovery_ref_id",
+        "prior_profile_id",
+        "replacement_profile_id",
+        "checkpoint_digest",
+        "created_at"
+      ],
+      "properties": {
+        "schema": {"const": "qso.iris-recovery-reference.v0"},
+        "recovery_ref_id": {"$ref": "#/$defs/identifier"},
+        "prior_profile_id": {"$ref": "#/$defs/identifier"},
+        "replacement_profile_id": {"$ref": "#/$defs/identifier"},
+        "checkpoint_digest": {"$ref": "#/$defs/sha256"},
+        "created_at": {"$ref": "#/$defs/timestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/derivationProfile"},
+    {"$ref": "#/$defs/verificationAttempt"},
+    {"$ref": "#/$defs/matchProposal"},
+    {"$ref": "#/$defs/revocationRecord"},
+    {"$ref": "#/$defs/recoveryReference"}
+  ]
+}

@@ -1,0 +1,256 @@
+name: Iris Verifier Contract
+
+on:
+  pull_request:
+    paths:
+      - "contracts/iris-derived-verifier-v0.schema.json"
+      - "docs/iris-derived-verifier.md"
+      - "fixtures/iris-verifier/**"
+      - "iris_verifier_contract/**"
+      - "scripts/generate_iris_verifier_fixtures.py"
+      - "tests/test_iris_*contract.py"
+      - ".github/workflows/iris-verifier-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iris-verifier-contract-${{ github.event.pull_request.number || github.ref }}-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SUBMITTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      ATOMIC_FIXTURE_SHA256: 5557b6eeec96a2655410a9a60bfddec9c981a10762f0f02eb6b91f07e0379fc5
+      JOURNAL_FIXTURE_SHA256: f255438eab406bba71ab23fad60d34b2a7d3a580e90583e1517d432d8e03b89a
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    steps:
+      - name: Initialize exact-head evidence context
+        id: context
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          mkdir -p "$evidence"
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'submitted_sha=%s\n' "$SUBMITTED_SHA"
+            printf 'workflow_run=%s\n' "$GITHUB_RUN_ID"
+            printf 'workflow_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+            printf 'event=%s\n' "$GITHUB_EVENT_NAME"
+            printf 'ref=%s\n' "$GITHUB_REF"
+          } | tee "$evidence/source-request.txt"
+
+      - name: Check out exact submitted head
+        id: checkout
+        continue-on-error: true
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ env.SUBMITTED_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+          show-progress: false
+
+      - name: Assert exact clean source and required inputs
+        id: source
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          mkdir -p "$evidence"
+          {
+            test "${{ steps.checkout.outcome }}" = "success"
+            test "$(git rev-parse HEAD 2>/dev/null)" = "$SUBMITTED_SHA"
+            test -z "$(git status --porcelain 2>/dev/null)"
+            test -f contracts/iris-derived-verifier-v0.schema.json
+            test -f docs/iris-derived-verifier.md
+            test -f fixtures/iris-verifier/golden-vectors.json
+            test -f fixtures/iris-verifier/hostile-context-vectors.json
+            test -f fixtures/iris-verifier/atomic-consume-record-vectors.json
+            test -f fixtures/iris-verifier/crash-recovery-journal-vectors.json
+            test -f scripts/generate_iris_verifier_fixtures.py
+            test -f tests/test_iris_verifier_contract.py
+            test -f tests/test_iris_atomic_contract.py
+            test -f tests/test_iris_journal_contract.py
+            test -f tests/test_iris_workflow_contract.py
+          } > "$evidence/source-check.txt" 2>&1
+          status=$?
+          cat "$evidence/source-check.txt"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Set up Python
+        id: python
+        if: always() && steps.checkout.outcome == 'success'
+        continue-on-error: true
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: ""
+
+      - name: Install pinned test runner
+        id: install
+        if: always() && steps.source.outputs.status == '0' && steps.python.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          python -m pip install --disable-pip-version-check --no-cache-dir 'pytest==8.4.2' \
+            > "$evidence/dependency-install.txt" 2>&1
+          status=$?
+          cat "$evidence/dependency-install.txt"
+          if [ "$status" -eq 0 ]; then
+            python -m pytest --version > "$evidence/pytest-version.txt" 2>&1
+          fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate schema and synthetic fixtures
+        id: fixtures
+        if: always() && steps.install.outputs.status == '0'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          {
+            python -m json.tool contracts/iris-derived-verifier-v0.schema.json \
+              > "$evidence/schema.validated.json"
+            python -m json.tool fixtures/iris-verifier/hostile-context-vectors.json \
+              > "$evidence/hostile-context.validated.json"
+            python -m json.tool fixtures/iris-verifier/atomic-consume-record-vectors.json \
+              > "$evidence/atomic-consume-record.validated.json"
+            python -m json.tool fixtures/iris-verifier/crash-recovery-journal-vectors.json \
+              > "$evidence/crash-recovery-journal.validated.json"
+            test "$(sha256sum fixtures/iris-verifier/atomic-consume-record-vectors.json | cut -d' ' -f1)" = "$ATOMIC_FIXTURE_SHA256"
+            test "$(sha256sum fixtures/iris-verifier/crash-recovery-journal-vectors.json | cut -d' ' -f1)" = "$JOURNAL_FIXTURE_SHA256"
+            python scripts/generate_iris_verifier_fixtures.py \
+              --check fixtures/iris-verifier/golden-vectors.json
+            printf 'fixture_check=passed\nhostile_context_check=passed\natomic_consume_record_check=passed\njournal_recovery_check=passed\n' \
+              > "$evidence/fixture-check.txt"
+          } > "$evidence/fixture-validation.txt" 2>&1
+          status=$?
+          cat "$evidence/fixture-validation.txt"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Run focused contract and workflow tests
+        id: tests
+        if: always() && steps.install.outputs.status == '0'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          python -m pytest -q \
+            tests/test_iris_verifier_contract.py \
+            tests/test_iris_atomic_contract.py \
+            tests/test_iris_journal_contract.py \
+            tests/test_iris_workflow_contract.py \
+            --junitxml="$evidence/pytest.xml" \
+            > "$evidence/pytest.log" 2>&1
+          status=$?
+          cat "$evidence/pytest.log"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Record deterministic source integrity
+        id: hashes
+        if: always() && steps.source.outputs.status == '0'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          {
+            printf 'source_sha=%s\n' "$(git rev-parse HEAD)"
+            printf 'python=%s\n' "$(python --version 2>&1)"
+            printf 'synthetic_only=true\n'
+            printf 'raw_biometric_material_allowed=false\n'
+            printf 'production_key_material_allowed=false\n'
+            printf 'operational_enrollment_authority=false\n'
+            printf 'producer_authority_state_mutation=false\n'
+            printf 'durable_journal_authority=false\n'
+            printf 'hostile_fixture_sha256=677a66f65bde813e122c6493b5421a06dadf867cfa029a05f3bc610564f50006\n'
+            printf 'atomic_fixture_sha256=%s\n' "$ATOMIC_FIXTURE_SHA256"
+            printf 'journal_fixture_sha256=%s\n' "$JOURNAL_FIXTURE_SHA256"
+            printf 'generated_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$evidence/run-summary.txt"
+          sha256sum \
+            contracts/iris-derived-verifier-v0.schema.json \
+            docs/iris-derived-verifier.md \
+            fixtures/iris-verifier/golden-vectors.json \
+            fixtures/iris-verifier/hostile-context-vectors.json \
+            fixtures/iris-verifier/atomic-consume-record-vectors.json \
+            fixtures/iris-verifier/crash-recovery-journal-vectors.json \
+            iris_verifier_contract/__init__.py \
+            iris_verifier_contract/contract.py \
+            iris_verifier_contract/atomicity.py \
+            iris_verifier_contract/journal.py \
+            scripts/generate_iris_verifier_fixtures.py \
+            tests/test_iris_verifier_contract.py \
+            tests/test_iris_atomic_contract.py \
+            tests/test_iris_journal_contract.py \
+            tests/test_iris_workflow_contract.py \
+            .github/workflows/iris-verifier-contract.yml \
+            > "$evidence/source.sha256"
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git status --porcelain)"
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Finalize evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/iris-verifier-contract-evidence"
+          mkdir -p "$evidence"
+          find "$evidence" -maxdepth 1 -type f ! -name artifact.sha256 -print0 \
+            | sort -z \
+            | xargs -0 -r sha256sum \
+            > "$evidence/artifact.sha256"
+
+      - name: Upload retained exact-head evidence
+        id: upload
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: iris-verifier-contract-${{ env.SUBMITTED_SHA }}
+          path: ${{ runner.temp }}/iris-verifier-contract-evidence
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Fail closed on unsuccessful validation
+        if: always()
+        shell: bash
+        env:
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          SOURCE_STATUS: ${{ steps.source.outputs.status }}
+          PYTHON_OUTCOME: ${{ steps.python.outcome }}
+          INSTALL_STATUS: ${{ steps.install.outputs.status }}
+          FIXTURE_STATUS: ${{ steps.fixtures.outputs.status }}
+          TEST_STATUS: ${{ steps.tests.outputs.status }}
+          HASH_STATUS: ${{ steps.hashes.outputs.status }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
+        run: |
+          set -euo pipefail
+          test "$CHECKOUT_OUTCOME" = "success"
+          test "$SOURCE_STATUS" = "0"
+          test "$PYTHON_OUTCOME" = "success"
+          test "$INSTALL_STATUS" = "0"
+          test "$FIXTURE_STATUS" = "0"
+          test "$TEST_STATUS" = "0"
+          test "$HASH_STATUS" = "0"
+          test "$UPLOAD_OUTCOME" = "success"
